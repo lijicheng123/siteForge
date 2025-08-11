@@ -4,7 +4,7 @@
 
 ## 🌟 项目特色
 
-- **🤖 AI驱动**: 集成OpenAI GPT和Anthropic Claude，智能分析用户需求
+- **🤖 AI驱动**: 集成OpenAI GPT、Anthropic Claude、Google Gemini，智能分析用户需求
 - **🔄 6步工作流**: 从需求分析到HTML生成的完整自动化流程
 - **🎨 WordPress兼容**: 输出Gutenberg兼容的HTML代码
 - **⚡ 高性能**: 基于Fastify框架，响应迅速
@@ -15,7 +15,7 @@
 
 - **后端框架**: Fastify (Node.js)
 - **开发语言**: TypeScript
-- **AI集成**: OpenAI GPT-5, Anthropic Claude
+- **AI集成**: OpenAI GPT-5, Anthropic Claude, Google Gemini
 - **项目结构**: 模块化设计，分离路由、服务、类型定义
 
 ## 📋 系统要求
@@ -45,7 +45,7 @@ npm install
 
 ```bash
 # 复制环境配置模板
-cp .env.example .env
+cp env.template .env
 
 # 编辑 .env 文件，添加你的API密钥
 nano .env
@@ -55,6 +55,9 @@ nano .env
 ```env
 ANTHROPIC_API_KEY=your_anthropic_api_key_here
 OPENAI_API_KEY=your_openai_api_key_here
+GEMINI_API_KEY=your_gemini_api_key_here
+# 兼容旧命名（可选）
+GOOGLE_API_KEY=
 ```
 
 ### 4. 构建项目

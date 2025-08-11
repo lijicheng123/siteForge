@@ -25,8 +25,10 @@ HOST=0.0.0.0
 ANTHROPIC_API_KEY=your_anthropic_api_key_here
 OPENAI_API_KEY=your_openai_api_key_here
 
-# 可选 API Keys
-GOOGLE_API_KEY=your_google_api_key_here
+# Google Gemini API Key（推荐）
+GEMINI_API_KEY=your_gemini_api_key_here
+# 兼容旧命名（可选）
+GOOGLE_API_KEY=
 
 # Environment
 NODE_ENV=development

@@ -10,7 +10,7 @@ export const menuItemSchema = objectSchema({
   name: nameSchema,
   path: { type: 'string', pattern: '^/[a-z0-9/-]*$', minLength: 1, maxLength: 100 },
   icon: { type: 'string', minLength: 1, maxLength: 50 },
-  children: arraySchema({ $ref: 'menuItemSchema#' })
+  children: arraySchema({ type: 'object', properties: { name: nameSchema, path: { type: 'string' } } })
 }, ['name', 'path']);
 
 // 页脚部分Schema
@@ -66,8 +66,8 @@ export const websiteArchitectureSchema = objectSchema({
 
 // 蓝图版本1 - 基础版本
 export const websiteBlueprintV1Schema = objectSchema({
-  structuredData: { $ref: 'structuredDataSchema#' },
-  designSystem: { $ref: 'designSystemSchema#' },
+  structuredData: { type: 'object' },
+  designSystem: { type: 'object' },
   globalElements: globalElementsSchema,
   pages: arraySchema(pageSchema)
 }, ['structuredData', 'designSystem', 'globalElements', 'pages']);

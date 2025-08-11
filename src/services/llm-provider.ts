@@ -2,12 +2,16 @@
 import OpenAI from 'openai';
 import Anthropic from '@anthropic-ai/sdk';
 import { MessageParam } from '@anthropic-ai/sdk/resources';
+import { isModelSupported } from './model-catalog';
+import { GoogleGenAI } from '@google/genai';
 
 interface LLMParams {
   model: string;
   prompt: string;
   temperature: number;
   top_p?: number;
+  // Gemini 专用：可选思考预算（仅 2.5 Flash 支持关闭或限制“思考”）
+  thinkingBudget?: number;
 }
 
 // 动态获取环境变量，避免模块加载时的问题
@@ -27,6 +31,17 @@ const getAnthropic = () => {
   return new Anthropic({ apiKey });
 };
 
+const getGoogleGenAI = () => {
+  // 官方 SDK 默认从 GEMINI_API_KEY 读取；如仅设置 GOOGLE_API_KEY 则兼容性赋值
+  if (!process.env.GEMINI_API_KEY && process.env.GOOGLE_API_KEY) {
+    process.env.GEMINI_API_KEY = process.env.GOOGLE_API_KEY;
+  }
+  if (!process.env.GEMINI_API_KEY) {
+    throw new Error('GEMINI_API_KEY (or GOOGLE_API_KEY) environment variable is not set');
+  }
+  return new GoogleGenAI({});
+};
+
 const cleanAiJsonResponse = (response: string): string => {
     // This regex handles JSON within markdown code blocks, with optional language specifier
     const match = response.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
@@ -34,8 +49,11 @@ const cleanAiJsonResponse = (response: string): string => {
 };
 
 export default {
-  invoke: async ({ model, prompt, temperature, top_p = 1.0 }: LLMParams): Promise<string> => {
+  invoke: async ({ model, prompt, temperature, top_p = 1.0, thinkingBudget }: LLMParams): Promise<string> => {
     try {
+      if (!isModelSupported(model)) {
+        throw new Error(`Unsupported model: ${model}. Please use a model id from model-catalog.`);
+      }
       switch (true) {
         case model.startsWith('gpt'):
           const openai = getOpenAI();
@@ -59,6 +77,23 @@ export default {
             messages: messages,
           });
           return claudeResponse.content[0].type === 'text' ? claudeResponse.content[0].text : '';
+
+        case model.startsWith('gemini'):
+          // 官方 @google/genai SDK 调用
+          {
+            const ai = getGoogleGenAI();
+            const response: any = await ai.models.generateContent({
+              model,
+              contents: prompt,
+              config: {
+                temperature,
+                topP: top_p,
+                ...(typeof thinkingBudget === 'number' ? { thinkingConfig: { thinkingBudget } } : {}),
+              },
+            });
+            // SDK 统一提供 .text() 方法
+            return typeof response.text === 'function' ? response.text() : (response.text || '');
+          }
 
         default:
           throw new Error(`Unsupported model: ${model}`);

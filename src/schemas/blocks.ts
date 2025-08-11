@@ -90,9 +90,9 @@ export const updatedPageV1Schema = objectSchema({
 
 // 蓝图版本2 - 包含内容大纲
 export const websiteBlueprintV2Schema = objectSchema({
-  structuredData: { $ref: 'structuredDataSchema#' },
-  designSystem: { $ref: 'designSystemSchema#' },
-  globalElements: { $ref: 'globalElementsSchema#' },
+  structuredData: { type: 'object' },
+  designSystem: { type: 'object' },
+  globalElements: { type: 'object' },
   pages: arraySchema(updatedPageV1Schema)
 }, ['structuredData', 'designSystem', 'globalElements', 'pages']);
 
@@ -101,23 +101,20 @@ export const updatedPageV2Schema = objectSchema({
   name: nameSchema,
   path: { type: 'string', pattern: '^/[a-z0-9/-]*$', minLength: 1, maxLength: 100 },
   purpose: { type: 'string', minLength: 10, maxLength: 200 },
-  seo: { $ref: 'seoSchema#' },
-  outline: arraySchema({ $ref: 'blockSchema#' })
+  seo: { type: 'object' },
+  outline: arraySchema({ type: 'object' })
 }, ['name', 'path', 'purpose', 'seo', 'outline']);
 
 // 蓝图版本3 - 包含结构化区块
 export const websiteBlueprintV3Schema = {
   type: 'object',
   definitions: { 
-    block: blockSchema,
-    structuredData: { $ref: 'structuredDataSchema#' },
-    designSystem: { $ref: 'designSystemSchema#' },
-    globalElements: { $ref: 'globalElementsSchema#' }
+    block: blockSchema
   },
   properties: {
-    structuredData: { $ref: 'structuredDataSchema#' },
-    designSystem: { $ref: 'designSystemSchema#' },
-    globalElements: { $ref: 'globalElementsSchema#' },
+    structuredData: { type: 'object' },
+    designSystem: { type: 'object' },
+    globalElements: { type: 'object' },
     pages: arraySchema(updatedPageV2Schema)
   },
   required: ['structuredData', 'designSystem', 'globalElements', 'pages']
@@ -182,23 +179,20 @@ export const updatedPageFinalSchema = objectSchema({
   name: nameSchema,
   path: { type: 'string', pattern: '^/[a-z0-9/-]*$', minLength: 1, maxLength: 100 },
   purpose: { type: 'string', minLength: 10, maxLength: 200 },
-  seo: { $ref: 'seoSchema#' },
-  outline: arraySchema({ $ref: 'blockSchemaFinal#' })
+  seo: { type: 'object' },
+  outline: arraySchema({ type: 'object' })
 }, ['name', 'path', 'purpose', 'seo', 'outline']);
 
 // 蓝图版本4 - 最终版本
 export const websiteBlueprintV4FinalSchema = {
   type: 'object',
   definitions: { 
-    block: blockSchemaFinal,
-    structuredData: { $ref: 'structuredDataSchema#' },
-    designSystem: { $ref: 'designSystemSchema#' },
-    globalElements: { $ref: 'globalElementsSchema#' }
+    block: blockSchemaFinal
   },
   properties: {
-    structuredData: { $ref: 'structuredDataSchema#' },
-    designSystem: { $ref: 'designSystemSchema#' },
-    globalElements: { $ref: 'globalElementsSchema#' },
+    structuredData: { type: 'object' },
+    designSystem: { type: 'object' },
+    globalElements: { type: 'object' },
     pages: arraySchema(updatedPageFinalSchema)
   },
   required: ['structuredData', 'designSystem', 'globalElements', 'pages']
