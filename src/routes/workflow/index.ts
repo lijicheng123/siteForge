@@ -11,6 +11,7 @@ import step4Routes from './step4';
 import step5Routes from './step5';
 import step5bRoutes from './step5b';
 import step6Routes from './step6';
+import completeWorkflowRoutes from './complete-workflow';
 
 /**
  * 工作流路由主插件
@@ -26,6 +27,9 @@ export default async function workflowRoutes(fastify: FastifyInstance, options: 
   await fastify.register(step5Routes, { prefix: '/workflow' });
   await fastify.register(step5bRoutes, { prefix: '/workflow' });
   await fastify.register(step6Routes, { prefix: '/workflow' });
+  
+  // 注册完整工作流路由
+  await fastify.register(completeWorkflowRoutes, { prefix: '/workflow' });
   
   fastify.log.info('工作流路由注册完成');
 }
