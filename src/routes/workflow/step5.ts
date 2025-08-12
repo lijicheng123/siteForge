@@ -4,75 +4,18 @@
  */
 
 import { FastifyInstance, FastifyPluginOptions, FastifySchema } from 'fastify';
-import { websiteBlueprintV3Schema, responseSchema } from '../../schemas';
+import { websiteBlueprintV2Schema, websiteBlueprintV3Schema, blockLibrarySchema, responseSchema } from '../../schemas';
 
-// 请求Schema
+// 请求Schema：复用蓝图V2和区块库定义
 const step5RequestSchema = {
   type: 'object',
   properties: {
-    blueprintV2: {
-      type: 'object',
-      properties: {
-        structuredData: { type: 'object' },
-        designSystem: { type: 'object' },
-        globalElements: { type: 'object' },
-        pages: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              name: { type: 'string' },
-              path: { type: 'string' },
-              purpose: { type: 'string' },
-              seo: { type: 'object' },
-              outline: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  properties: {
-                    sectionName: { type: 'string' },
-                    instruction: { type: 'string' },
-                    priority: { type: 'number' },
-                    estimatedWords: { type: 'number' }
-                  },
-                  required: ['sectionName', 'instruction']
-                }
-              }
-            },
-            required: ['name', 'path', 'purpose', 'seo', 'outline']
-          }
-        }
-      },
-      required: ['structuredData', 'designSystem', 'globalElements', 'pages']
-    },
-    blockLibrary: {
-      type: 'object',
-      properties: {
-        core_blocks: { 
-          type: 'array', 
-          items: { type: 'string' },
-          description: '可用的核心古腾堡区块'
-        },
-        custom_blocks: { 
-          type: 'array', 
-          items: {
-            type: 'object',
-            properties: {
-              name: { type: 'string' },
-              description: { type: 'string' },
-              props: { type: 'object' }
-            },
-            required: ['name', 'description', 'props']
-          },
-          description: '可用的自定义区块'
-        }
-      },
-      required: ['core_blocks', 'custom_blocks']
-    }
+    blueprintV2: websiteBlueprintV2Schema,
+    blockLibrary: blockLibrarySchema,
   },
   required: ['blueprintV2', 'blockLibrary'],
   additionalProperties: false
-};
+} as const;
 
 // 响应Schema
 const step5ResponseSchema = responseSchema(websiteBlueprintV3Schema);

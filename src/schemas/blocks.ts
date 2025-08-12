@@ -120,6 +120,16 @@ export const websiteBlueprintV3Schema = {
   required: ['structuredData', 'designSystem', 'globalElements', 'pages']
 };
 
+// 可用区块库 Schema（用于 Step5 请求）
+export const blockLibrarySchema = objectSchema({
+  core_blocks: arraySchema({ type: 'string' }),
+  custom_blocks: arraySchema(objectSchema({
+    name: { type: 'string', minLength: 1, maxLength: 100 },
+    description: { type: 'string', minLength: 1, maxLength: 500 },
+    props: { type: 'object' }
+  }, ['name', 'description', 'props']))
+}, ['core_blocks', 'custom_blocks']);
+
 // 最终区块Schema - 移除prompt，只保留确定内容
 export const blockSchemaFinal = {
   $id: 'blockSchemaFinal',

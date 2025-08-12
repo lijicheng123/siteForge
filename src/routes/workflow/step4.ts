@@ -4,81 +4,10 @@
  */
 
 import { FastifyInstance, FastifyPluginOptions, FastifySchema } from 'fastify';
-import { websiteBlueprintV2Schema, responseSchema } from '../../schemas';
+import { websiteBlueprintV1Schema, websiteBlueprintV2Schema, responseSchema } from '../../schemas';
 
-// 请求Schema - 输入蓝图V1
-const step4RequestSchema = {
-  type: 'object',
-  properties: {
-    structuredData: {
-      type: 'object',
-      properties: {
-        companyInfo: {
-          type: 'object',
-          properties: {
-            name: { type: 'string' },
-            description: { type: 'string' },
-            industry: { type: 'string' }
-          },
-          required: ['name', 'description', 'industry']
-        },
-        products: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              name: { type: 'string' },
-              category: { type: 'string' },
-              short_description: { type: 'string' }
-            },
-            required: ['name', 'category']
-          }
-        },
-        targetAudience: {
-          type: 'object',
-          properties: {
-            region: { type: 'string' },
-            industry: { type: 'string' },
-            concerns: { type: 'array', items: { type: 'string' } }
-          },
-          required: ['region', 'industry']
-        }
-      },
-      required: ['companyInfo', 'products', 'targetAudience']
-    },
-    designSystem: {
-      type: 'object',
-      properties: {
-        palette: { type: 'object' },
-        typography: { type: 'object' }
-      },
-      required: ['palette', 'typography']
-    },
-    globalElements: {
-      type: 'object',
-      properties: {
-        header: { type: 'object' },
-        footer: { type: 'object' }
-      },
-      required: ['header', 'footer']
-    },
-    pages: {
-      type: 'array',
-      minItems: 1,
-      items: {
-        type: 'object',
-        properties: {
-          name: { type: 'string' },
-          path: { type: 'string' },
-          purpose: { type: 'string' }
-        },
-        required: ['name', 'path', 'purpose']
-      }
-    }
-  },
-  required: ['structuredData', 'designSystem', 'globalElements', 'pages'],
-  additionalProperties: false
-};
+// 请求Schema - 直接复用输入蓝图V1
+const step4RequestSchema = websiteBlueprintV1Schema as any;
 
 // 响应Schema - 输出蓝图V2
 const step4ResponseSchema = responseSchema(websiteBlueprintV2Schema);

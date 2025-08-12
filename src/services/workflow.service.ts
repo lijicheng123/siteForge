@@ -3,50 +3,12 @@ import promptFactory from './prompt-factory';
 import llmProvider from './llm-provider';
 import { MODEL_IDS } from './model-catalog';
 import { FinalBlueprint } from '../types';
+import { generateFullGutenbergHtml } from './html-generator';
 
-// Simplified deterministic code generator (Step 6)
-const generateGutenbergHTML = (blueprintOutline: any[]): string => {
-    let html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>SiteForge AI Preview</title><style>body{font-family: sans-serif; margin: 2em;} .section{border: 1px solid #ccc; padding: 1em; margin-bottom: 1em; border-radius: 5px;} h2{border-bottom: 2px solid #eee; padding-bottom: .5em;}</style></head><body><h1>AI Generated Website Preview</h1>`;
-    blueprintOutline.forEach(section => {
-        html += `<div class="section"><h2>Section: ${section.sectionName || 'Untitled'} (Component: ${section.component})</h2><pre><code>${JSON.stringify(section.children || section.content || 'No Content', null, 2)}</code></pre></div>`;
-    });
-    html += `</body></html>`;
-    return html;
-};
+// Removed local HTML preview generator in favor of shared generator
 
-// Helper to traverse blueprint and collect prompts
-const collectPrompts = (obj: any, path = 'task', acc: Record<string, string> = {}): Record<string, string> => {
-    if (!obj || typeof obj !== 'object') return acc;
-    if (obj.prompt) {
-        const taskId = `task_${Object.keys(acc).length + 1}`;
-        acc[taskId] = obj.prompt;
-        obj.source = `generated.${taskId}`; // Replace prompt with a reference
-        delete obj.prompt;
-    }
-    for (const key in obj) {
-        if (Object.prototype.hasOwnProperty.call(obj, key)) {
-            collectPrompts(obj[key], `${path}_${key}`, acc);
-        }
-    }
-    return acc;
-};
-
-// Helper to inject generated content back into the blueprint
-const injectContent = (obj: any, generatedContent: Record<string, string>): void => {
-    if (!obj || typeof obj !== 'object') return;
-    if (obj.source && typeof obj.source === 'string' && obj.source.startsWith('generated.')) {
-        const taskId = obj.source.split('.')[1];
-        if (generatedContent[taskId]) {
-            obj.text = generatedContent[taskId];
-            delete obj.source;
-        }
-    }
-    for (const key in obj) {
-        if (Object.prototype.hasOwnProperty.call(obj, key)) {
-            injectContent(obj[key], generatedContent);
-        }
-    }
-};
+// Import blueprint utilities once extracted
+import { collectPrompts, injectContent } from './blueprint-utils';
 
 export default {
     async runStep1_Analyze(rawInput: string): Promise<any> {
@@ -104,7 +66,16 @@ export default {
         const finalBlueprint: FinalBlueprint = { ...blueprintV3 };
 
         console.log("Workflow Step 6: Generating Final HTML...");
-        const finalHtml = generateGutenbergHTML(finalBlueprint.pages[0].outline);
+        const finalHtml = generateFullGutenbergHtml({
+            structuredData: finalBlueprint.structuredData,
+            pages: finalBlueprint.pages.map(p => ({
+                name: p.name,
+                path: p.path,
+                purpose: p.purpose,
+                seo: p.seo,
+                outline: Array.isArray(p.outline) ? p.outline : []
+            }))
+        });
         
         console.log("Workflow Finished.");
         return finalHtml;
