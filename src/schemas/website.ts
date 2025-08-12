@@ -10,16 +10,19 @@ export const menuItemSchema = objectSchema({
   name: nameSchema,
   path: { type: 'string', pattern: '^/[a-z0-9/-]*$', minLength: 1, maxLength: 100 },
   icon: { type: 'string', minLength: 1, maxLength: 50 },
-  children: arraySchema({ type: 'object', properties: { name: nameSchema, path: { type: 'string' } } })
+  children: arraySchema(objectSchema({
+    name: nameSchema,
+    path: { type: 'string' }
+  }, ['name', 'path']))
 }, ['name', 'path']);
 
 // 页脚部分Schema
 export const footerSectionSchema = objectSchema({
   title: { type: 'string', minLength: 1, maxLength: 100 },
-  links: arraySchema({
+  links: arraySchema(objectSchema({
     name: { type: 'string', minLength: 1, maxLength: 100 },
     url: { type: 'string', format: 'uri' }
-  })
+  }, ['name', 'url']))
 }, ['title', 'links']);
 
 // 全局元素Schema
@@ -27,15 +30,11 @@ export const globalElementsSchema = objectSchema({
   header: objectSchema({
     logo: { type: 'string', format: 'uri' },
     menuItems: arraySchema(menuItemSchema),
-    ctaButton: {
-      type: 'object',
-      properties: {
-        text: { type: 'string', minLength: 1, maxLength: 50 },
-        url: { type: 'string', format: 'uri' },
-        style: { type: 'string', enum: ['primary', 'secondary', 'outline'] }
-      },
-      required: ['text', 'url']
-    }
+    ctaButton: objectSchema({
+      text: { type: 'string', minLength: 1, maxLength: 50 },
+      url: { type: 'string', format: 'uri' },
+      style: { type: 'string', enum: ['primary', 'secondary', 'outline'] }
+    }, ['text', 'url'])
   }, ['menuItems']),
   footer: objectSchema({
     sections: arraySchema(footerSectionSchema),

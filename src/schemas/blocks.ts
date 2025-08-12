@@ -62,13 +62,10 @@ export const blockSchema = {
       },
       required: ['source']
     },
-    style: {
-      type: 'object',
-      properties: {
-        className: { type: 'string', minLength: 1, maxLength: 200 },
-        customCSS: { type: 'string', minLength: 1, maxLength: 1000 }
-      }
-    }
+    style: objectSchema({
+      className: { type: 'string', minLength: 1, maxLength: 200 },
+      customCSS: { type: 'string', minLength: 1, maxLength: 1000 }
+    })
   },
   required: ['component'],
   additionalProperties: false
@@ -106,19 +103,12 @@ export const updatedPageV2Schema = objectSchema({
 }, ['name', 'path', 'purpose', 'seo', 'outline']);
 
 // 蓝图版本3 - 包含结构化区块
-export const websiteBlueprintV3Schema = {
-  type: 'object',
-  definitions: { 
-    block: blockSchema
-  },
-  properties: {
-    structuredData: { type: 'object' },
-    designSystem: { type: 'object' },
-    globalElements: { type: 'object' },
-    pages: arraySchema(updatedPageV2Schema)
-  },
-  required: ['structuredData', 'designSystem', 'globalElements', 'pages']
-};
+export const websiteBlueprintV3Schema = objectSchema({
+  structuredData: { type: 'object' },
+  designSystem: { type: 'object' },
+  globalElements: { type: 'object' },
+  pages: arraySchema(updatedPageV2Schema)
+}, ['structuredData', 'designSystem', 'globalElements', 'pages']);
 
 // 可用区块库 Schema（用于 Step5 请求）
 export const blockLibrarySchema = objectSchema({
@@ -131,58 +121,33 @@ export const blockLibrarySchema = objectSchema({
 }, ['core_blocks', 'custom_blocks']);
 
 // 最终区块Schema - 移除prompt，只保留确定内容
-export const blockSchemaFinal = {
-  $id: 'blockSchemaFinal',
-  type: 'object',
-  properties: {
-    component: { type: 'string', minLength: 1, maxLength: 100 },
-    level: { type: 'number', minimum: 0, maximum: 10, default: 0 },
-    config: { type: 'object', additionalProperties: true },
-    props: { type: 'object', additionalProperties: true },
-    children: {
-      type: 'array',
-      items: { $ref: 'blockSchemaFinal#' },
-      minItems: 0
-    },
-    content: {
-      oneOf: [
-        { 
-          type: 'object', 
-          properties: { 
-            source: { type: 'string', format: 'uri' },
-            alt: { type: 'string', minLength: 1, maxLength: 200 }
-          }, 
-          required: ['source'] 
-        },
-        { 
-          type: 'object', 
-          properties: { 
-            text: { type: 'string', minLength: 1, maxLength: 2000 } 
-          }, 
-          required: ['text'] 
-        }
-      ]
-    },
-    link: {
-      type: 'object',
-      properties: {
+export const blockSchemaFinal = objectSchema({
+  component: { type: 'string', minLength: 1, maxLength: 100 },
+  level: { type: 'number', minimum: 0, maximum: 10, default: 0 },
+  config: { type: 'object', additionalProperties: true },
+  props: { type: 'object', additionalProperties: true },
+  children: arraySchema({ $ref: 'blockSchemaFinal#' }),
+  content: {
+    oneOf: [
+      objectSchema({
         source: { type: 'string', format: 'uri' },
-        target: { type: 'string', enum: ['_self', '_blank', '_parent', '_top'], default: '_self' },
-        rel: { type: 'string', enum: ['noopener', 'noreferrer'], default: 'noopener' }
-      },
-      required: ['source']
-    },
-    style: {
-      type: 'object',
-      properties: {
-        className: { type: 'string', minLength: 1, maxLength: 200 },
-        customCSS: { type: 'string', minLength: 1, maxLength: 1000 }
-      }
-    }
+        alt: { type: 'string', minLength: 1, maxLength: 200 }
+      }, ['source']),
+      objectSchema({
+        text: { type: 'string', minLength: 1, maxLength: 2000 }
+      }, ['text'])
+    ]
   },
-  required: ['component'],
-  additionalProperties: false
-};
+  link: objectSchema({
+    source: { type: 'string', format: 'uri' },
+    target: { type: 'string', enum: ['_self', '_blank', '_parent', '_top'], default: '_self' },
+    rel: { type: 'string', enum: ['noopener', 'noreferrer'], default: 'noopener' }
+  }, ['source']),
+  style: objectSchema({
+    className: { type: 'string', minLength: 1, maxLength: 200 },
+    customCSS: { type: 'string', minLength: 1, maxLength: 1000 }
+  })
+}, ['component']);
 
 // 最终页面Schema
 export const updatedPageFinalSchema = objectSchema({
@@ -194,16 +159,9 @@ export const updatedPageFinalSchema = objectSchema({
 }, ['name', 'path', 'purpose', 'seo', 'outline']);
 
 // 蓝图版本4 - 最终版本
-export const websiteBlueprintV4FinalSchema = {
-  type: 'object',
-  definitions: { 
-    block: blockSchemaFinal
-  },
-  properties: {
-    structuredData: { type: 'object' },
-    designSystem: { type: 'object' },
-    globalElements: { type: 'object' },
-    pages: arraySchema(updatedPageFinalSchema)
-  },
-  required: ['structuredData', 'designSystem', 'globalElements', 'pages']
-};
+export const websiteBlueprintV4FinalSchema = objectSchema({
+  structuredData: { type: 'object' },
+  designSystem: { type: 'object' },
+  globalElements: { type: 'object' },
+  pages: arraySchema(updatedPageFinalSchema)
+}, ['structuredData', 'designSystem', 'globalElements', 'pages']);
