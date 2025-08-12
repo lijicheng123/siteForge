@@ -11,6 +11,7 @@ export * from './company';
 export * from './design';
 export * from './website';
 export * from './blocks';
+export * from './seo';
 
 // 常用组合Schema
 export const commonSchemas = {

@@ -40,6 +40,14 @@ export const descriptionSchema = {
   maxLength: 1000
 };
 
+// 通用页面路径 Schema
+export const pagePathSchema = {
+  type: 'string',
+  pattern: '^/[a-z0-9/-]*$',
+  minLength: 1,
+  maxLength: 100
+};
+
 // 通用数组Schema
 export const arraySchema = <T>(itemSchema: T) => ({
   type: 'array',

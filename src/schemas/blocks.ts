@@ -3,7 +3,8 @@
  * 包含古腾堡区块、内容大纲等页面内容结构
  */
 
-import { objectSchema, arraySchema, nameSchema } from './base';
+import { objectSchema, arraySchema, nameSchema, pagePathSchema } from './base';
+import { seoDetailedSchema } from './seo';
 
 // 内容大纲Schema (版本1)
 export const outlineSectionV1Schema = objectSchema({
@@ -74,14 +75,9 @@ export const blockSchema = {
 // 页面Schema (版本2) - 包含SEO和内容大纲
 export const updatedPageV1Schema = objectSchema({
   name: nameSchema,
-  path: { type: 'string', pattern: '^/[a-z0-9/-]*$', minLength: 1, maxLength: 100 },
+  path: pagePathSchema,
   purpose: { type: 'string', minLength: 10, maxLength: 200 },
-  seo: objectSchema({
-    title: { type: 'string', minLength: 10, maxLength: 70 },
-    description: { type: 'string', minLength: 50, maxLength: 160 },
-    primaryKeyword: { type: 'string', minLength: 1, maxLength: 50 },
-    secondaryKeywords: arraySchema({ type: 'string', minLength: 1, maxLength: 50 })
-  }, ['title', 'description', 'primaryKeyword', 'secondaryKeywords']),
+  seo: seoDetailedSchema,
   outline: arraySchema(outlineSectionV1Schema)
 }, ['name', 'path', 'purpose', 'seo', 'outline']);
 
@@ -96,7 +92,7 @@ export const websiteBlueprintV2Schema = objectSchema({
 // 页面Schema (版本3) - 包含结构化区块
 export const updatedPageV2Schema = objectSchema({
   name: nameSchema,
-  path: { type: 'string', pattern: '^/[a-z0-9/-]*$', minLength: 1, maxLength: 100 },
+  path: pagePathSchema,
   purpose: { type: 'string', minLength: 10, maxLength: 200 },
   seo: { type: 'object' },
   outline: arraySchema({ type: 'object' })
@@ -152,7 +148,7 @@ export const blockSchemaFinal = objectSchema({
 // 最终页面Schema
 export const updatedPageFinalSchema = objectSchema({
   name: nameSchema,
-  path: { type: 'string', pattern: '^/[a-z0-9/-]*$', minLength: 1, maxLength: 100 },
+  path: pagePathSchema,
   purpose: { type: 'string', minLength: 10, maxLength: 200 },
   seo: { type: 'object' },
   outline: arraySchema({ type: 'object' })
