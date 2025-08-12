@@ -6,7 +6,16 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/app.js",
-    "dev": "ts-node-dev --respawn --transpile-only src/app.ts"
+    "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
+    "test": "node tests/run-all-tests.js",
+    "test:health": "node tests/test-health-check.js",
+    "test:step1": "node tests/test-workflow-step1.js",
+    "test:step2": "node tests/test-workflow-step2.js",
+    "test:step3": "node tests/test-workflow-step3.js",
+    "test:step4": "node tests/test-workflow-step4.js",
+    "test:step5": "node tests/test-workflow-step5.js",
+    "test:step6": "node tests/test-workflow-step6.js",
+    "test:complete": "node tests/test-complete-workflow.js"
   },
   "keywords": [
     "ai",
