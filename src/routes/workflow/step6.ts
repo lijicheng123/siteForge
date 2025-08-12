@@ -56,7 +56,6 @@ const step6Schema: FastifySchema = {
   response: step6ResponseSchema
 };
 
-
 /**
  * 步骤6路由注册
  */
@@ -85,7 +84,7 @@ export default async function step6Routes(fastify: FastifyInstance, options: Fas
         }>;
       };
       
-      // TODO: 核心业务逻辑 (此步骤不调用AI)
+      // 核心业务逻辑 (此步骤不调用AI)
       // 1. 获取请求体中的 WebsiteBlueprint_V4_Final 数据
       // 2. 实现一个确定性的JS/TS函数 `generateGutenbergHTML`
       // 3. 该函数需要递归遍历蓝图中的所有 Block 对象
@@ -93,22 +92,22 @@ export default async function step6Routes(fastify: FastifyInstance, options: Fas
       // 5. 返回包含完整HTML字符串的JSON对象
       
       // 生成完整的HTML
-      let fullHTML = '';
+      const fullHTML = generateFullGutenbergHtml({
+        structuredData,
+        pages: pages.map(p => ({
+          name: p.name,
+          path: p.path,
+          purpose: p.purpose,
+          seo: p.seo,
+          outline: Array.isArray(p.outline) ? p.outline : []
+        }))
+      });
       
-      // 添加页面头部
-      fullHTML += `<!DOCTYPE html>\n<html lang="zh-CN">\n<head>\n`;
-      fullHTML += `  <meta charset="UTF-8">\n`;
-      fullHTML += `  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n`;
-      fullHTML += `  <title>${structuredData.companyInfo.name}</title>\n`;
-      fullHTML += `  <meta name="description" content="${structuredData.companyInfo.description}">\n`;
-      fullHTML += `</head>\n<body>\n`;
-      
-  // 使用共享的页面级生成器
-  fullHTML = generateFullGutenbergHtml({ structuredData, pages });
-
       return reply.send({
         success: true,
-        data: { html: fullHTML },
+        data: {
+          html: fullHTML
+        },
         message: 'HTML代码生成成功',
         timestamp: new Date().toISOString()
       });

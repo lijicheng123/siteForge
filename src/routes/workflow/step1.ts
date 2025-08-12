@@ -5,6 +5,9 @@
 
 import { FastifyInstance, FastifyPluginOptions, FastifySchema } from 'fastify';
 import { structuredDataSchema, responseSchema } from '../../schemas';
+import promptFactory from '../../services/prompt-factory';
+import llmProvider from '../../services/llm-provider';
+import { MODEL_IDS } from '../../services/model-catalog';
 
 // 请求Schema
 const step1RequestSchema = {
@@ -47,43 +50,24 @@ export default async function step1Routes(fastify: FastifyInstance, options: Fas
     try {
       const { rawInput } = request.body as { rawInput: string };
       
-      // TODO: 核心业务逻辑
+      // 核心业务逻辑
       // 1. 构建AI Prompt，包含角色、背景、目标和详细任务
-      // 2. 调用AI模型（例如GPT-4），强制返回符合structuredDataSchema结构的JSON
-      // 3. 验证AI返回的数据结构
-      // 4. 返回结构化的公司数据
+      const prompt = promptFactory.getStep1AnalyzerPrompt(rawInput);
       
-      // 临时返回示例数据（实际应该调用AI服务）
-      const mockStructuredData = {
-        companyInfo: {
-          name: "示例公司",
-          description: "基于用户输入生成的示例描述",
-          industry: "示例行业"
-        },
-        products: [],
-        sellingPoints: {
-          primary: "示例主要卖点",
-          secondary: "示例次要卖点", 
-          tertiary: "示例第三卖点"
-        },
-        targetAudience: {
-          region: "示例地区",
-          industry: "示例目标行业",
-          concerns: ["示例关注点1", "示例关注点2"],
-          preference: "示例偏好"
-        },
-        assets: {
-          images: {}
-        },
-        seo: {
-          mainKeywords: ["示例关键词1", "示例关键词2"],
-          longTailKeywords: ["示例长尾关键词1", "示例长尾关键词2"]
-        }
-      };
-
+      // 2. 调用AI模型（使用Gemini），强制返回符合structuredDataSchema结构的JSON
+      const responseJsonString = await llmProvider.invoke({ 
+        model: MODEL_IDS.GEMINI_2_5_PRO, 
+        prompt, 
+        temperature: 0.2 
+      });
+      
+      // 3. 验证AI返回的数据结构
+      const structuredData = JSON.parse(llmProvider.cleanAiJsonResponse(responseJsonString));
+      
+      // 4. 返回结构化的公司数据
       return reply.send({
         success: true,
-        data: mockStructuredData,
+        data: structuredData,
         message: '需求解析成功',
         timestamp: new Date().toISOString()
       });

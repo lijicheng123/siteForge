@@ -5,6 +5,9 @@
 
 import { FastifyInstance, FastifyPluginOptions, FastifySchema } from 'fastify';
 import { designSystemSchema, responseSchema } from '../../schemas';
+import promptFactory from '../../services/prompt-factory';
+import llmProvider from '../../services/llm-provider';
+import { MODEL_IDS } from '../../services/model-catalog';
 
 // 请求Schema
 const step2RequestSchema = {
@@ -68,58 +71,26 @@ export default async function step2Routes(fastify: FastifyInstance, options: Fas
         targetMarket?: string;
       };
       
-      // TODO: 核心业务逻辑
+      // 核心业务逻辑
       // 1. 构建AI Prompt，指示AI扮演品牌视觉设计师
+      const context = { industry, preference };
+      const prompt = promptFactory.getStep2DesignerPrompt(context);
+      
       // 2. 根据行业和偏好生成调色板、字体、间距等设计规范
       // 3. 调用AI模型，强制返回符合designSystemSchema结构的JSON
-      // 4. 验证AI返回的数据结构
-      // 5. 返回设计系统配置
+      const responseJsonString = await llmProvider.invoke({ 
+        model: MODEL_IDS.GEMINI_2_5_PRO, 
+        prompt, 
+        temperature: 0.6 
+      });
       
-      // 临时返回示例数据（实际应该调用AI服务）
-      const mockDesignSystem = {
-        palette: {
-          primary: "#2563eb",
-          secondary: "#64748b", 
-          accent: "#f59e0b",
-          text_on_dark: "#ffffff",
-          text_on_light: "#1e293b",
-          background_light: "#ffffff",
-          background_medium: "#f8fafc",
-          background_dark: "#0f172a"
-        },
-        typography: {
-          font_family_heading: "Inter",
-          font_family_body: "Inter",
-          font_size_base: "16px",
-          line_height_base: 1.6
-        },
-        spacing: {
-          xs: "4px",
-          sm: "8px",
-          md: "16px",
-          lg: "24px",
-          xl: "32px",
-          xxl: "48px"
-        },
-        borderRadius: {
-          none: "0px",
-          sm: "4px",
-          md: "8px",
-          lg: "16px",
-          full: "9999px"
-        },
-        shadow: {
-          none: "none",
-          sm: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
-          md: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-          lg: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
-          xl: "0 20px 25px -5px rgba(0, 0, 0, 0.1)"
-        }
-      };
-
+      // 4. 验证AI返回的数据结构
+      const designSystem = JSON.parse(llmProvider.cleanAiJsonResponse(responseJsonString));
+      
+      // 5. 返回设计系统配置
       return reply.send({
         success: true,
-        data: mockDesignSystem,
+        data: designSystem,
         message: '设计系统生成成功',
         timestamp: new Date().toISOString()
       });

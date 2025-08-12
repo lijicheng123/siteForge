@@ -5,6 +5,10 @@
 
 import { FastifyInstance, FastifyPluginOptions, FastifySchema } from 'fastify';
 import { responseSchema } from '../../schemas';
+import promptFactory from '../../services/prompt-factory';
+import llmProvider from '../../services/llm-provider';
+import { MODEL_IDS } from '../../services/model-catalog';
+import { generateFullGutenbergHtml } from '../../services/html-generator';
 
 // 请求Schema - 只需要用户的原始输入
 const completeWorkflowRequestSchema = {
@@ -164,151 +168,108 @@ export default async function completeWorkflowRoutes(fastify: FastifyInstance, o
 
       // 步骤1: 需求解析与结构化
       const step1Start = Date.now();
-      const step1Result = await fastify.inject({
-        method: 'POST',
-        url: '/api/workflow/1-structure-data',
-        payload: { rawInput }
+      const step1Prompt = promptFactory.getStep1AnalyzerPrompt(rawInput);
+      const step1Response = await llmProvider.invoke({ 
+        model: MODEL_IDS.GEMINI_2_5_PRO, 
+        prompt: step1Prompt, 
+        temperature: 0.2 
       });
-      const step1Data = JSON.parse(step1Result.payload);
+      const step1Data = JSON.parse(llmProvider.cleanAiJsonResponse(step1Response));
       const step1Time = Date.now() - step1Start;
-
-      if (!step1Data.success) {
-        return reply.status(500).send({
-          success: false,
-          error: 'STEP1_FAILED',
-          message: '步骤1执行失败',
-          timestamp: new Date().toISOString()
-        });
-      }
 
       // 步骤2: 品牌视觉设计
       const step2Start = Date.now();
-      const step2Input = {
-        industry: step1Data.data.companyInfo.industry,
-        preference: `基于${step1Data.data.companyInfo.industry}行业特点，${step1Data.data.targetAudience.preference}风格`,
-        brandPersonality: options.brandPersonality,
-        targetMarket: options.targetMarket
-      };
-      const step2Result = await fastify.inject({
-        method: 'POST',
-        url: '/api/workflow/2-design-system',
-        payload: step2Input
+      const step2Prompt = promptFactory.getStep2DesignerPrompt({
+        industry: step1Data.companyInfo.industry,
+        preference: `基于${step1Data.companyInfo.industry}行业特点，${step1Data.targetAudience.preference}风格`
       });
-      const step2Data = JSON.parse(step2Result.payload);
+      const step2Response = await llmProvider.invoke({ 
+        model: MODEL_IDS.GEMINI_2_5_PRO, 
+        prompt: step2Prompt, 
+        temperature: 0.6 
+      });
+      const step2Data = JSON.parse(llmProvider.cleanAiJsonResponse(step2Response));
       const step2Time = Date.now() - step2Start;
-
-      if (!step2Data.success) {
-        return reply.status(500).send({
-          success: false,
-          error: 'STEP2_FAILED',
-          message: '步骤2执行失败',
-          timestamp: new Date().toISOString()
-        });
-      }
 
       // 步骤3: 网站信息架构
       const step3Start = Date.now();
-      const step3Input = {
-        companyName: step1Data.data.companyInfo.name,
-        products: step1Data.data.products,
-        industry: step1Data.data.companyInfo.industry,
-        targetMarket: options.targetMarket
-      };
-      const step3Result = await fastify.inject({
-        method: 'POST',
-        url: '/api/workflow/3-website-architecture',
-        payload: step3Input
+      const step3Prompt = promptFactory.getStep3ArchitectPrompt({
+        companyName: step1Data.companyInfo.name,
+        products: step1Data.products
       });
-      const step3Data = JSON.parse(step3Result.payload);
+      const step3Response = await llmProvider.invoke({ 
+        model: MODEL_IDS.GEMINI_2_5_PRO, 
+        prompt: step3Prompt, 
+        temperature: 0.3 
+      });
+      const step3Data = JSON.parse(llmProvider.cleanAiJsonResponse(step3Response));
       const step3Time = Date.now() - step3Start;
-
-      if (!step3Data.success) {
-        return reply.status(500).send({
-          success: false,
-          error: 'STEP3_FAILED',
-          message: '步骤3执行失败',
-          timestamp: new Date().toISOString()
-        });
-      }
 
       // 步骤4: 页面内容策划
       const step4Start = Date.now();
-      const step4Input = {
-        structuredData: step1Data.data,
-        designSystem: step2Data.data,
-        globalElements: step3Data.data.globalElements,
-        pages: step3Data.data.pages
+      const blueprintV1 = {
+        structuredData: step1Data,
+        designSystem: step2Data,
+        globalElements: step3Data.globalElements,
+        pages: step3Data.pages
       };
-      const step4Result = await fastify.inject({
-        method: 'POST',
-        url: '/api/workflow/4-plan-content',
-        payload: step4Input
+      const step4Prompt = promptFactory.getStep4PlannerPrompt(blueprintV1);
+      const step4Response = await llmProvider.invoke({ 
+        model: MODEL_IDS.GEMINI_2_5_PRO, 
+        prompt: step4Prompt, 
+        temperature: 0.7 
       });
-      const step4Data = JSON.parse(step4Result.payload);
+      const step4Data = JSON.parse(llmProvider.cleanAiJsonResponse(step4Response));
       const step4Time = Date.now() - step4Start;
-
-      if (!step4Data.success) {
-        return reply.status(500).send({
-          success: false,
-          error: 'STEP4_FAILED',
-          message: '步骤4执行失败',
-          timestamp: new Date().toISOString()
-        });
-      }
 
       // 步骤5: 区块布局设计
       const step5Start = Date.now();
-      const step5Input = {
-        blueprintV2: step4Data.data,
-        blockLibrary: {
-          core_blocks: [
-            "core/cover", "core/heading", "core/paragraph", "core/columns", 
-            "core/column", "core/button", "core/image", "core/gallery"
-          ],
-          custom_blocks: options.customBlocks || []
-        }
+      const blockLibrary = {
+        core_blocks: [
+          "core/cover", "core/heading", "core/paragraph", "core/columns", 
+          "core/column", "core/button", "core/image", "core/gallery"
+        ],
+        custom_blocks: options.customBlocks || []
       };
-      const step5Result = await fastify.inject({
-        method: 'POST',
-        url: '/api/workflow/5-design-layout',
-        payload: step5Input
-      });
-      const step5Data = JSON.parse(step5Result.payload);
+      
+      // 为每个页面的outline生成区块布局
+      const enhancedPages = await Promise.all(step4Data.pages.map(async (page: any) => {
+        if (page.outline && Array.isArray(page.outline)) {
+          const step5Prompt = promptFactory.getStep5LayoutPrompt(page.outline, blockLibrary);
+          const step5Response = await llmProvider.invoke({ 
+            model: MODEL_IDS.GEMINI_2_5_PRO, 
+            prompt: step5Prompt, 
+            temperature: 0.1 
+          });
+          const blockLayout = JSON.parse(llmProvider.cleanAiJsonResponse(step5Response));
+          
+          return {
+            ...page,
+            outline: blockLayout
+          };
+        }
+        return page;
+      }));
+      
+      const blueprintV3 = {
+        ...blueprintV1,
+        pages: enhancedPages
+      };
       const step5Time = Date.now() - step5Start;
-
-      if (!step5Data.success) {
-        return reply.status(500).send({
-          success: false,
-          error: 'STEP5_FAILED',
-          message: '步骤5执行失败',
-          timestamp: new Date().toISOString()
-        });
-      }
 
       // 步骤6: 确定性代码生成
       const step6Start = Date.now();
-      const step6Input = {
-        structuredData: step1Data.data,
-        designSystem: step2Data.data,
-        globalElements: step3Data.data.globalElements,
-        pages: step5Data.data.pages
-      };
-      const step6Result = await fastify.inject({
-        method: 'POST',
-        url: '/api/workflow/6-generate-html',
-        payload: step6Input
+      const finalHTML = generateFullGutenbergHtml({
+        structuredData: step1Data,
+        pages: blueprintV3.pages.map(p => ({
+          name: p.name,
+          path: p.path,
+          purpose: p.purpose,
+          seo: p.seo,
+          outline: Array.isArray(p.outline) ? p.outline : []
+        }))
       });
-      const step6Data = JSON.parse(step6Result.payload);
       const step6Time = Date.now() - step6Start;
-
-      if (!step6Data.success) {
-        return reply.status(500).send({
-          success: false,
-          error: 'STEP6_FAILED',
-          message: '步骤6执行失败',
-          timestamp: new Date().toISOString()
-        });
-      }
 
       const totalTime = Date.now() - startTime;
 
@@ -319,16 +280,16 @@ export default async function completeWorkflowRoutes(fastify: FastifyInstance, o
           workflowId,
           status: 'completed',
           steps: {
-            step1: { status: 'success', data: step1Data.data, message: '需求解析成功' },
-            step2: { status: 'success', data: step2Data.data, message: '设计系统生成成功' },
-            step3: { status: 'success', data: step3Data.data, message: '网站架构设计成功' },
-            step4: { status: 'success', data: step4Data.data, message: '页面内容策划成功' },
-            step5: { status: 'success', data: step5Data.data, message: '区块布局设计成功' },
-            step6: { status: 'success', data: step6Data.data, message: 'HTML代码生成成功' }
+            step1: { status: 'success', data: step1Data, message: '需求解析成功' },
+            step2: { status: 'success', data: step2Data, message: '设计系统生成成功' },
+            step3: { status: 'success', data: step3Data, message: '网站架构设计成功' },
+            step4: { status: 'success', data: step4Data, message: '页面内容策划成功' },
+            step5: { status: 'success', data: blueprintV3, message: '区块布局设计成功' },
+            step6: { status: 'success', data: { html: finalHTML }, message: 'HTML代码生成成功' }
           },
           finalResult: {
-            html: step6Data.data.html,
-            blueprint: step6Data.data
+            html: finalHTML,
+            blueprint: blueprintV3
           },
           metadata: {
             totalTime,
