@@ -115,7 +115,7 @@ export interface BaseBlueprint {
       images: Record<string, string>;
     };
     seo: {
-      mainKeywords: string[];
+      primaryKeywords: string[];
       longTailKeywords: string[];
     };
   };
@@ -178,8 +178,8 @@ export interface ContentCompleteBlueprint extends Omit<BaseBlueprint, 'pages'> {
     seo: {
       title: string;
       description: string;
-      primaryKeyword: string;
-      secondaryKeywords: string[];
+      primaryKeywords: string[];
+      longTailKeywords: string[];
     };
     outline: Array<{
       sectionName: string;
@@ -198,8 +198,8 @@ export interface LayoutCompleteBlueprint extends Omit<BaseBlueprint, 'pages'> {
     seo: {
       title: string;
       description: string;
-      primaryKeyword: string;
-      secondaryKeywords: string[];
+      primaryKeywords: string[];
+      longTailKeywords: string[];
     };
     outline: Array<{
       component: string;
@@ -222,8 +222,8 @@ export interface ContentAndLayoutCompleteBlueprint extends Omit<BaseBlueprint, '
     seo: {
       title: string;
       description: string;
-      primaryKeyword: string;
-      secondaryKeywords: string[];
+      primaryKeywords: string[];
+      longTailKeywords: string[];
     };
     outline: Array<{
       component: string;

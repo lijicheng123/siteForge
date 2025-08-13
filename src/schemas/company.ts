@@ -4,6 +4,7 @@
  */
 
 import { objectSchema, arraySchema, nameSchema, descriptionSchema } from './base';
+import { companySeoSchema } from './seo';
 
 // 公司基本信息
 export const companyInfoSchema = objectSchema({
@@ -45,11 +46,8 @@ export const assetsSchema = objectSchema({
   }, [])  // 移除logo的必需性
 }, ['images']);
 
-// SEO信息
-export const seoSchema = objectSchema({
-  mainKeywords: arraySchema({ type: 'string', minLength: 1, maxLength: 50 }),
-  longTailKeywords: arraySchema({ type: 'string', minLength: 3, maxLength: 100 })
-}, ['mainKeywords', 'longTailKeywords']);
+// SEO信息 - 使用统一的SEO schema
+export const seoSchema = companySeoSchema;
 
 // 结构化数据 - 整合所有公司相关信息
 export const structuredDataSchema = objectSchema({

@@ -40,7 +40,7 @@ async function testWorkflowStep4() {
         images: {}
       },
       seo: {
-        mainKeywords: ["LED照明", "工业照明"],
+        primaryKeywords: ["LED照明", "工业照明"],
         longTailKeywords: ["工厂LED照明", "仓库LED灯具"]
       }
     },
@@ -126,7 +126,7 @@ async function testWorkflowStep4() {
       },
       assets: { images: {} },
       seo: {
-        mainKeywords: ["测试关键词"],
+        primaryKeywords: ["测试关键词"],
         longTailKeywords: ["测试长尾关键词"]
       }
     },
@@ -183,7 +183,7 @@ async function testWorkflowStep4() {
       },
       assets: { images: {} },
       seo: {
-        mainKeywords: ["综合服务", "专业团队"],
+        primaryKeywords: ["综合服务", "专业团队"],
         longTailKeywords: ["企业综合服务", "专业团队服务"]
       }
     },
@@ -236,7 +236,7 @@ async function testWorkflowStep4() {
       sellingPoints: { primary: "测试", secondary: "测试", tertiary: "测试" },
       targetAudience: { region: "测试", industry: "测试", concerns: [], preference: "测试" },
       assets: { images: {} },
-      seo: { mainKeywords: [], longTailKeywords: [] }
+              seo: { primaryKeywords: [], longTailKeywords: [] }
     },
     designSystem: { palette: { primary: "#000" }, typography: { font_family_heading: "Arial" }, spacing: { xs: "4px" } },
     globalElements: { header: { logo: "/logo.png", menuItems: [] }, footer: { links: [] } },

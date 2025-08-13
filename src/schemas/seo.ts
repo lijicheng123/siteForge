@@ -5,6 +5,12 @@
 
 import { objectSchema, arraySchema } from './base';
 
+// 公共的 keywords 字段定义
+const keywordsSchema = {
+  primaryKeywords: arraySchema({ type: 'string', minLength: 1, maxLength: 50 }),
+  longTailKeywords: arraySchema({ type: 'string', minLength: 3, maxLength: 100 })
+};
+
 // 通用 SEO 元信息（用于网站页面 meta）
 export const seoMetaSchema = objectSchema({
   title: { type: 'string', minLength: 10, maxLength: 70 },
@@ -16,8 +22,19 @@ export const seoMetaSchema = objectSchema({
 export const seoDetailedSchema = objectSchema({
   title: { type: 'string', minLength: 10, maxLength: 70 },
   description: { type: 'string', minLength: 50, maxLength: 160 },
-  primaryKeyword: { type: 'string', minLength: 1, maxLength: 50 },
-  secondaryKeywords: arraySchema({ type: 'string', minLength: 1, maxLength: 50 })
-}, ['title', 'description', 'primaryKeyword', 'secondaryKeywords']);
+  ...keywordsSchema
+}, ['title', 'description', 'primaryKeywords', 'longTailKeywords']);
+
+// 公司级别 SEO 信息（用于公司整体SEO策略）
+export const companySeoSchema = objectSchema({
+  ...keywordsSchema
+}, ['primaryKeywords', 'longTailKeywords']);
+
+// 页面级别 SEO 信息（用于具体页面的SEO）
+export const pageSeoSchema = objectSchema({
+  title: { type: 'string', minLength: 10, maxLength: 70 },
+  description: { type: 'string', minLength: 50, maxLength: 160 },
+  ...keywordsSchema
+}, ['title', 'description', 'primaryKeywords', 'longTailKeywords']);
 
 

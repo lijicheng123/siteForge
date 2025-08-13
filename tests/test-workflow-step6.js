@@ -38,7 +38,7 @@ async function testWorkflowStep6() {
       },
       assets: { images: {} },
       seo: {
-        mainKeywords: ["LED照明", "工业照明"],
+        primaryKeywords: ["LED照明", "工业照明"],
         longTailKeywords: ["工厂LED照明", "仓库LED灯具"]
       }
     },
@@ -77,8 +77,8 @@ async function testWorkflowStep6() {
         seo: {
           title: "明辉LED照明 - 工业LED照明专业服务",
           description: "专注于工业LED照明解决方案",
-          primaryKeyword: "工业LED照明",
-          secondaryKeywords: ["LED灯具", "节能照明"]
+                  primaryKeywords: ["工业LED照明"],
+        longTailKeywords: ["LED灯具", "节能照明"]
         },
         outline: [
           {
@@ -160,7 +160,7 @@ async function testWorkflowStep6() {
       sellingPoints: { primary: "测试", secondary: "测试", tertiary: "测试" },
       targetAudience: { region: "测试", industry: "测试", concerns: [], preference: "测试" },
       assets: { images: {} },
-      seo: { mainKeywords: [], longTailKeywords: [] }
+      seo: { primaryKeywords: [], longTailKeywords: [] }
     },
     designSystem: { palette: { primary: "#000" }, typography: { font_family_heading: "Arial" }, spacing: { xs: "4px" } },
     globalElements: { header: { logo: "/logo.png", menuItems: [] }, footer: { links: [] } },
@@ -169,7 +169,7 @@ async function testWorkflowStep6() {
         name: "测试页面",
         path: "/test",
         purpose: "测试目的",
-        seo: { title: "测试", description: "测试", primaryKeyword: "测试", secondaryKeywords: [] },
+        seo: { title: "测试", description: "测试", primaryKeywords: ["测试"], longTailKeywords: [] },
         outline: [
           {
             component: "core/heading",
@@ -206,7 +206,7 @@ async function testWorkflowStep6() {
       sellingPoints: { primary: "复杂", secondary: "复杂", tertiary: "复杂" },
       targetAudience: { region: "复杂", industry: "复杂", concerns: [], preference: "复杂" },
       assets: { images: {} },
-      seo: { mainKeywords: [], longTailKeywords: [] }
+      seo: { primaryKeywords: [], longTailKeywords: [] }
     },
     designSystem: { palette: { primary: "#000" }, typography: { font_family_heading: "Arial" }, spacing: { xs: "4px" } },
     globalElements: { header: { logo: "/logo.png", menuItems: [] }, footer: { links: [] } },
@@ -215,7 +215,7 @@ async function testWorkflowStep6() {
         name: "复杂页面",
         path: "/complex",
         purpose: "复杂目的",
-        seo: { title: "复杂", description: "复杂", primaryKeyword: "复杂", secondaryKeywords: [] },
+        seo: { title: "复杂", description: "复杂", primaryKeywords: ["复杂"], longTailKeywords: [] },
         outline: [
           {
             component: "core/cover",
