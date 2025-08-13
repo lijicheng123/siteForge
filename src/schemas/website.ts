@@ -3,8 +3,7 @@
  * 包含页面、导航、布局等网站结构相关配置
  */
 
-import { objectSchema, arraySchema, nameSchema, pagePathSchema } from './base';
-import { seoMetaSchema } from './seo';
+import { objectSchema, arraySchema, nameSchema } from './base';
 
 // 菜单项Schema
 export const menuItemSchema = objectSchema({
@@ -43,16 +42,3 @@ export const globalElementsSchema = objectSchema({
   }, ['sections', 'copyright'])
 }, ['header', 'footer']);
 
-// 网站架构Schema
-export const websiteArchitectureSchema = objectSchema({
-  globalElements: globalElementsSchema,
-  pages: arraySchema(objectSchema({
-    name: nameSchema,
-    path: pagePathSchema,
-    purpose: { type: 'string', minLength: 10, maxLength: 200 },
-    priority: { type: 'number', minimum: 1, maximum: 10, default: 5 },
-    meta: seoMetaSchema
-  }, ['name', 'path', 'purpose'])),
-  sitemap: { type: 'string', format: 'uri' },
-  robots: { type: 'string', format: 'uri' }
-}, ['globalElements', 'pages']);

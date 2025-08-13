@@ -14,16 +14,17 @@ export * from './blocks';
 export * from './seo';
 
 // 蓝图Schema - 渐进式定义
-import { objectSchema, arraySchema } from './base';
+import { objectSchema, arraySchema, nameSchema, pagePathSchema, responseSchema } from './base';
+import { websiteSeoSchema, seoMetaSchema } from './seo';
+
 import { 
-  structuredDataSchema,
   companyInfoSchema,
   productSchema,
   sellingPointsSchema,
-  targetAudienceSchema
+  targetAudienceSchema,
+  assetsSchema
 } from './company';
 import { 
-  designSystemSchema,
   paletteSchema,
   typographySchema,
   spacingSchema,
@@ -44,7 +45,46 @@ import {
   outlineSectionSchema
 } from './blocks';
 
-// 基础蓝图Schema - 包含核心业务数据，用于Step1-3
+/**
+ * 第一步：获取结构化数据 - 整合所有公司相关信息 - 用于Step1
+ */
+export const structuredDataSchema = objectSchema({
+  companyInfo: companyInfoSchema,
+  products: arraySchema(productSchema),
+  sellingPoints: sellingPointsSchema,
+  targetAudience: targetAudienceSchema,
+  assets: assetsSchema,
+  seo: websiteSeoSchema
+}, ['companyInfo', 'products', 'sellingPoints', 'targetAudience', 'assets', 'seo']);
+
+// 第二步：获取设计系统主题Schema - 用于Step2
+export const designSystemSchema = objectSchema({
+  palette: paletteSchema,
+  typography: typographySchema,
+  spacing: spacingSchema,
+  borderRadius: borderRadiusSchema,
+  shadow: shadowSchema
+}, ['palette', 'typography']);
+
+/**
+ * 第三步：获取网站架构Schema - 用于Step3
+ */
+export const websiteArchitectureSchema = objectSchema({
+  globalElements: globalElementsSchema,
+  pages: arraySchema(objectSchema({
+    name: nameSchema,
+    path: pagePathSchema,
+    purpose: { type: 'string', minLength: 10, maxLength: 200 },
+    priority: { type: 'number', minimum: 1, maximum: 10, default: 5 },
+    meta: seoMetaSchema
+  }, ['name', 'path', 'purpose'])),
+  sitemap: { type: 'string', format: 'uri' },
+  robots: { type: 'string', format: 'uri' }
+}, ['globalElements', 'pages']);
+
+/**
+ * 第三步：生成基础蓝图Schema - 包含核心业务数据，用于Step1-3
+ */
 export const baseBlueprintSchema = objectSchema({
   structuredData: structuredDataSchema,
   designSystem: designSystemSchema,
@@ -76,33 +116,46 @@ export const contentAndLayoutCompleteBlueprintSchema = objectSchema({
   pages: arraySchema(finalPageSchema)
 }, ['structuredData', 'designSystem', 'globalElements', 'pages']);
 
-// 常用组合Schema
-export const commonSchemas = {
-  // 快速访问常用Schema
-  company: {
-    info: companyInfoSchema,
-    product: productSchema,
-    sellingPoints: sellingPointsSchema,
-    targetAudience: targetAudienceSchema
-  },
-  design: {
-    palette: paletteSchema,
-    typography: typographySchema,
-    spacing: spacingSchema,
-    borderRadius: borderRadiusSchema,
-    shadow: shadowSchema
-  },
-  website: {
-    basicPage: basicPageSchema,
-    contentCompletePage: contentCompletePageSchema,
-    layoutCompletePage: layoutCompletePageSchema,
-    finalPage: finalPageSchema,
-    menuItem: menuItemSchema,
-    globalElements: globalElementsSchema
-  },
-  blocks: {
-    block: blockSchema,
-    blockFinal: blockFinalSchema,
-    outlineSection: outlineSectionSchema
+/**
+ * Step5b: 文案生成相关Schema
+ * 用于批量生成网站文案内容
+ */
+
+// 文案生成请求Schema
+export const contentGenerationRequestSchema = objectSchema({
+  context: objectSchema({
+    companyInfo: objectSchema({
+      name: { type: 'string', minLength: 1, maxLength: 100 },
+      industry: { type: 'string', minLength: 1, maxLength: 100 },
+      description: { type: 'string', minLength: 1, maxLength: 1000 }
+    }, ['name', 'industry']),
+    targetAudience: objectSchema({
+      region: { type: 'string', minLength: 1, maxLength: 100 },
+      industry: { type: 'string', minLength: 1, maxLength: 100 },
+      concerns: arraySchema({ type: 'string', minLength: 5, maxLength: 200 })
+    }, ['region', 'industry']),
+    designSystem: objectSchema({
+      palette: paletteSchema,
+      typography: typographySchema
+    }, [])
+  }, ['companyInfo', 'targetAudience']),
+  tasks: {
+    type: 'object',
+    description: "Key-Value对象，Key是唯一任务ID，Value是具体的文案生成指令",
+    patternProperties: {
+      '^.+$': { type: 'string' }
+    },
+    additionalProperties: false,
+    minProperties: 1
   }
-};
+}, ['context', 'tasks']);
+
+// 文案生成响应Schema
+export const contentGenerationResponseSchema = responseSchema({
+  type: 'object',
+  description: "Key-Value对象，Key是任务ID，Value是AI生成的文案",
+  patternProperties: {
+    '^.+$': { type: 'string' }
+  },
+  additionalProperties: false,
+});

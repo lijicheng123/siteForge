@@ -18,7 +18,7 @@ const step5RequestSchema = {
   },
   required: ['blueprint', 'blockLibrary'],
   additionalProperties: false
-} as const;
+};
 
 // 响应Schema
 const step5ResponseSchema = responseSchema(layoutCompleteBlueprintSchema);

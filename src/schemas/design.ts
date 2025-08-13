@@ -72,11 +72,3 @@ export const shadowSchema = objectSchema({
   xl: { type: 'string', pattern: '^0 20px 25px -5px rgba\\(0, 0, 0, 0\\.1\\)$' }
 }, ['none', 'sm', 'md', 'lg', 'xl']);
 
-// 设计系统主Schema
-export const designSystemSchema = objectSchema({
-  palette: paletteSchema,
-  typography: typographySchema,
-  spacing: spacingSchema,
-  borderRadius: borderRadiusSchema,
-  shadow: shadowSchema
-}, ['palette', 'typography']);

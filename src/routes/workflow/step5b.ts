@@ -1,104 +1,21 @@
 /**
- * 步骤5.5: 批量文案生成
- * 汇总所有文案生成请求，一次性调用AI完成
+ * 步骤5b: 批量文案生成
+ * 根据任务列表批量生成网站文案内容
  */
 
 import { FastifyInstance, FastifyPluginOptions, FastifySchema } from 'fastify';
-
-// 请求Schema
-const step5bRequestSchema = {
-  type: 'object',
-  properties: {
-    context: {
-      type: 'object',
-      properties: {
-        companyInfo: { 
-          type: 'object', 
-          properties: { 
-            name: { type: 'string' }, 
-            industry: { type: 'string' },
-            description: { type: 'string' }
-          },
-          required: ['name', 'industry']
-        },
-        targetAudience: { 
-          type: 'object', 
-          properties: { 
-            region: { type: 'string' }, 
-            industry: { type: 'string' },
-            concerns: { type: 'array', items: { type: 'string' } }
-          },
-          required: ['region', 'industry']
-        },
-        designSystem: {
-          type: 'object',
-          properties: {
-            palette: { type: 'object' },
-            typography: { type: 'object' }
-          }
-        }
-      },
-      required: ['companyInfo', 'targetAudience']
-    },
-    tasks: {
-      type: 'object',
-      description: "Key-Value对象，Key是唯一任务ID，Value是具体的文案生成指令",
-      patternProperties: {
-        '^.+$': { type: 'string' }
-      },
-      additionalProperties: false,
-      minProperties: 1
-    }
-  },
-  required: ['context', 'tasks'],
-  additionalProperties: false
-};
-
-// 响应Schema
-const step5bResponseSchema = {
-  200: {
-    type: 'object',
-    properties: {
-      success: { type: 'boolean' },
-      data: {
-        type: 'object',
-        description: "Key-Value对象，Key是任务ID，Value是AI生成的文案",
-        patternProperties: {
-          '^.+$': { type: 'string' }
-        },
-        additionalProperties: false,
-      },
-      message: { type: 'string' },
-      timestamp: { type: 'string', format: 'date-time' }
-    },
-    required: ['success', 'data', 'timestamp']
-  },
-  400: {
-    type: 'object',
-    properties: {
-      success: { type: 'boolean' },
-      error: { type: 'string' },
-      message: { type: 'string' },
-      timestamp: { type: 'string', format: 'date-time' }
-    },
-    required: ['success', 'error', 'message', 'timestamp']
-  },
-  500: {
-    type: 'object',
-    properties: {
-      success: { type: 'boolean' },
-      error: { type: 'string' },
-      message: { type: 'string' },
-      timestamp: { type: 'string', format: 'date-time' }
-    },
-    required: ['success', 'error', 'message', 'timestamp']
-  }
-};
+import { 
+  contentGenerationRequestSchema, 
+  contentGenerationResponseSchema 
+} from '../../schemas';
+import promptFactory from '../../services/prompt-factory';
+import llmProvider from '../../services/llm-provider';
+import { MODEL_IDS } from '../../services/model-catalog';
 
 // 完整的路由Schema
 const step5bSchema: FastifySchema = {
-  body: step5bRequestSchema,
-  response: step5bResponseSchema
+  body: contentGenerationRequestSchema,
+  response: contentGenerationResponseSchema
 };
 
 /**

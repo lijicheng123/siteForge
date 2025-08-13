@@ -33,7 +33,8 @@ const step2RequestSchema = {
     targetMarket: {
       type: 'string',
       enum: ['B2B', 'B2C', 'Enterprise', 'SMB'],
-      description: '目标市场类型'
+      description: '目标市场类型',
+      default: 'B2B'
     }
   },
   required: ['industry', 'preference'],

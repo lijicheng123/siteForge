@@ -21,7 +21,7 @@ import type {
   sellingPointsSchema,
   targetAudienceSchema,
   assetsSchema,
-  seoSchema,
+  websiteSeoSchema,
   structuredDataSchema,
   paletteSchema,
   typographySchema,
@@ -55,7 +55,7 @@ export type Product = typeof productSchema;
 export type SellingPoints = typeof sellingPointsSchema;
 export type TargetAudience = typeof targetAudienceSchema;
 export type Assets = typeof assetsSchema;
-export type SEO = typeof seoSchema;
+export type SEO = typeof websiteSeoSchema;
 export type StructuredData = typeof structuredDataSchema;
 
 export type Palette = typeof paletteSchema;
@@ -238,32 +238,4 @@ export interface ContentAndLayoutCompleteBlueprint extends Omit<BaseBlueprint, '
   }>;
 }
 
-// 常用组合类型
-export type CommonSchemas = {
-  company: {
-    info: typeof companyInfoSchema;
-    product: typeof productSchema;
-    sellingPoints: typeof sellingPointsSchema;
-    targetAudience: typeof targetAudienceSchema;
-  };
-  design: {
-    palette: typeof paletteSchema;
-    typography: typeof typographySchema;
-    spacing: typeof spacingSchema;
-    borderRadius: typeof borderRadiusSchema;
-    shadow: typeof shadowSchema;
-  };
-  website: {
-    basicPage: typeof basicPageSchema;
-    contentCompletePage: typeof contentCompletePageSchema;
-    layoutCompletePage: typeof layoutCompletePageSchema;
-    finalPage: typeof finalPageSchema;
-    menuItem: typeof menuItemSchema;
-    globalElements: typeof globalElementsSchema;
-  };
-  blocks: {
-    block: typeof blockSchema;
-    blockFinal: typeof blockFinalSchema;
-    outlineSection: typeof outlineSectionSchema;
-  };
-};
+

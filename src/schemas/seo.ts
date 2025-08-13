@@ -25,8 +25,8 @@ export const seoDetailedSchema = objectSchema({
   ...keywordsSchema
 }, ['title', 'description', 'primaryKeywords', 'longTailKeywords']);
 
-// 公司级别 SEO 信息（用于公司整体SEO策略）
-export const companySeoSchema = objectSchema({
+// 整个网站的 SEO 信息（用于网站整体SEO策略）
+export const websiteSeoSchema = objectSchema({
   ...keywordsSchema
 }, ['primaryKeywords', 'longTailKeywords']);
 

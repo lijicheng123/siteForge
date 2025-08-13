@@ -10,45 +10,17 @@ import { generateFullGutenbergHtml } from '../../services/html-generator';
 // 请求Schema 使用内容和布局都完备的蓝图Schema定义
 const step6RequestSchema = contentAndLayoutCompleteBlueprintSchema;
 
-// 响应Schema
-const step6ResponseSchema = {
-  200: {
-    type: 'object',
-    properties: {
-      success: { type: 'boolean' },
-      data: {
-        type: 'object',
-        properties: {
-          html: { type: 'string', description: '完整的、可被WordPress编辑器解析的古腾堡HTML' }
-        },
-        required: ['html']
-      },
-      message: { type: 'string' },
-      timestamp: { type: 'string', format: 'date-time' }
-    },
-    required: ['success', 'data', 'timestamp']
+// 响应数据Schema
+const step6ResponseDataSchema = {
+  type: 'object',
+  properties: {
+    html: { type: 'string', description: '完整的、可被WordPress编辑器解析的古腾堡HTML' }
   },
-  400: {
-    type: 'object',
-    properties: {
-      success: { type: 'boolean' },
-      error: { type: 'string' },
-      message: { type: 'string' },
-      timestamp: { type: 'string', format: 'date-time' }
-    },
-    required: ['success', 'error', 'message', 'timestamp']
-  },
-  500: {
-    type: 'object',
-    properties: {
-      success: { type: 'boolean' },
-      error: { type: 'string' },
-      message: { type: 'string' },
-      timestamp: { type: 'string', format: 'date-time' }
-    },
-    required: ['success', 'error', 'message', 'timestamp']
-  }
+  required: ['html']
 };
+
+// 响应Schema - 使用通用的responseSchema函数
+const step6ResponseSchema = responseSchema(step6ResponseDataSchema);
 
 // 完整的路由Schema
 const step6Schema: FastifySchema = {
