@@ -6,15 +6,15 @@
 import { objectSchema, arraySchema, nameSchema, pagePathSchema } from './base';
 import { seoDetailedSchema } from './seo';
 
-// 内容大纲Schema (版本1)
-export const outlineSectionV1Schema = objectSchema({
+// 内容大纲Schema
+export const outlineSectionSchema = objectSchema({
   sectionName: nameSchema,
   instruction: { type: 'string', minLength: 10, maxLength: 500 },
   priority: { type: 'number', minimum: 1, maximum: 10, default: 5 },
   estimatedWords: { type: 'number', minimum: 50, maximum: 2000 }
 }, ['sectionName', 'instruction']);
 
-// 区块Schema - 支持递归结构
+// 基础区块Schema - 支持递归结构，包含prompt字段
 export const blockSchema = {
   $id: 'blockSchema',
   type: 'object',
@@ -72,57 +72,13 @@ export const blockSchema = {
   additionalProperties: false
 };
 
-// 页面Schema (版本2) - 包含SEO和内容大纲
-export const updatedPageV1Schema = objectSchema({
-  name: nameSchema,
-  path: pagePathSchema,
-  purpose: { type: 'string', minLength: 10, maxLength: 200 },
-  seo: seoDetailedSchema,
-  outline: arraySchema(outlineSectionV1Schema)
-}, ['name', 'path', 'purpose', 'seo', 'outline']);
-
-// 蓝图版本2 - 包含内容大纲
-export const websiteBlueprintV2Schema = objectSchema({
-  structuredData: { type: 'object' },
-  designSystem: { type: 'object' },
-  globalElements: { type: 'object' },
-  pages: arraySchema(updatedPageV1Schema)
-}, ['structuredData', 'designSystem', 'globalElements', 'pages']);
-
-// 页面Schema (版本3) - 包含结构化区块
-export const updatedPageV2Schema = objectSchema({
-  name: nameSchema,
-  path: pagePathSchema,
-  purpose: { type: 'string', minLength: 10, maxLength: 200 },
-  seo: { type: 'object' },
-  outline: arraySchema({ type: 'object' })
-}, ['name', 'path', 'purpose', 'seo', 'outline']);
-
-// 蓝图版本3 - 包含结构化区块
-export const websiteBlueprintV3Schema = objectSchema({
-  structuredData: { type: 'object' },
-  designSystem: { type: 'object' },
-  globalElements: { type: 'object' },
-  pages: arraySchema(updatedPageV2Schema)
-}, ['structuredData', 'designSystem', 'globalElements', 'pages']);
-
-// 可用区块库 Schema（用于 Step5 请求）
-export const blockLibrarySchema = objectSchema({
-  core_blocks: arraySchema({ type: 'string' }),
-  custom_blocks: arraySchema(objectSchema({
-    name: { type: 'string', minLength: 1, maxLength: 100 },
-    description: { type: 'string', minLength: 1, maxLength: 500 },
-    props: { type: 'object' }
-  }, ['name', 'description', 'props']))
-}, ['core_blocks', 'custom_blocks']);
-
 // 最终区块Schema - 移除prompt，只保留确定内容
-export const blockSchemaFinal = objectSchema({
+export const blockFinalSchema = objectSchema({
   component: { type: 'string', minLength: 1, maxLength: 100 },
   level: { type: 'number', minimum: 0, maximum: 10, default: 0 },
   config: { type: 'object', additionalProperties: true },
   props: { type: 'object', additionalProperties: true },
-  children: arraySchema({ $ref: 'blockSchemaFinal#' }),
+  children: arraySchema({ $ref: 'blockFinalSchema#' }),
   content: {
     oneOf: [
       objectSchema({
@@ -145,19 +101,46 @@ export const blockSchemaFinal = objectSchema({
   })
 }, ['component']);
 
-// 最终页面Schema
-export const updatedPageFinalSchema = objectSchema({
+// 基础页面Schema - 只包含基本信息
+export const basicPageSchema = objectSchema({
+  name: nameSchema,
+  path: pagePathSchema,
+  purpose: { type: 'string', minLength: 10, maxLength: 200 }
+}, ['name', 'path', 'purpose']);
+
+// 内容完备页面Schema - 包含SEO和内容大纲
+export const contentCompletePageSchema = objectSchema({
   name: nameSchema,
   path: pagePathSchema,
   purpose: { type: 'string', minLength: 10, maxLength: 200 },
-  seo: { type: 'object' },
-  outline: arraySchema({ type: 'object' })
+  seo: seoDetailedSchema,
+  outline: arraySchema(outlineSectionSchema)
 }, ['name', 'path', 'purpose', 'seo', 'outline']);
 
-// 蓝图版本4 - 最终版本
-export const websiteBlueprintV4FinalSchema = objectSchema({
-  structuredData: { type: 'object' },
-  designSystem: { type: 'object' },
-  globalElements: { type: 'object' },
-  pages: arraySchema(updatedPageFinalSchema)
-}, ['structuredData', 'designSystem', 'globalElements', 'pages']);
+// 布局完备页面Schema - 包含区块布局
+export const layoutCompletePageSchema = objectSchema({
+  name: nameSchema,
+  path: pagePathSchema,
+  purpose: { type: 'string', minLength: 10, maxLength: 200 },
+  seo: seoDetailedSchema,
+  outline: arraySchema(blockSchema)
+}, ['name', 'path', 'purpose', 'seo', 'outline']);
+
+// 最终页面Schema - 包含最终区块布局
+export const finalPageSchema = objectSchema({
+  name: nameSchema,
+  path: pagePathSchema,
+  purpose: { type: 'string', minLength: 10, maxLength: 200 },
+  seo: seoDetailedSchema,
+  outline: arraySchema(blockFinalSchema)
+}, ['name', 'path', 'purpose', 'seo', 'outline']);
+
+// 可用区块库 Schema
+export const blockLibrarySchema = objectSchema({
+  core_blocks: arraySchema({ type: 'string' }),
+  custom_blocks: arraySchema(objectSchema({
+    name: { type: 'string', minLength: 1, maxLength: 100 },
+    description: { type: 'string', minLength: 1, maxLength: 500 },
+    props: { type: 'object' }
+  }, ['name', 'description', 'props']))
+}, ['core_blocks', 'custom_blocks']);

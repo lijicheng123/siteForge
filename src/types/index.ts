@@ -1,54 +1,269 @@
 // src/types/index.ts
+// 从schemas导出所有类型定义，实现单一数据源
 
-// Business core types aligned with prompt-factory definitions
+// 基础类型
+export * from '../schemas/base';
 
-// Company and product data
-export interface CompanyInfo { name: string; description: string; industry: string; }
-export interface Product { name: string; slug: string; category: string; short_description: string; keywords: string[]; }
-export interface SellingPoints { primary: string; secondary: string; tertiary: string; }
-export interface TargetAudience { region: string; industry: string; concerns: string[]; preference: string; }
-export interface Assets { images: Record<string, string>; }
-export interface SEO { mainKeywords: string[]; longTailKeywords: string[]; }
+// 业务实体类型
+export * from '../schemas/company';
+export * from '../schemas/design';
+export * from '../schemas/website';
+export * from '../schemas/blocks';
+export * from '../schemas/seo';
 
-export interface StructuredData {
-  companyInfo: CompanyInfo;
-  products: Product[];
-  sellingPoints: SellingPoints;
-  targetAudience: TargetAudience;
-  assets: Assets;
-  seo: SEO;
+// 常用组合类型
+export * from '../schemas';
+
+// 类型别名 - 为了保持与原有代码的兼容性，提供更友好的类型名称
+import type {
+  companyInfoSchema,
+  productSchema,
+  sellingPointsSchema,
+  targetAudienceSchema,
+  assetsSchema,
+  seoSchema,
+  structuredDataSchema,
+  paletteSchema,
+  typographySchema,
+  spacingSchema,
+  borderRadiusSchema,
+  shadowSchema,
+  designSystemSchema,
+  menuItemSchema,
+  footerSectionSchema,
+  globalElementsSchema,
+  websiteArchitectureSchema,
+  outlineSectionSchema,
+  blockSchema,
+  blockFinalSchema,
+  basicPageSchema,
+  contentCompletePageSchema,
+  layoutCompletePageSchema,
+  finalPageSchema,
+  blockLibrarySchema,
+  seoMetaSchema,
+  seoDetailedSchema,
+  baseBlueprintSchema,
+  contentCompleteBlueprintSchema,
+  layoutCompleteBlueprintSchema,
+  contentAndLayoutCompleteBlueprintSchema
+} from '../schemas';
+
+// 从Schema推导出TypeScript类型
+export type CompanyInfo = typeof companyInfoSchema;
+export type Product = typeof productSchema;
+export type SellingPoints = typeof sellingPointsSchema;
+export type TargetAudience = typeof targetAudienceSchema;
+export type Assets = typeof assetsSchema;
+export type SEO = typeof seoSchema;
+export type StructuredData = typeof structuredDataSchema;
+
+export type Palette = typeof paletteSchema;
+export type Typography = typeof typographySchema;
+export type Spacing = typeof spacingSchema;
+export type BorderRadius = typeof borderRadiusSchema;
+export type Shadow = typeof shadowSchema;
+export type DesignSystem = typeof designSystemSchema;
+
+export type MenuItem = typeof menuItemSchema;
+export type FooterSection = typeof footerSectionSchema;
+export type GlobalElements = typeof globalElementsSchema;
+export type WebsiteArchitecture = typeof websiteArchitectureSchema;
+
+export type OutlineSection = typeof outlineSectionSchema;
+export type Block = typeof blockSchema;
+export type BlockFinal = typeof blockFinalSchema;
+
+// 页面类型 - 渐进式定义
+export type BasicPage = typeof basicPageSchema;
+export type ContentCompletePage = typeof contentCompletePageSchema;
+export type LayoutCompletePage = typeof layoutCompletePageSchema;
+export type FinalPage = typeof finalPageSchema;
+
+export type BlockLibrary = typeof blockLibrarySchema;
+
+export type SEOMeta = typeof seoMetaSchema;
+export type SEODetailed = typeof seoDetailedSchema;
+
+// 蓝图类型 - 渐进式定义
+export interface BaseBlueprint {
+  structuredData: {
+    companyInfo: {
+      name: string;
+      description: string;
+      industry: string;
+    };
+    products: Array<{
+      name: string;
+      slug: string;
+      category: string;
+      short_description: string;
+      keywords: string[];
+    }>;
+    sellingPoints: {
+      primary: string;
+      secondary: string;
+      tertiary: string;
+    };
+    targetAudience: {
+      region: string;
+      industry: string;
+      concerns: string[];
+      preference: string;
+    };
+    assets: {
+      images: Record<string, string>;
+    };
+    seo: {
+      mainKeywords: string[];
+      longTailKeywords: string[];
+    };
+  };
+  designSystem: {
+    palette: {
+      primary: string;
+      secondary: string;
+      accent: string;
+      text_on_dark: string;
+      text_on_light: string;
+      background_light: string;
+      background_medium: string;
+      background_dark: string;
+    };
+    typography: {
+      font_family_heading: string;
+      font_family_body: string;
+      font_size_base?: string;
+      line_height_base?: number;
+    };
+    spacing?: Record<string, string>;
+    borderRadius?: Record<string, string>;
+    shadow?: Record<string, string>;
+  };
+  globalElements: {
+    header: {
+      logo?: string;
+      menuItems: Array<{
+        name: string;
+        path: string;
+        icon?: string;
+        children?: Array<{ name: string; path: string }>;
+      }>;
+      ctaButton?: {
+        text: string;
+        url: string;
+        style: 'primary' | 'secondary' | 'outline';
+      };
+    };
+    footer: {
+      sections: Array<{
+        title: string;
+        links: Array<{ name: string; url: string }>;
+      }>;
+      copyright: string;
+    };
+  };
+  pages: Array<{
+    name: string;
+    path: string;
+    purpose: string;
+  }>;
 }
 
-// Design system
-export interface Palette {
-  primary: string; secondary: string; accent: string;
-  text_on_dark: string; text_on_light: string;
-  background_light: string; background_medium: string; background_dark: string;
+export interface ContentCompleteBlueprint extends Omit<BaseBlueprint, 'pages'> {
+  pages: Array<{
+    name: string;
+    path: string;
+    purpose: string;
+    seo: {
+      title: string;
+      description: string;
+      primaryKeyword: string;
+      secondaryKeywords: string[];
+    };
+    outline: Array<{
+      sectionName: string;
+      instruction: string;
+      priority?: number;
+      estimatedWords?: number;
+    }>;
+  }>;
 }
-export interface Typography { font_family_heading: string; font_family_body: string; }
-export interface DesignSystem { palette: Palette; typography: Typography; }
 
-// Website architecture
-export interface MenuItem { name: string; path: string; }
-export interface Header { menuItems: MenuItem[]; }
-export interface Footer { sections: string[]; }
-export interface GlobalElements { header: Header; footer: Footer; }
-export interface Page { name: string; path: string; purpose: string; }
-export interface WebsiteArchitecture { globalElements: GlobalElements; pages: Page[]; }
-
-// Page outline (strategy)
-export interface SEOInfo { title: string; description: string; primaryKeyword: string; secondaryKeywords: string[]; }
-export interface OutlineSection { sectionName: string; instruction: string; }
-export interface UpdatedPage { name: string; path: string; purpose: string; seo: SEOInfo; outline: OutlineSection[] | any; }
-
-// Block layout (render model)
-export type ContentSource = { source: string } | { text: string } | { prompt: string };
-export interface Block { component: string; level?: number; config?: Record<string, unknown>; props?: Record<string, unknown>; children?: Block[]; content?: ContentSource; }
-
-// Final blueprint passed across steps
-export interface FinalBlueprint {
-  structuredData: StructuredData;
-  designSystem: DesignSystem;
-  globalElements: GlobalElements;
-  pages: UpdatedPage[];
+export interface LayoutCompleteBlueprint extends Omit<BaseBlueprint, 'pages'> {
+  pages: Array<{
+    name: string;
+    path: string;
+    purpose: string;
+    seo: {
+      title: string;
+      description: string;
+      primaryKeyword: string;
+      secondaryKeywords: string[];
+    };
+    outline: Array<{
+      component: string;
+      level?: number;
+      config?: Record<string, unknown>;
+      props?: Record<string, unknown>;
+      children?: any[];
+      content?: { source?: string; alt?: string; text?: string; prompt?: string };
+      link?: { source: string; target?: string; rel?: string };
+      style?: { className?: string; customCSS?: string };
+    }>;
+  }>;
 }
+
+export interface ContentAndLayoutCompleteBlueprint extends Omit<BaseBlueprint, 'pages'> {
+  pages: Array<{
+    name: string;
+    path: string;
+    purpose: string;
+    seo: {
+      title: string;
+      description: string;
+      primaryKeyword: string;
+      secondaryKeywords: string[];
+    };
+    outline: Array<{
+      component: string;
+      level?: number;
+      config?: Record<string, unknown>;
+      props?: Record<string, unknown>;
+      children?: any[];
+      content?: { source?: string; alt?: string; text?: string };
+      link?: { source: string; target?: string; rel?: string };
+      style?: { className?: string; customCSS?: string };
+    }>;
+  }>;
+}
+
+// 常用组合类型
+export type CommonSchemas = {
+  company: {
+    info: typeof companyInfoSchema;
+    product: typeof productSchema;
+    sellingPoints: typeof sellingPointsSchema;
+    targetAudience: typeof targetAudienceSchema;
+  };
+  design: {
+    palette: typeof paletteSchema;
+    typography: typeof typographySchema;
+    spacing: typeof spacingSchema;
+    borderRadius: typeof borderRadiusSchema;
+    shadow: typeof shadowSchema;
+  };
+  website: {
+    basicPage: typeof basicPageSchema;
+    contentCompletePage: typeof contentCompletePageSchema;
+    layoutCompletePage: typeof layoutCompletePageSchema;
+    finalPage: typeof finalPageSchema;
+    menuItem: typeof menuItemSchema;
+    globalElements: typeof globalElementsSchema;
+  };
+  blocks: {
+    block: typeof blockSchema;
+    blockFinal: typeof blockFinalSchema;
+    outlineSection: typeof outlineSectionSchema;
+  };
+};

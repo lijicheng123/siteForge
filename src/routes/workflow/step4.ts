@@ -4,16 +4,16 @@
  */
 
 import { FastifyInstance, FastifyPluginOptions, FastifySchema } from 'fastify';
-import { websiteBlueprintV1Schema, websiteBlueprintV2Schema, responseSchema } from '../../schemas';
+import { baseBlueprintSchema, contentCompleteBlueprintSchema, responseSchema } from '../../schemas';
 import promptFactory from '../../services/prompt-factory';
 import llmProvider from '../../services/llm-provider';
 import { MODEL_IDS } from '../../services/model-catalog';
 
-// 请求Schema - 直接复用输入蓝图V1
-const step4RequestSchema = websiteBlueprintV1Schema as any;
+// 请求Schema - 使用基础蓝图Schema
+const step4RequestSchema = baseBlueprintSchema;
 
-// 响应Schema - 输出蓝图V2
-const step4ResponseSchema = responseSchema(websiteBlueprintV2Schema);
+// 响应Schema - 输出内容完备蓝图Schema
+const step4ResponseSchema = responseSchema(contentCompleteBlueprintSchema);
 
 // 完整的路由Schema
 const step4Schema: FastifySchema = {
@@ -48,11 +48,11 @@ export default async function step4Routes(fastify: FastifyInstance, options: Fas
       // 2. 为每个页面构建AI Prompt，指示AI扮演内容策略专家
       // 3. 生成每个页面的SEO信息和内容大纲
       // 4. 调用AI模型，获取每个页面的seo和outline数据
-      // 5. 将生成的数据整合回蓝图，形成WebsiteBlueprint_V2
+      // 5. 将生成的数据整合回蓝图，形成内容完备的蓝图
       // 6. 返回更新后的蓝图
       
-      // 构建完整的蓝图V1
-      const blueprintV1 = {
+      // 构建基础蓝图
+      const blueprint = {
         structuredData,
         designSystem,
         globalElements,
@@ -60,7 +60,7 @@ export default async function step4Routes(fastify: FastifyInstance, options: Fas
       };
       
       // 调用AI模型生成页面内容策划
-      const prompt = promptFactory.getStep4PlannerPrompt(blueprintV1);
+      const prompt = promptFactory.getStep4PlannerPrompt(blueprint);
       const responseJsonString = await llmProvider.invoke({ 
         model: MODEL_IDS.GEMINI_2_5_PRO, 
         prompt, 
@@ -70,15 +70,15 @@ export default async function step4Routes(fastify: FastifyInstance, options: Fas
       // 解析AI返回的数据
       const updatedPages = JSON.parse(llmProvider.cleanAiJsonResponse(responseJsonString));
       
-      // 构建蓝图V2
-      const blueprintV2 = {
-        ...blueprintV1,
+      // 构建内容完备蓝图
+      const contentCompleteBlueprint = {
+        ...blueprint,
         pages: updatedPages
       };
       
       return reply.send({
         success: true,
-        data: blueprintV2,
+        data: contentCompleteBlueprint,
         message: '页面内容策划成功',
         timestamp: new Date().toISOString()
       });

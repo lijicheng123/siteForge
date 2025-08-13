@@ -5,7 +5,7 @@ import {
   structuredDataSchema,
   designSystemSchema,
   websiteArchitectureSchema,
-  updatedPageV1Schema,
+  contentCompletePageSchema,
   blockSchema,
 } from '../schemas';
 
@@ -47,23 +47,23 @@ ${getSchemaString(designSystemSchema)}`,
 输出必须严格符合以下 JSON Schema:
 ${getSchemaString(websiteArchitectureSchema)}`,
 
-  getStep4PlannerPrompt: (blueprintV1: any): string => `
+  getStep4PlannerPrompt: (blueprint: any): string => `
 角色: 你是一位集 B2B 内容营销、搜索引擎优化 (SEO) 和用户旅程规划于一身的顶级内容策略专家。
 背景: 现在我们有了完整的网站蓝图，它包含了业务数据、设计系统和页面结构。下一步是为蓝图中的每个页面注入生命力——规划其具体内容和 SEO 策略。
 目标: 遍历输入数据中 pages 数组的每一个页面对象，并为其精心策划 SEO 信息 (title, description, keywords) 和 outline 内容大纲。
 详细任务: 遍历页面，规划 SEO 信息，规划内容大纲 (outline)，将页面内容分解为若干个有逻辑顺序的内容区块 (Section)，并为每个区块撰写清晰的 instruction 指令。
 
 输出必须严格符合以下 JSON Schema (单个页面对象结构):
-${getSchemaString(updatedPageV1Schema)}
+${getSchemaString(contentCompletePageSchema)}
 
-[输入蓝图 V1]:
-${JSON.stringify(blueprintV1, null, 2)}`,
+[输入蓝图]:
+${JSON.stringify(blueprint, null, 2)}`,
 
   getStep5LayoutPrompt: (pageOutline: any, blockLibrary: any): string => `
 角色: 你是一名顶级的 WordPress 古腾堡技术架构师和前端设计师。
 背景: 你收到了一份来自 "内容策略师" 的页面大纲 (outline)。你还有一个严格定义的 "可用区块库"。
 目标: 将自然语言的 "意图"，精确地 "翻译" 成一个严格结构化的 JSON 布局指令。将每一个 instruction 都转换成一个或多个嵌套的 Block 对象。
-约束: 只能从下方提供的 "可用区块库" 中选择区块，绝不能发明。必须严格遵循自定义区块 "说明书 (Manifest)" 中定义的 props 结构。所有需要 AI 生成文本的地方，必须以 {"prompt": "..."} 的形式标记。
+约束: 只能从下方提供的 "可用区块库" 中选择区块，绝不能发明。必须严格遵循自定义区块 "说明书 (Manifest)" 中定义的 props 结构。所有需要 AI 生成文案的地方，必须以 {"prompt": "..."} 的形式标记。
 
 输出必须严格符合以下 JSON Schema (Block 对象结构):
 ${getSchemaString(blockSchema)}

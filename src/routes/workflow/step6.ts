@@ -4,11 +4,11 @@
  */
 
 import { FastifyInstance, FastifyPluginOptions, FastifySchema } from 'fastify';
-import { websiteBlueprintV4FinalSchema, responseSchema } from '../../schemas';
+import { contentAndLayoutCompleteBlueprintSchema, responseSchema } from '../../schemas';
 import { generateFullGutenbergHtml } from '../../services/html-generator';
 
-// 请求Schema 直接复用最终蓝图 V4 定义
-const step6RequestSchema = websiteBlueprintV4FinalSchema as any;
+// 请求Schema 使用内容和布局都完备的蓝图Schema定义
+const step6RequestSchema = contentAndLayoutCompleteBlueprintSchema;
 
 // 响应Schema
 const step6ResponseSchema = {
@@ -85,7 +85,7 @@ export default async function step6Routes(fastify: FastifyInstance, options: Fas
       };
       
       // 核心业务逻辑 (此步骤不调用AI)
-      // 1. 获取请求体中的 WebsiteBlueprint_V4_Final 数据
+      // 1. 获取请求体中的内容和布局都完备的蓝图数据
       // 2. 实现一个确定性的JS/TS函数 `generateGutenbergHTML`
       // 3. 该函数需要递归遍历蓝图中的所有 Block 对象
       // 4. 根据每个 block 的 `component`, `config`, `props`, `content` 和 `children`，精确地生成对应的古腾堡HTML注释语法

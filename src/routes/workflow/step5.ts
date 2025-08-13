@@ -4,24 +4,24 @@
  */
 
 import { FastifyInstance, FastifyPluginOptions, FastifySchema } from 'fastify';
-import { websiteBlueprintV2Schema, websiteBlueprintV3Schema, blockLibrarySchema, responseSchema } from '../../schemas';
+import { contentCompleteBlueprintSchema, layoutCompleteBlueprintSchema, blockLibrarySchema, responseSchema } from '../../schemas';
 import promptFactory from '../../services/prompt-factory';
 import llmProvider from '../../services/llm-provider';
 import { MODEL_IDS } from '../../services/model-catalog';
 
-// 请求Schema：复用蓝图V2和区块库定义
+// 请求Schema：使用内容完备蓝图Schema和区块库定义
 const step5RequestSchema = {
   type: 'object',
   properties: {
-    blueprintV2: websiteBlueprintV2Schema,
+    blueprint: contentCompleteBlueprintSchema,
     blockLibrary: blockLibrarySchema,
   },
-  required: ['blueprintV2', 'blockLibrary'],
+  required: ['blueprint', 'blockLibrary'],
   additionalProperties: false
 } as const;
 
 // 响应Schema
-const step5ResponseSchema = responseSchema(websiteBlueprintV3Schema);
+const step5ResponseSchema = responseSchema(layoutCompleteBlueprintSchema);
 
 // 完整的路由Schema
 const step5Schema: FastifySchema = {
@@ -44,8 +44,8 @@ export default async function step5Routes(fastify: FastifyInstance, options: Fas
     }
   }, async (request, reply) => {
     try {
-      const { blueprintV2, blockLibrary } = request.body as {
-        blueprintV2: any;
+      const { blueprint, blockLibrary } = request.body as {
+        blueprint: any;
         blockLibrary: {
           core_blocks: string[];
           custom_blocks: Array<{ name: string; description: string; props: any }>;
@@ -60,10 +60,10 @@ export default async function step5Routes(fastify: FastifyInstance, options: Fas
       // 5. 要求AI将instruction翻译成符合Block Schema的JSON结构
       // 6. AI的输出会包含需要生成文案的{ "prompt": "..." }标记
       // 7. 将每个页面的outline更新为AI返回的结构化Block数组
-      // 8. 形成WebsiteBlueprint_V3并返回
+      // 8. 形成布局完备的蓝图并返回
       
       // 为每个页面的outline生成区块布局
-      const enhancedPages = await Promise.all(blueprintV2.pages.map(async (page: any) => {
+      const enhancedPages = await Promise.all(blueprint.pages.map(async (page: any) => {
         if (page.outline && Array.isArray(page.outline)) {
           // 为每个页面的outline生成区块布局
           const layoutPrompt = promptFactory.getStep5LayoutPrompt(page.outline, blockLibrary);
@@ -84,15 +84,15 @@ export default async function step5Routes(fastify: FastifyInstance, options: Fas
         return page;
       }));
       
-      // 构建蓝图V3
-      const blueprintV3 = {
-        ...blueprintV2,
+      // 构建布局完备蓝图
+      const layoutCompleteBlueprint = {
+        ...blueprint,
         pages: enhancedPages
       };
       
       return reply.send({
         success: true,
-        data: blueprintV3,
+        data: layoutCompleteBlueprint,
         message: '区块布局设计成功',
         timestamp: new Date().toISOString()
       });

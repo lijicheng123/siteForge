@@ -13,6 +13,50 @@ export * from './website';
 export * from './blocks';
 export * from './seo';
 
+// 蓝图Schema - 渐进式定义
+import { objectSchema, arraySchema } from './base';
+import { structuredDataSchema } from './company';
+import { designSystemSchema } from './design';
+import { globalElementsSchema } from './website';
+import { 
+  basicPageSchema, 
+  contentCompletePageSchema, 
+  layoutCompletePageSchema, 
+  finalPageSchema 
+} from './blocks';
+
+// 基础蓝图Schema - 包含核心业务数据，用于Step1-3
+export const baseBlueprintSchema = objectSchema({
+  structuredData: structuredDataSchema,
+  designSystem: designSystemSchema,
+  globalElements: globalElementsSchema,
+  pages: arraySchema(basicPageSchema)
+}, ['structuredData', 'designSystem', 'globalElements', 'pages']);
+
+// 内容完备蓝图Schema - 包含页面内容策划，用于Step4
+export const contentCompleteBlueprintSchema = objectSchema({
+  structuredData: structuredDataSchema,
+  designSystem: designSystemSchema,
+  globalElements: globalElementsSchema,
+  pages: arraySchema(contentCompletePageSchema)
+}, ['structuredData', 'designSystem', 'globalElements', 'pages']);
+
+// 布局完备蓝图Schema - 包含区块布局，用于Step5
+export const layoutCompleteBlueprintSchema = objectSchema({
+  structuredData: structuredDataSchema,
+  designSystem: designSystemSchema,
+  globalElements: globalElementsSchema,
+  pages: arraySchema(layoutCompletePageSchema)
+}, ['structuredData', 'designSystem', 'globalElements', 'pages']);
+
+// 内容和布局都完备的蓝图Schema - 用于Step6生成HTML
+export const contentAndLayoutCompleteBlueprintSchema = objectSchema({
+  structuredData: structuredDataSchema,
+  designSystem: designSystemSchema,
+  globalElements: globalElementsSchema,
+  pages: arraySchema(finalPageSchema)
+}, ['structuredData', 'designSystem', 'globalElements', 'pages']);
+
 // 常用组合Schema
 export const commonSchemas = {
   // 快速访问常用Schema
@@ -30,21 +74,16 @@ export const commonSchemas = {
     shadow: 'shadowSchema'
   },
   website: {
-    page: 'pageSchema',
+    basicPage: 'basicPageSchema',
+    contentCompletePage: 'contentCompletePageSchema',
+    layoutCompletePage: 'layoutCompletePageSchema',
+    finalPage: 'finalPageSchema',
     menuItem: 'menuItemSchema',
     globalElements: 'globalElementsSchema'
   },
   blocks: {
     block: 'blockSchema',
-    blockFinal: 'blockSchemaFinal',
-    outlineSection: 'outlineSectionV1Schema'
+    blockFinal: 'blockFinalSchema',
+    outlineSection: 'outlineSectionSchema'
   }
-};
-
-// Schema版本管理
-export const schemaVersions = {
-  v1: 'websiteBlueprintV1Schema',
-  v2: 'websiteBlueprintV2Schema', 
-  v3: 'websiteBlueprintV3Schema',
-  v4: 'websiteBlueprintV4FinalSchema'
 };

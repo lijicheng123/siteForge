@@ -43,27 +43,16 @@ export const globalElementsSchema = objectSchema({
   }, ['sections', 'copyright'])
 }, ['header', 'footer']);
 
-// 页面Schema
-export const pageSchema = objectSchema({
-  name: nameSchema,
-  path: pagePathSchema,
-  purpose: { type: 'string', minLength: 10, maxLength: 200 },
-  priority: { type: 'number', minimum: 1, maximum: 10, default: 5 },
-  meta: seoMetaSchema
-}, ['name', 'path', 'purpose']);
-
 // 网站架构Schema
 export const websiteArchitectureSchema = objectSchema({
   globalElements: globalElementsSchema,
-  pages: arraySchema(pageSchema),
+  pages: arraySchema(objectSchema({
+    name: nameSchema,
+    path: pagePathSchema,
+    purpose: { type: 'string', minLength: 10, maxLength: 200 },
+    priority: { type: 'number', minimum: 1, maximum: 10, default: 5 },
+    meta: seoMetaSchema
+  }, ['name', 'path', 'purpose'])),
   sitemap: { type: 'string', format: 'uri' },
   robots: { type: 'string', format: 'uri' }
 }, ['globalElements', 'pages']);
-
-// 蓝图版本1 - 基础版本
-export const websiteBlueprintV1Schema = objectSchema({
-  structuredData: { type: 'object' },
-  designSystem: { type: 'object' },
-  globalElements: globalElementsSchema,
-  pages: arraySchema(pageSchema)
-}, ['structuredData', 'designSystem', 'globalElements', 'pages']);
