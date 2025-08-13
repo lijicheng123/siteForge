@@ -15,14 +15,33 @@ export * from './seo';
 
 // 蓝图Schema - 渐进式定义
 import { objectSchema, arraySchema } from './base';
-import { structuredDataSchema } from './company';
-import { designSystemSchema } from './design';
-import { globalElementsSchema } from './website';
+import { 
+  structuredDataSchema,
+  companyInfoSchema,
+  productSchema,
+  sellingPointsSchema,
+  targetAudienceSchema
+} from './company';
+import { 
+  designSystemSchema,
+  paletteSchema,
+  typographySchema,
+  spacingSchema,
+  borderRadiusSchema,
+  shadowSchema
+} from './design';
+import { 
+  globalElementsSchema,
+  menuItemSchema
+} from './website';
 import { 
   basicPageSchema, 
   contentCompletePageSchema, 
   layoutCompletePageSchema, 
-  finalPageSchema 
+  finalPageSchema,
+  blockSchema,
+  blockFinalSchema,
+  outlineSectionSchema
 } from './blocks';
 
 // 基础蓝图Schema - 包含核心业务数据，用于Step1-3
@@ -61,29 +80,29 @@ export const contentAndLayoutCompleteBlueprintSchema = objectSchema({
 export const commonSchemas = {
   // 快速访问常用Schema
   company: {
-    info: 'companyInfoSchema',
-    product: 'productSchema',
-    sellingPoints: 'sellingPointsSchema',
-    targetAudience: 'targetAudienceSchema'
+    info: companyInfoSchema,
+    product: productSchema,
+    sellingPoints: sellingPointsSchema,
+    targetAudience: targetAudienceSchema
   },
   design: {
-    palette: 'paletteSchema',
-    typography: 'typographySchema',
-    spacing: 'spacingSchema',
-    borderRadius: 'borderRadiusSchema',
-    shadow: 'shadowSchema'
+    palette: paletteSchema,
+    typography: typographySchema,
+    spacing: spacingSchema,
+    borderRadius: borderRadiusSchema,
+    shadow: shadowSchema
   },
   website: {
-    basicPage: 'basicPageSchema',
-    contentCompletePage: 'contentCompletePageSchema',
-    layoutCompletePage: 'layoutCompletePageSchema',
-    finalPage: 'finalPageSchema',
-    menuItem: 'menuItemSchema',
-    globalElements: 'globalElementsSchema'
+    basicPage: basicPageSchema,
+    contentCompletePage: contentCompletePageSchema,
+    layoutCompletePage: layoutCompletePageSchema,
+    finalPage: finalPageSchema,
+    menuItem: menuItemSchema,
+    globalElements: globalElementsSchema
   },
   blocks: {
-    block: 'blockSchema',
-    blockFinal: 'blockFinalSchema',
-    outlineSection: 'outlineSectionSchema'
+    block: blockSchema,
+    blockFinal: blockFinalSchema,
+    outlineSection: outlineSectionSchema
   }
 };
