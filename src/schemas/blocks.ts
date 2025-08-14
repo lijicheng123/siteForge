@@ -14,9 +14,8 @@ export const outlineSectionSchema = objectSchema({
   estimatedWords: { type: 'number', minimum: 50, maximum: 2000 }
 }, ['sectionName', 'instruction']);
 
-// 基础区块Schema - 支持递归结构，包含prompt字段
+// 基础区块Schema - 支持一层嵌套，包含prompt字段
 export const blockSchema = {
-  $id: 'blockSchema',
   type: 'object',
   properties: {
     component: { type: 'string', minLength: 1, maxLength: 100 },
@@ -25,7 +24,59 @@ export const blockSchema = {
     props: { type: 'object', additionalProperties: true },
     children: {
       type: 'array',
-      items: { $ref: 'blockSchema#' },
+      items: {
+        type: 'object',
+        properties: {
+          component: { type: 'string', minLength: 1, maxLength: 100 },
+          level: { type: 'number', minimum: 0, maximum: 10, default: 0 },
+          config: { type: 'object', additionalProperties: true },
+          props: { type: 'object', additionalProperties: true },
+          content: {
+            oneOf: [
+              { 
+                type: 'object', 
+                properties: { 
+                  source: { type: 'string', format: 'uri' },
+                  alt: { type: 'string', minLength: 1, maxLength: 200 }
+                }, 
+                required: ['source'] 
+              },
+              { 
+                type: 'object', 
+                properties: { 
+                  text: { type: 'string', minLength: 1, maxLength: 2000 } 
+                }, 
+                required: ['text'] 
+              },
+              { 
+                type: 'object', 
+                properties: { 
+                  prompt: { type: 'string', minLength: 10, maxLength: 500 } 
+                }, 
+                required: ['prompt'] 
+              }
+            ]
+          },
+          link: {
+            type: 'object',
+            properties: {
+              source: { type: 'string', format: 'uri' },
+              target: { type: 'string', enum: ['_self', '_blank', '_parent', '_top'], default: '_self' },
+              rel: { type: 'string', enum: ['noopener', 'noreferrer'], default: 'noopener' }
+            },
+            required: ['source']
+          },
+          style: {
+            type: 'object',
+            properties: {
+              className: { type: 'string', minLength: 1, maxLength: 200 },
+              customCSS: { type: 'string', minLength: 1, maxLength: 1000 }
+            }
+          }
+        },
+        required: ['component'],
+        additionalProperties: false
+      },
       minItems: 0
     },
     content: {
@@ -63,43 +114,115 @@ export const blockSchema = {
       },
       required: ['source']
     },
-    style: objectSchema({
-      className: { type: 'string', minLength: 1, maxLength: 200 },
-      customCSS: { type: 'string', minLength: 1, maxLength: 1000 }
-    })
+    style: {
+      type: 'object',
+      properties: {
+        className: { type: 'string', minLength: 1, maxLength: 200 },
+        customCSS: { type: 'string', minLength: 1, maxLength: 1000 }
+      }
+    }
   },
   required: ['component'],
   additionalProperties: false
 };
 
-// 最终区块Schema - 移除prompt，只保留确定内容
-export const blockFinalSchema = objectSchema({
-  component: { type: 'string', minLength: 1, maxLength: 100 },
-  level: { type: 'number', minimum: 0, maximum: 10, default: 0 },
-  config: { type: 'object', additionalProperties: true },
-  props: { type: 'object', additionalProperties: true },
-  children: arraySchema({ $ref: 'blockFinalSchema#' }),
-  content: {
-    oneOf: [
-      objectSchema({
+// 最终区块Schema - 移除prompt，只保留确定内容，支持一层嵌套
+export const blockFinalSchema = {
+  type: 'object',
+  properties: {
+    component: { type: 'string', minLength: 1, maxLength: 100 },
+    level: { type: 'number', minimum: 0, maximum: 10, default: 0 },
+    config: { type: 'object', additionalProperties: true },
+    props: { type: 'object', additionalProperties: true },
+    children: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          component: { type: 'string', minLength: 1, maxLength: 100 },
+          level: { type: 'number', minimum: 0, maximum: 10, default: 0 },
+          config: { type: 'object', additionalProperties: true },
+          props: { type: 'object', additionalProperties: true },
+          content: {
+            oneOf: [
+              {
+                type: 'object',
+                properties: {
+                  source: { type: 'string', format: 'uri' },
+                  alt: { type: 'string', minLength: 1, maxLength: 200 }
+                },
+                required: ['source']
+              },
+              {
+                type: 'object',
+                properties: {
+                  text: { type: 'string', minLength: 1, maxLength: 2000 }
+                },
+                required: ['text']
+              }
+            ]
+          },
+          link: {
+            type: 'object',
+            properties: {
+              source: { type: 'string', format: 'uri' },
+              target: { type: 'string', enum: ['_self', '_blank', '_parent', '_top'], default: '_self' },
+              rel: { type: 'string', enum: ['noopener', 'noreferrer'], default: 'noopener' }
+            },
+            required: ['source']
+          },
+          style: {
+            type: 'object',
+            properties: {
+              className: { type: 'string', minLength: 1, maxLength: 200 },
+              customCSS: { type: 'string', minLength: 1, maxLength: 1000 }
+            }
+          }
+        },
+        required: ['component'],
+        additionalProperties: false
+      },
+      minItems: 0
+    },
+    content: {
+      oneOf: [
+        {
+          type: 'object',
+          properties: {
+            source: { type: 'string', format: 'uri' },
+            alt: { type: 'string', minLength: 1, maxLength: 200 }
+          },
+          required: ['source']
+        },
+        {
+          type: 'object',
+          properties: {
+            text: { type: 'string', minLength: 1, maxLength: 2000 }
+          },
+          required: ['text']
+        }
+      ]
+    },
+    link: {
+      type: 'object',
+      properties: {
         source: { type: 'string', format: 'uri' },
-        alt: { type: 'string', minLength: 1, maxLength: 200 }
-      }, ['source']),
-      objectSchema({
-        text: { type: 'string', minLength: 1, maxLength: 2000 }
-      }, ['text'])
-    ]
+        target: { type: 'string', enum: ['_self', '_blank', '_parent', '_top'], default: '_self' },
+        rel: { type: 'string', enum: ['noopener', 'noreferrer'], default: 'noopener' }
+      },
+      required: ['source']
+    },
+    style: {
+      type: 'object',
+      properties: {
+        className: { type: 'string', minLength: 1, maxLength: 200 },
+        customCSS: { type: 'string', minLength: 1, maxLength: 1000 }
+      }
+    }
   },
-  link: objectSchema({
-    source: { type: 'string', format: 'uri' },
-    target: { type: 'string', enum: ['_self', '_blank', '_parent', '_top'], default: '_self' },
-    rel: { type: 'string', enum: ['noopener', 'noreferrer'], default: 'noopener' }
-  }, ['source']),
-  style: objectSchema({
-    className: { type: 'string', minLength: 1, maxLength: 200 },
-    customCSS: { type: 'string', minLength: 1, maxLength: 1000 }
-  })
-}, ['component']);
+  required: ['component'],
+  additionalProperties: false
+};
 
 // 基础页面Schema - 只包含基本信息
 export const basicPageSchema = objectSchema({
