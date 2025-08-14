@@ -7,6 +7,8 @@
     "build": "tsc",
     "start": "node dist/app.js",
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
+    "debug": "node --inspect-brk=0.0.0.0:9229 -r ts-node-dev/register src/app.ts",
+    "debug:test": "node --inspect-brk=0.0.0.0:9229 tests/run-all-tests.js",
     "test": "node tests/run-all-tests.js",
     "test:health": "node tests/test-health-check.js",
     "test:step1": "node tests/test-workflow-step1.js",

@@ -22,12 +22,18 @@ import {
  */
 export async function executeStep1(params: Step1Request) {
   const { rawInput } = params;
-  const prompt = promptFactory.getStep1AnalyzerPrompt(rawInput);
+  const prompt = promptFactory.getStep1AnalyzerPrompt(rawInput, true); // 启用 JSON 模式
   const response = await LLMGateway.callText({ 
     model: MODEL_IDS.GEMINI_2_5_PRO, 
     prompt, 
-    temperature: 0.2 
+    temperature: 0.2,
+    jsonMode: true // 启用原生 JSON 模式
   });
+  
+  // 调试：打印原始响应
+  console.log(`[Step1 Debug] 原始响应长度: ${response.length}`);
+  console.log(`[Step1 Debug] 原始响应内容: ${response.substring(0, 200)}${response.length > 200 ? '...' : ''}`);
+  
   return JSON.parse(response);
 }
 
@@ -38,12 +44,18 @@ export async function executeStep1(params: Step1Request) {
 export async function executeStep2(params: Step2Request) {
   const { industry, preference, brandPersonality, targetMarket } = params;
   const context = { industry, preference };
-  const prompt = promptFactory.getStep2DesignerPrompt(context);
+  const prompt = promptFactory.getStep2DesignerPrompt(context, true); // 启用 JSON 模式
   const response = await LLMGateway.callText({ 
     model: MODEL_IDS.GEMINI_2_5_PRO, 
     prompt, 
-    temperature: 0.6 
+    temperature: 0.6,
+    jsonMode: true // 启用原生 JSON 模式
   });
+  
+  // 调试：打印原始响应
+  console.log(`[Step2 Debug] 原始响应长度: ${response.length}`);
+  console.log(`[Step2 Debug] 原始响应内容: ${response.substring(0, 200)}${response.length > 200 ? '...' : ''}`);
+  
   return JSON.parse(response);
 }
 
@@ -54,12 +66,18 @@ export async function executeStep2(params: Step2Request) {
 export async function executeStep3(params: Step3Request) {
   const { companyName, products, industry, targetMarket } = params;
   const context = { companyName, products };
-  const prompt = promptFactory.getStep3ArchitectPrompt(context);
+  const prompt = promptFactory.getStep3ArchitectPrompt(context, true); // 启用 JSON 模式
   const response = await LLMGateway.callText({ 
     model: MODEL_IDS.GEMINI_2_5_PRO, 
     prompt, 
-    temperature: 0.3 
+    temperature: 0.3,
+    jsonMode: true // 启用原生 JSON 模式
   });
+  
+  // 调试：打印原始响应
+  console.log(`[Step3 Debug] 原始响应长度: ${response.length}`);
+  console.log(`[Step3 Debug] 原始响应内容: ${response.substring(0, 200)}${response.length > 200 ? '...' : ''}`);
+  
   return JSON.parse(response);
 }
 
@@ -68,12 +86,18 @@ export async function executeStep3(params: Step3Request) {
  * 得到所有页面的内容大纲和SEO信息
  */
 export async function executeStep4(params: Step4Request): Promise<any> {
-  const prompt = promptFactory.getStep4PlannerPrompt(params);
+  const prompt = promptFactory.getStep4PlannerPrompt(params, true); // 启用 JSON 模式
   const response = await LLMGateway.callText({ 
     model: MODEL_IDS.GEMINI_2_5_PRO, 
     prompt, 
-    temperature: 0.7 
+    temperature: 0.7,
+    jsonMode: true // 启用原生 JSON 模式
   });
+  
+  // 调试：打印原始响应
+  console.log(`[Step4 Debug] 原始响应长度: ${response.length}`);
+  console.log(`[Step4 Debug] 原始响应内容: ${response.substring(0, 200)}${response.length > 200 ? '...' : ''}`);
+  
   return JSON.parse(response);
 }
 
@@ -85,12 +109,17 @@ export async function executeStep5(params: Step5Request) {
   // 为每个页面的outline生成区块布局
   const enhancedPages = await Promise.all(blueprint.pages.map(async (page: any) => {
     if (page.outline && Array.isArray(page.outline)) {
-      const layoutPrompt = promptFactory.getStep5LayoutPrompt(page.outline, blockLibrary);
+      const layoutPrompt = promptFactory.getStep5LayoutPrompt(page.outline, blockLibrary, true); // 启用 JSON 模式
       const response = await LLMGateway.callText({ 
         model: MODEL_IDS.GEMINI_2_5_PRO, 
         prompt: layoutPrompt, 
-        temperature: 0.1 
+        temperature: 0.1,
+        jsonMode: true // 启用原生 JSON 模式
       });
+      
+      // 调试：打印原始响应
+      console.log(`[Step5 Debug] 页面 ${page.name} 原始响应长度: ${response.length}`);
+      console.log(`[Step5 Debug] 页面 ${page.name} 原始响应内容: ${response.substring(0, 200)}${response.length > 200 ? '...' : ''}`);
       
       const blockLayout = JSON.parse(response);
       
