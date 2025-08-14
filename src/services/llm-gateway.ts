@@ -92,6 +92,20 @@ const getConfig = (): GatewayConfig => {
   };
 };
 
+// 获取默认的max_tokens配置
+const getDefaultMaxTokens = (provider: Provider): number => {
+  switch (provider) {
+    case 'claude':
+      return parseInt(process.env.DEFAULT_MAX_TOKENS_CLAUDE || '4096', 10);
+    case 'openai':
+      return parseInt(process.env.DEFAULT_MAX_TOKENS_GPT || '4096', 10);
+    case 'gemini':
+      return parseInt(process.env.DEFAULT_MAX_TOKENS_GEMINI || '4096', 10);
+    default:
+      return 4096; // 兜底默认值
+  }
+};
+
 // 检测模型提供商
 const getProvider = (model: string): Provider => {
   if (model.startsWith('gemini')) return 'gemini';
@@ -120,7 +134,7 @@ const callGeminiOfficial = async (request: LLMRequest): Promise<LLMResponse> => 
     generationConfig: {
       temperature: request.temperature || 0.7,
       topP: request.top_p || 1.0,
-      maxOutputTokens: request.max_tokens || 4096
+      maxOutputTokens: request.max_tokens || getDefaultMaxTokens('gemini')
     }
   };
 
@@ -170,7 +184,7 @@ const callGeminiHuandu = async (request: LLMRequest): Promise<LLMResponse> => {
     generationConfig: {
       temperature: request.temperature || 0.7,
       topP: request.top_p || 1.0,
-      maxOutputTokens: request.max_tokens || 4096
+      maxOutputTokens: request.max_tokens || getDefaultMaxTokens('gemini')
     }
   };
 
@@ -212,7 +226,7 @@ const callClaudeOfficial = async (request: LLMRequest): Promise<LLMResponse> => 
   const url = `${baseUrl}/v1/messages`;
   const payload: any = {
     model: request.model,
-    max_tokens: request.max_tokens || 4096,
+    max_tokens: request.max_tokens || getDefaultMaxTokens('claude'),
     temperature: request.temperature || 0.7,
     top_p: request.top_p || 1.0,
     messages: []
@@ -267,7 +281,7 @@ const callClaudeHuandu = async (request: LLMRequest): Promise<LLMResponse> => {
   const url = `${baseUrl}${endpoints.claude}`;
   const payload: any = {
     model: request.model,
-    max_tokens: request.max_tokens || 4096,
+    max_tokens: request.max_tokens || getDefaultMaxTokens('claude'),
     temperature: request.temperature || 0.7,
     top_p: request.top_p || 1.0,
     messages: []
@@ -326,7 +340,7 @@ const callOpenAIOfficial = async (request: LLMRequest): Promise<LLMResponse> => 
     }],
     temperature: request.temperature || 0.7,
     top_p: request.top_p || 1.0,
-    max_tokens: request.max_tokens || 4096
+    max_tokens: request.max_tokens || getDefaultMaxTokens('openai')
   };
 
   // 启用原生 JSON 模式
@@ -374,7 +388,7 @@ const callOpenAIHuandu = async (request: LLMRequest): Promise<LLMResponse> => {
     }],
     temperature: request.temperature || 0.7,
     top_p: request.top_p || 1.0,
-    max_tokens: request.max_tokens || 4096
+    max_tokens: request.max_tokens || getDefaultMaxTokens('openai')
   };
 
   // 启用原生 JSON 模式
@@ -409,13 +423,6 @@ export const callLLM = async (request: LLMRequest): Promise<LLMResponse> => {
   const provider = getProvider(request.model);
 
   console.log(`[LLM Gateway] 调用模型: ${request.model}, 渠道: ${channel}, 提供商: ${provider}`);
-  console.log(`[LLM Gateway] 请求参数:`, {
-    model: request.model,
-    temperature: request.temperature,
-    top_p: request.top_p,
-    max_tokens: request.max_tokens,
-    prompt_length: request.prompt.length
-  });
 
   try {
     let response: LLMResponse;
@@ -443,12 +450,6 @@ export const callLLM = async (request: LLMRequest): Promise<LLMResponse> => {
       default:
         throw new Error(`Unsupported provider: ${provider}`);
     }
-
-    console.log(`[LLM Gateway] 调用成功, 响应长度: ${response.content.length}`);
-    if (response.usage) {
-      console.log(`[LLM Gateway] Token 使用量:`, response.usage);
-    }
-
     return response;
   } catch (error: any) {
     console.error(`[LLM Gateway] 调用失败:`, error.message);
