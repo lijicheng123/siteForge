@@ -20,17 +20,11 @@ const getSchemaString = (schema: unknown): string => {
 };
 
 // 通用的JSON格式要求，根据Schema类型自动判断
-const getJsonFormatRequirement = (schema: unknown, useJsonMode: boolean = false): string => {
-  if (useJsonMode) {
-    // 启用原生 JSON 模式时，只需简单说明
-    return `\n请严格按照以下 JSON Schema 返回结构化数据：\n`;
-  }
-  
-  // 未启用原生 JSON 模式时，使用详细的格式要求
+const getJsonFormatRequirement = (schema: unknown, _useJsonMode: boolean = false): string => {
+  // 无论是否启用 JSON 模式，都强制严格的纯 JSON 输出要求
   let outputType = '数据';
   let startChar = '{';
-  
-  // 检查Schema定义中的type字段
+
   if (typeof schema === 'object' && schema !== null) {
     const schemaObj = schema as any;
     if (schemaObj.type === 'array') {
@@ -41,7 +35,7 @@ const getJsonFormatRequirement = (schema: unknown, useJsonMode: boolean = false)
       startChar = '{';
     }
   }
-  
+
   return `
 ⚠️ 重要：输出格式要求 ⚠️
 1. 必须返回纯JSON${outputType}，不要包含任何其他文字、解释或markdown标记
@@ -50,6 +44,7 @@ const getJsonFormatRequirement = (schema: unknown, useJsonMode: boolean = false)
 4. 直接返回符合Schema的JSON${outputType}
 5. 确保JSON格式完全正确，可以被JSON.parse()直接解析
 6. 如果无法生成完整数据，请返回包含error字段的JSON对象
+7. 不要输出“好的/Alright/Okay”等确认词，直接输出JSON
 
 💡 续写技巧：请从以下字符开始你的回答：
 ${startChar}`;

@@ -16,17 +16,67 @@ export interface LLMRequest {
   max_tokens?: number;
   channel?: Channel; // 默认为 huandu
   jsonMode?: boolean; // 启用原生 JSON 模式
+  // 提供可选的 JSON Schema（仅 Gemini 官方/兼容通道支持）。
+  // 对应官方文档的 response_json_schema 字段：
+  // https://ai.google.dev/gemini-api/docs/structured-output?hl=zh-cn#javascript
+  jsonSchema?: unknown;
 }
 
 // LLM 响应
 export interface LLMResponse {
   content: string;
+  thought?: string;
   usage?: {
     prompt_tokens: number;
     completion_tokens: number;
     total_tokens: number;
   };
 }
+
+// 尝试将带有 ```json 包裹或前后夹杂说明文字的文本，清洗为纯 JSON 字符串
+const sanitizeJsonLikeContent = (rawText: string): string => {
+  if (!rawText) return rawText;
+
+  let text = rawText.trim();
+
+  // 去除 Markdown 代码块围栏 ```json ... ``` 或 ``` ... ```
+  if (text.startsWith('```')) {
+    // 移除起始 ```json 或 ```
+    text = text.replace(/^```[a-zA-Z]*\s*/i, '');
+    // 移除末尾 ```
+    text = text.replace(/\s*```\s*$/i, '');
+  }
+
+  // 直接尝试解析
+  try {
+    JSON.parse(text);
+    return text;
+  } catch {}
+
+  // 尝试截取第一个对象或数组的主体
+  const firstBrace = text.indexOf('{');
+  const lastBrace = text.lastIndexOf('}');
+  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+    const candidate = text.slice(firstBrace, lastBrace + 1).trim();
+    try {
+      JSON.parse(candidate);
+      return candidate;
+    } catch {}
+  }
+
+  const firstBracket = text.indexOf('[');
+  const lastBracket = text.lastIndexOf(']');
+  if (firstBracket !== -1 && lastBracket !== -1 && lastBracket > firstBracket) {
+    const candidate = text.slice(firstBracket, lastBracket + 1).trim();
+    try {
+      JSON.parse(candidate);
+      return candidate;
+    } catch {}
+  }
+
+  // 未能清洗出有效 JSON，返回原始文本
+  return rawText;
+};
 
 // 网关配置
 interface GatewayConfig {
@@ -140,7 +190,11 @@ const callGeminiOfficial = async (request: LLMRequest): Promise<LLMResponse> => 
 
   // 启用原生 JSON 模式
   if (request.jsonMode) {
-    payload.generationConfig.responseMimeType = "application/json";
+    // Gemini 使用下划线参数名
+    payload.generationConfig.response_mime_type = "application/json";
+    if (request.jsonSchema) {
+      payload.generationConfig.response_json_schema = request.jsonSchema;
+    }
   }
 
   try {
@@ -151,7 +205,14 @@ const callGeminiOfficial = async (request: LLMRequest): Promise<LLMResponse> => 
       }
     });
 
-    const content = (response.data.candidates?.[0]?.content?.parts?.[0]?.text || '').trim();
+    const contentRaw = (response.data.candidates?.[0]?.content?.parts?.[0]?.text || '').trim();
+    const content = request.jsonMode ? sanitizeJsonLikeContent(contentRaw) : contentRaw;
+    // 调试：记录返回的 content-type 与内容片段
+    try {
+      const ct = (response.headers && (response.headers['content-type'] || response.headers['Content-Type'])) || 'unknown';
+      console.log('[LLM Gateway][Gemini official] content-type:', ct);
+      console.log('[LLM Gateway][Gemini official] jsonMode:', !!request.jsonMode, 'preview:', content.substring(0, 200));
+    } catch {}
     const usage = response.data.usageMetadata ? {
       prompt_tokens: response.data.usageMetadata.promptTokenCount || 0,
       completion_tokens: response.data.usageMetadata.candidatesTokenCount || 0,
@@ -190,7 +251,11 @@ const callGeminiHuandu = async (request: LLMRequest): Promise<LLMResponse> => {
 
   // 启用原生 JSON 模式
   if (request.jsonMode) {
+    // 根据官方 REST Demo，使用 camelCase
     payload.generationConfig.responseMimeType = "application/json";
+    if (request.jsonSchema) {
+      payload.generationConfig.responseSchema = request.jsonSchema;
+    }
   }
 
   try {
@@ -200,15 +265,18 @@ const callGeminiHuandu = async (request: LLMRequest): Promise<LLMResponse> => {
         'Authorization': `Bearer ${apiKey}`
       }
     });
+    // parts[0] 是系统思考，parts[1] 是响应
+    const thought = (response.data.candidates?.[0]?.content?.parts?.[0]?.text || '').trim();
+    const contentRaw = (response.data.candidates?.[0]?.content?.parts?.[1]?.text || '').trim();
+    const content = request.jsonMode ? sanitizeJsonLikeContent(contentRaw) : contentRaw;
 
-    const content = (response.data.candidates?.[0]?.content?.parts?.[0]?.text || '').trim();
     const usage = response.data.usageMetadata ? {
       prompt_tokens: response.data.usageMetadata.promptTokenCount || 0,
       completion_tokens: response.data.usageMetadata.candidatesTokenCount || 0,
       total_tokens: response.data.usageMetadata.totalTokenCount || 0
     } : undefined;
 
-    return { content, usage };
+    return { content, usage, thought };
   } catch (error: any) {
     throw new Error(`Gemini huandu gateway error: ${error.response?.data?.error?.message || error.message}`);
   }
@@ -255,7 +323,13 @@ const callClaudeOfficial = async (request: LLMRequest): Promise<LLMResponse> => 
       }
     });
 
-    const content = (response.data.content?.[0]?.text || '').trim();
+    const contentRaw = (response.data.content?.[0]?.text || '').trim();
+    const content = request.jsonMode ? sanitizeJsonLikeContent(contentRaw) : contentRaw;
+    try {
+      const ct = (response.headers && (response.headers['content-type'] || response.headers['Content-Type'])) || 'unknown';
+      console.log('[LLM Gateway][Claude official] content-type:', ct);
+      console.log('[LLM Gateway][Claude official] jsonMode:', !!request.jsonMode, 'preview:', content.substring(0, 200));
+    } catch {}
     const usage = response.data.usage ? {
       prompt_tokens: response.data.usage.input_tokens || 0,
       completion_tokens: response.data.usage.output_tokens || 0,
@@ -309,7 +383,13 @@ const callClaudeHuandu = async (request: LLMRequest): Promise<LLMResponse> => {
       }
     });
 
-    const content = (response.data.content?.[0]?.text || '').trim();
+    const contentRaw = (response.data.content?.[0]?.text || '').trim();
+    const content = request.jsonMode ? sanitizeJsonLikeContent(contentRaw) : contentRaw;
+    try {
+      const ct = (response.headers && (response.headers['content-type'] || response.headers['Content-Type'])) || 'unknown';
+      console.log('[LLM Gateway][Claude huandu] content-type:', ct);
+      console.log('[LLM Gateway][Claude huandu] jsonMode:', !!request.jsonMode, 'preview:', content.substring(0, 200));
+    } catch {}
     const usage = response.data.usage ? {
       prompt_tokens: response.data.usage.input_tokens || 0,
       completion_tokens: response.data.usage.output_tokens || 0,
@@ -356,7 +436,13 @@ const callOpenAIOfficial = async (request: LLMRequest): Promise<LLMResponse> => 
       }
     });
 
-    const content = (response.data.choices?.[0]?.message?.content || '').trim();
+    const contentRaw = (response.data.choices?.[0]?.message?.content || '').trim();
+    const content = request.jsonMode ? sanitizeJsonLikeContent(contentRaw) : contentRaw;
+    try {
+      const ct = (response.headers && (response.headers['content-type'] || response.headers['Content-Type'])) || 'unknown';
+      console.log('[LLM Gateway][OpenAI official] content-type:', ct);
+      console.log('[LLM Gateway][OpenAI official] jsonMode:', !!request.jsonMode, 'preview:', content.substring(0, 200));
+    } catch {}
     const usage = response.data.usage ? {
       prompt_tokens: response.data.usage.prompt_tokens || 0,
       completion_tokens: response.data.usage.completion_tokens || 0,
@@ -404,7 +490,13 @@ const callOpenAIHuandu = async (request: LLMRequest): Promise<LLMResponse> => {
       }
     });
 
-    const content = (response.data.choices?.[0]?.message?.content || '').trim();
+    const contentRaw = (response.data.choices?.[0]?.message?.content || '').trim();
+    const content = request.jsonMode ? sanitizeJsonLikeContent(contentRaw) : contentRaw;
+    try {
+      const ct = (response.headers && (response.headers['content-type'] || response.headers['Content-Type'])) || 'unknown';
+      console.log('[LLM Gateway][OpenAI huandu] content-type:', ct);
+      console.log('[LLM Gateway][OpenAI huandu] jsonMode:', !!request.jsonMode, 'preview:', content.substring(0, 200));
+    } catch {}
     const usage = response.data.usage ? {
       prompt_tokens: response.data.usage.prompt_tokens || 0,
       completion_tokens: response.data.usage.completion_tokens || 0,
@@ -460,6 +552,17 @@ export const callLLM = async (request: LLMRequest): Promise<LLMResponse> => {
 // 便捷的调用方法，只返回内容文本
 export const callLLMText = async (request: LLMRequest): Promise<string> => {
   const response = await callLLM(request);
+  if (!response.content) {
+    console.error('没有content，callLLMText thought=>', response.thought)
+    throw new Error('没有content，callLLMText thought')
+  }
+  try {
+    JSON.parse(response.content)
+  } catch (error) {
+    console.error('callLLMText response.content 不是有效的 JSON,response=>', response)
+    return response.content
+  }
+
   return response.content;
 };
 
