@@ -4,55 +4,15 @@
  */
 
 import { FastifyInstance, FastifyPluginOptions, FastifySchema } from 'fastify';
-import { responseSchema } from '../../schemas';
-import promptFactory from '../../services/prompt-factory';
-import llmProvider from '../../services/llm-provider';
-import { MODEL_IDS } from '../../services/model-catalog';
-import { generateFullGutenbergHtml } from '../../services/html-generator';
-
-// 请求Schema - 只需要用户的原始输入
-const completeWorkflowRequestSchema = {
-  type: 'object',
-  properties: {
-    rawInput: { 
-      type: 'string', 
-      minLength: 10,
-      maxLength: 5000,
-      description: '用户的原始纯文本需求描述'
-    },
-    options: {
-      type: 'object',
-      properties: {
-        brandPersonality: {
-          type: 'string',
-          enum: ['professional', 'creative', 'friendly', 'luxury', 'minimalist', 'bold'],
-          description: '品牌个性特征'
-        },
-        targetMarket: {
-          type: 'string',
-          enum: ['B2B', 'B2C', 'Enterprise', 'SMB'],
-          description: '目标市场类型'
-        },
-        customBlocks: {
-          type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              name: { type: 'string' },
-              description: { type: 'string' },
-              props: { type: 'object' }
-            },
-            required: ['name', 'description']
-          },
-          description: '自定义区块定义'
-        }
-      },
-      additionalProperties: false
-    }
-  },
-  required: ['rawInput'],
-  additionalProperties: false
-};
+import { responseSchema, completeWorkflowRequestSchema } from '../../schemas';
+import { 
+  executeStep1, 
+  executeStep2, 
+  executeStep3, 
+  executeStep4, 
+  executeStep5, 
+  executeStep6 
+} from '../../services/workflow-steps.service';
 
 // 响应Schema - 包含所有步骤的结果
 const completeWorkflowResponseSchema = responseSchema({
@@ -168,41 +128,80 @@ export default async function completeWorkflowRoutes(fastify: FastifyInstance, o
 
       // 步骤1: 需求解析与结构化
       const step1Start = Date.now();
-      const step1Prompt = promptFactory.getStep1AnalyzerPrompt(rawInput);
-      const step1Response = await llmProvider.invoke({ 
-        model: MODEL_IDS.GEMINI_2_5_PRO, 
-        prompt: step1Prompt, 
-        temperature: 0.2 
-      });
-      const step1Data = JSON.parse(llmProvider.cleanAiJsonResponse(step1Response));
+      const step1Input = { rawInput };
+      console.log(`[${workflowId}] Step1 入参:`, JSON.stringify(step1Input, null, 2));
+      
+      const step1Data = await executeStep1(step1Input);
+      console.log(`[${workflowId}] Step1 出参:`, JSON.stringify(step1Data, null, 2));
+      
+      // 验证 Step1 返回数据
+      if (!step1Data || typeof step1Data !== 'object' || Object.keys(step1Data).length === 0) {
+        throw new Error('Step1 返回数据无效或为空');
+      }
+      
+      // 验证必需字段
+      if (!step1Data.companyInfo || !step1Data.companyInfo.industry || !step1Data.companyInfo.name) {
+        throw new Error('Step1 返回数据缺少必需的 companyInfo.industry 或 companyInfo.name 字段');
+      }
+      
+      if (!step1Data.products || !Array.isArray(step1Data.products) || step1Data.products.length === 0) {
+        throw new Error('Step1 返回数据缺少必需的 products 数组');
+      }
+      
+      if (!step1Data.targetAudience || !step1Data.targetAudience.preference) {
+        throw new Error('Step1 返回数据缺少必需的 targetAudience.preference 字段');
+      }
+      
       const step1Time = Date.now() - step1Start;
 
       // 步骤2: 品牌视觉设计
       const step2Start = Date.now();
-      const step2Prompt = promptFactory.getStep2DesignerPrompt({
+      const step2Input = {
         industry: step1Data.companyInfo.industry,
-        preference: `基于${step1Data.companyInfo.industry}行业特点，${step1Data.targetAudience.preference}风格`
-      });
-      const step2Response = await llmProvider.invoke({ 
-        model: MODEL_IDS.GEMINI_2_5_PRO, 
-        prompt: step2Prompt, 
-        temperature: 0.6 
-      });
-      const step2Data = JSON.parse(llmProvider.cleanAiJsonResponse(step2Response));
+        preference: `基于${step1Data.companyInfo.industry}行业特点，${step1Data.targetAudience.preference}风格`,
+        brandPersonality: options.brandPersonality,
+        targetMarket: options.targetMarket
+      };
+      console.log(`[${workflowId}] Step2 入参:`, JSON.stringify(step2Input, null, 2));
+      
+      const step2Data = await executeStep2(step2Input);
+      console.log(`[${workflowId}] Step2 出参:`, JSON.stringify(step2Data, null, 2));
+      
+      // 验证 Step2 返回数据
+      if (!step2Data || typeof step2Data !== 'object' || Object.keys(step2Data).length === 0) {
+        throw new Error('Step2 返回数据无效或为空');
+      }
+      
+      // 验证设计系统必需字段
+      if (!step2Data.palette || !step2Data.typography) {
+        throw new Error('Step2 返回数据缺少必需的设计系统字段 (palette 或 typography)');
+      }
+      
       const step2Time = Date.now() - step2Start;
 
       // 步骤3: 网站信息架构
       const step3Start = Date.now();
-      const step3Prompt = promptFactory.getStep3ArchitectPrompt({
+      const step3Input = {
         companyName: step1Data.companyInfo.name,
-        products: step1Data.products
-      });
-      const step3Response = await llmProvider.invoke({ 
-        model: MODEL_IDS.GEMINI_2_5_PRO, 
-        prompt: step3Prompt, 
-        temperature: 0.3 
-      });
-      const step3Data = JSON.parse(llmProvider.cleanAiJsonResponse(step3Response));
+        products: step1Data.products,
+        industry: step1Data.companyInfo.industry,
+        targetMarket: options.targetMarket
+      };
+      console.log(`[${workflowId}] Step3 入参:`, JSON.stringify(step3Input, null, 2));
+      
+      const step3Data = await executeStep3(step3Input);
+      console.log(`[${workflowId}] Step3 出参:`, JSON.stringify(step3Data, null, 2));
+      
+      // 验证 Step3 返回数据
+      if (!step3Data || typeof step3Data !== 'object' || Object.keys(step3Data).length === 0) {
+        throw new Error('Step3 返回数据无效或为空');
+      }
+      
+      // 验证网站架构必需字段
+      if (!step3Data.globalElements || !step3Data.pages || !Array.isArray(step3Data.pages) || step3Data.pages.length === 0) {
+        throw new Error('Step3 返回数据缺少必需的网站架构字段 (globalElements 或 pages)');
+      }
+      
       const step3Time = Date.now() - step3Start;
 
       // 步骤4: 页面内容策划
@@ -213,13 +212,31 @@ export default async function completeWorkflowRoutes(fastify: FastifyInstance, o
         globalElements: step3Data.globalElements,
         pages: step3Data.pages
       };
-      const step4Prompt = promptFactory.getStep4PlannerPrompt(blueprintV1);
-      const step4Response = await llmProvider.invoke({ 
-        model: MODEL_IDS.GEMINI_2_5_PRO, 
-        prompt: step4Prompt, 
-        temperature: 0.7 
-      });
-      const step4Data = JSON.parse(llmProvider.cleanAiJsonResponse(step4Response));
+      console.log(`[${workflowId}] Step4 入参:`, JSON.stringify(blueprintV1, null, 2));
+      
+      const step4Data = await executeStep4(blueprintV1);
+      console.log(`[${workflowId}] Step4 出参:`, JSON.stringify(step4Data, null, 2));
+      
+      // 验证 Step4 返回数据
+      if (!step4Data || typeof step4Data !== 'object' || Object.keys(step4Data).length === 0) {
+        throw new Error('Step4 返回数据无效或为空');
+      }
+      
+      // 验证内容完备蓝图必需字段
+      if (!step4Data.pages || !Array.isArray(step4Data.pages) || step4Data.pages.length === 0) {
+        throw new Error('Step4 返回数据缺少必需的 pages 数组');
+      }
+      
+      // 验证每个页面都有必需的字段
+      for (const page of step4Data.pages) {
+        if (!page.name || !page.path || !page.purpose || !page.seo || !page.outline) {
+          throw new Error(`Step4 返回的页面数据缺少必需字段: ${page.name || 'unknown'}`);
+        }
+        if (!Array.isArray(page.outline)) {
+          throw new Error(`Step4 返回的页面 ${page.name} 的 outline 不是数组`);
+        }
+      }
+      
       const step4Time = Date.now() - step4Start;
 
       // 步骤5: 区块布局设计
@@ -232,43 +249,41 @@ export default async function completeWorkflowRoutes(fastify: FastifyInstance, o
         custom_blocks: options.customBlocks || []
       };
       
-      // 为每个页面的outline生成区块布局
-      const enhancedPages = await Promise.all(step4Data.pages.map(async (page: any) => {
-        if (page.outline && Array.isArray(page.outline)) {
-          const step5Prompt = promptFactory.getStep5LayoutPrompt(page.outline, blockLibrary);
-          const step5Response = await llmProvider.invoke({ 
-            model: MODEL_IDS.GEMINI_2_5_PRO, 
-            prompt: step5Prompt, 
-            temperature: 0.1 
-          });
-          const blockLayout = JSON.parse(llmProvider.cleanAiJsonResponse(step5Response));
-          
-          return {
-            ...page,
-            outline: blockLayout
-          };
-        }
-        return page;
-      }));
+      const step5Input = { blueprint: step4Data, blockLibrary };
+      console.log(`[${workflowId}] Step5 入参:`, JSON.stringify(step5Input, null, 2));
       
-      const blueprintV3 = {
-        ...blueprintV1,
-        pages: enhancedPages
-      };
+      const blueprintV3 = await executeStep5(step5Input);
+      console.log(`[${workflowId}] Step5 出参:`, JSON.stringify(blueprintV3, null, 2));
+      
+      // 验证 Step5 返回数据
+      if (!blueprintV3 || typeof blueprintV3 !== 'object' || Object.keys(blueprintV3).length === 0) {
+        throw new Error('Step5 返回数据无效或为空');
+      }
+      
+      // 验证布局完备蓝图必需字段
+      if (!blueprintV3.pages || !Array.isArray(blueprintV3.pages) || blueprintV3.pages.length === 0) {
+        throw new Error('Step5 返回数据缺少必需的 pages 数组');
+      }
+      
+      // 验证每个页面都有必需的字段
+      for (const page of blueprintV3.pages) {
+        if (!page.name || !page.path || !page.purpose || !page.seo || !page.outline) {
+          throw new Error(`Step5 返回的页面数据缺少必需字段: ${page.name || 'unknown'}`);
+        }
+        if (!Array.isArray(page.outline)) {
+          throw new Error(`Step5 返回的页面 ${page.name} 的 outline 不是数组`);
+        }
+      }
+      
       const step5Time = Date.now() - step5Start;
 
       // 步骤6: 确定性代码生成
       const step6Start = Date.now();
-      const finalHTML = generateFullGutenbergHtml({
-        structuredData: step1Data,
-        pages: blueprintV3.pages.map(p => ({
-          name: p.name,
-          path: p.path,
-          purpose: p.purpose,
-          seo: p.seo,
-          outline: Array.isArray(p.outline) ? p.outline : []
-        }))
-      });
+      console.log(`[${workflowId}] Step6 入参:`, JSON.stringify(blueprintV3, null, 2));
+      
+      const finalHTML = executeStep6(blueprintV3);
+      console.log(`[${workflowId}] Step6 出参:`, JSON.stringify({ html: finalHTML.substring(0, 200) + '...' }, null, 2));
+      
       const step6Time = Date.now() - step6Start;
 
       const totalTime = Date.now() - startTime;

@@ -4,49 +4,8 @@
  */
 
 import { FastifyInstance, FastifyPluginOptions, FastifySchema } from 'fastify';
-import { websiteArchitectureSchema, responseSchema } from '../../schemas';
-import promptFactory from '../../services/prompt-factory';
-import llmProvider from '../../services/llm-provider';
-import { MODEL_IDS } from '../../services/model-catalog';
-
-// 请求Schema
-const step3RequestSchema = {
-  type: 'object',
-  properties: {
-    companyName: { 
-      type: 'string', 
-      minLength: 1,
-      maxLength: 100,
-      description: '公司名称'
-    },
-    products: { 
-      type: 'array', 
-      minItems: 1,
-      items: {
-        type: 'object',
-        properties: {
-          name: { type: 'string', minLength: 1, maxLength: 100 },
-          category: { type: 'string', minLength: 1, maxLength: 100 },
-          description: { type: 'string', minLength: 10, maxLength: 500 }
-        },
-        required: ['name', 'category']
-      }
-    },
-    industry: {
-      type: 'string',
-      minLength: 1,
-      maxLength: 100,
-      description: '公司所属行业'
-    },
-    targetMarket: {
-      type: 'string',
-      enum: ['B2B', 'B2C', 'Enterprise', 'SMB'],
-      description: '目标市场类型'
-    }
-  },
-  required: ['companyName', 'products'],
-  additionalProperties: false
-};
+import { websiteArchitectureSchema, responseSchema, step3RequestSchema } from '../../schemas';
+import { executeStep3 } from '../../services/workflow-steps.service';
 
 // 响应Schema
 const step3ResponseSchema = responseSchema(websiteArchitectureSchema);
@@ -81,22 +40,13 @@ export default async function step3Routes(fastify: FastifyInstance, options: Fas
       
       // 核心业务逻辑
       // 1. 构建AI Prompt，指示AI扮演信息架构师
-      const context = { companyName, products };
-      const prompt = promptFactory.getStep3ArchitectPrompt(context);
-      
       // 2. 根据公司名称和产品信息生成网站地图
       // 3. 设计全局导航和页脚结构
       // 4. 调用AI模型，强制返回符合websiteArchitectureSchema结构的JSON
-      const responseJsonString = await llmProvider.invoke({ 
-        model: MODEL_IDS.GEMINI_2_5_PRO, 
-        prompt, 
-        temperature: 0.3 
-      });
+      // 调用服务函数执行核心业务逻辑
+      const websiteArchitecture = await executeStep3({ companyName, products, industry, targetMarket });
       
-      // 5. 验证AI返回的数据结构
-      const websiteArchitecture = JSON.parse(llmProvider.cleanAiJsonResponse(responseJsonString));
-      
-      // 6. 返回网站架构信息
+      // 返回网站架构信息
       return reply.send({
         success: true,
         data: websiteArchitecture,

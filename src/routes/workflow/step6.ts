@@ -4,11 +4,8 @@
  */
 
 import { FastifyInstance, FastifyPluginOptions, FastifySchema } from 'fastify';
-import { contentAndLayoutCompleteBlueprintSchema, responseSchema } from '../../schemas';
-import { generateFullGutenbergHtml } from '../../services/html-generator';
-
-// 请求Schema 使用内容和布局都完备的蓝图Schema定义
-const step6RequestSchema = contentAndLayoutCompleteBlueprintSchema;
+import { contentAndLayoutCompleteBlueprintSchema, responseSchema, step6RequestSchema } from '../../schemas';
+import { executeStep6 } from '../../services/workflow-steps.service';
 
 // 响应数据Schema
 const step6ResponseDataSchema = {
@@ -62,18 +59,16 @@ export default async function step6Routes(fastify: FastifyInstance, options: Fas
       // 3. 该函数需要递归遍历蓝图中的所有 Block 对象
       // 4. 根据每个 block 的 `component`, `config`, `props`, `content` 和 `children`，精确地生成对应的古腾堡HTML注释语法
       // 5. 返回包含完整HTML字符串的JSON对象
-      
-      // 生成完整的HTML
-      const fullHTML = generateFullGutenbergHtml({
+      // 构建蓝图数据
+      const blueprint = {
         structuredData,
-        pages: pages.map(p => ({
-          name: p.name,
-          path: p.path,
-          purpose: p.purpose,
-          seo: p.seo,
-          outline: Array.isArray(p.outline) ? p.outline : []
-        }))
-      });
+        designSystem,
+        globalElements,
+        pages
+      };
+      
+      // 调用服务函数执行核心业务逻辑
+      const fullHTML = executeStep6(blueprint);
       
       return reply.send({
         success: true,

@@ -4,42 +4,8 @@
  */
 
 import { FastifyInstance, FastifyPluginOptions, FastifySchema } from 'fastify';
-import { designSystemSchema, responseSchema } from '../../schemas';
-import promptFactory from '../../services/prompt-factory';
-import llmProvider from '../../services/llm-provider';
-import { MODEL_IDS } from '../../services/model-catalog';
-
-// 请求Schema
-const step2RequestSchema = {
-  type: 'object',
-  properties: {
-    industry: { 
-      type: 'string', 
-      minLength: 1,
-      maxLength: 100,
-      description: '公司所属行业，例如：工业LED照明'
-    },
-    preference: { 
-      type: 'string', 
-      minLength: 10,
-      maxLength: 500,
-      description: '目标客户的设计偏好，例如：简洁明了的设计'
-    },
-    brandPersonality: {
-      type: 'string',
-      enum: ['professional', 'creative', 'friendly', 'luxury', 'minimalist', 'bold'],
-      description: '品牌个性特征'
-    },
-    targetMarket: {
-      type: 'string',
-      enum: ['B2B', 'B2C', 'Enterprise', 'SMB'],
-      description: '目标市场类型',
-      default: 'B2B'
-    }
-  },
-  required: ['industry', 'preference'],
-  additionalProperties: false
-};
+import { designSystemSchema, responseSchema, step2RequestSchema } from '../../schemas';
+import { executeStep2 } from '../../services/workflow-steps.service';
 
 // 响应Schema
 const step2ResponseSchema = responseSchema(designSystemSchema);
@@ -74,21 +40,12 @@ export default async function step2Routes(fastify: FastifyInstance, options: Fas
       
       // 核心业务逻辑
       // 1. 构建AI Prompt，指示AI扮演品牌视觉设计师
-      const context = { industry, preference };
-      const prompt = promptFactory.getStep2DesignerPrompt(context);
-      
       // 2. 根据行业和偏好生成调色板、字体、间距等设计规范
       // 3. 调用AI模型，强制返回符合designSystemSchema结构的JSON
-      const responseJsonString = await llmProvider.invoke({ 
-        model: MODEL_IDS.GEMINI_2_5_PRO, 
-        prompt, 
-        temperature: 0.6 
-      });
+      // 调用服务函数执行核心业务逻辑
+      const designSystem = await executeStep2({ industry, preference, brandPersonality, targetMarket });
       
-      // 4. 验证AI返回的数据结构
-      const designSystem = JSON.parse(llmProvider.cleanAiJsonResponse(responseJsonString));
-      
-      // 5. 返回设计系统配置
+      // 返回设计系统配置
       return reply.send({
         success: true,
         data: designSystem,

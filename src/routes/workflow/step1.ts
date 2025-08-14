@@ -4,25 +4,8 @@
  */
 
 import { FastifyInstance, FastifyPluginOptions, FastifySchema } from 'fastify';
-import { structuredDataSchema, responseSchema } from '../../schemas';
-import promptFactory from '../../services/prompt-factory';
-import llmProvider from '../../services/llm-provider';
-import { MODEL_IDS } from '../../services/model-catalog';
-
-// 请求Schema
-const step1RequestSchema = {
-  type: 'object',
-  properties: {
-    rawInput: { 
-      type: 'string', 
-      minLength: 10,
-      maxLength: 5000,
-      description: '用户的原始纯文本需求描述'
-    }
-  },
-  required: ['rawInput'],
-  additionalProperties: false
-};
+import { structuredDataSchema, responseSchema, step1RequestSchema } from '../../schemas';
+import { executeStep1 } from '../../services/workflow-steps.service';
 
 // 响应Schema
 const step1ResponseSchema = responseSchema(structuredDataSchema);
@@ -52,19 +35,10 @@ export default async function step1Routes(fastify: FastifyInstance, options: Fas
       
       // 核心业务逻辑
       // 1. 构建AI Prompt，包含角色、背景、目标和详细任务
-      const prompt = promptFactory.getStep1AnalyzerPrompt(rawInput);
+      // 调用服务函数执行核心业务逻辑
+      const structuredData = await executeStep1({ rawInput });
       
-      // 2. 调用AI模型（使用Gemini），强制返回符合structuredDataSchema结构的JSON
-      const responseJsonString = await llmProvider.invoke({ 
-        model: MODEL_IDS.GEMINI_2_5_PRO, 
-        prompt, 
-        temperature: 0.2 
-      });
-      
-      // 3. 验证AI返回的数据结构
-      const structuredData = JSON.parse(llmProvider.cleanAiJsonResponse(responseJsonString));
-      
-      // 4. 返回结构化的公司数据
+      // 返回结构化的公司数据
       return reply.send({
         success: true,
         data: structuredData,

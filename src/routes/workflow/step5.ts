@@ -4,21 +4,8 @@
  */
 
 import { FastifyInstance, FastifyPluginOptions, FastifySchema } from 'fastify';
-import { contentCompleteBlueprintSchema, layoutCompleteBlueprintSchema, blockLibrarySchema, responseSchema } from '../../schemas';
-import promptFactory from '../../services/prompt-factory';
-import llmProvider from '../../services/llm-provider';
-import { MODEL_IDS } from '../../services/model-catalog';
-
-// 请求Schema：使用内容完备蓝图Schema和区块库定义
-const step5RequestSchema = {
-  type: 'object',
-  properties: {
-    blueprint: contentCompleteBlueprintSchema,
-    blockLibrary: blockLibrarySchema,
-  },
-  required: ['blueprint', 'blockLibrary'],
-  additionalProperties: false
-};
+import { contentCompleteBlueprintSchema, layoutCompleteBlueprintSchema, responseSchema, step5RequestSchema } from '../../schemas';
+import { executeStep5 } from '../../services/workflow-steps.service';
 
 // 响应Schema
 const step5ResponseSchema = responseSchema(layoutCompleteBlueprintSchema);
@@ -61,34 +48,8 @@ export default async function step5Routes(fastify: FastifyInstance, options: Fas
       // 6. AI的输出会包含需要生成文案的{ "prompt": "..." }标记
       // 7. 将每个页面的outline更新为AI返回的结构化Block数组
       // 8. 形成布局完备的蓝图并返回
-      
-      // 为每个页面的outline生成区块布局
-      const enhancedPages = await Promise.all(blueprint.pages.map(async (page: any) => {
-        if (page.outline && Array.isArray(page.outline)) {
-          // 为每个页面的outline生成区块布局
-          const layoutPrompt = promptFactory.getStep5LayoutPrompt(page.outline, blockLibrary);
-          const layoutString = await llmProvider.invoke({ 
-            model: MODEL_IDS.GEMINI_2_5_PRO, 
-            prompt: layoutPrompt, 
-            temperature: 0.1 
-          });
-          
-          // 解析AI返回的区块布局
-          const blockLayout = JSON.parse(llmProvider.cleanAiJsonResponse(layoutString));
-          
-          return {
-            ...page,
-            outline: blockLayout
-          };
-        }
-        return page;
-      }));
-      
-      // 构建布局完备蓝图
-      const layoutCompleteBlueprint = {
-        ...blueprint,
-        pages: enhancedPages
-      };
+      // 调用服务函数执行核心业务逻辑
+      const layoutCompleteBlueprint = await executeStep5({ blueprint, blockLibrary });
       
       return reply.send({
         success: true,

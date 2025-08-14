@@ -4,13 +4,8 @@
  */
 
 import { FastifyInstance, FastifyPluginOptions, FastifySchema } from 'fastify';
-import { baseBlueprintSchema, contentCompleteBlueprintSchema, responseSchema } from '../../schemas';
-import promptFactory from '../../services/prompt-factory';
-import llmProvider from '../../services/llm-provider';
-import { MODEL_IDS } from '../../services/model-catalog';
-
-// 请求Schema - 使用基础蓝图Schema
-const step4RequestSchema = baseBlueprintSchema;
+import { baseBlueprintSchema, contentCompleteBlueprintSchema, responseSchema, step4RequestSchema } from '../../schemas';
+import { executeStep4 } from '../../services/workflow-steps.service';
 
 // 响应Schema - 输出内容完备蓝图Schema
 const step4ResponseSchema = responseSchema(contentCompleteBlueprintSchema);
@@ -59,16 +54,8 @@ export default async function step4Routes(fastify: FastifyInstance, options: Fas
         pages
       };
       
-      // 调用AI模型生成页面内容策划
-      const prompt = promptFactory.getStep4PlannerPrompt(blueprint);
-      const responseJsonString = await llmProvider.invoke({ 
-        model: MODEL_IDS.GEMINI_2_5_PRO, 
-        prompt, 
-        temperature: 0.7 
-      });
-      
-      // 解析AI返回的数据
-      const updatedPages = JSON.parse(llmProvider.cleanAiJsonResponse(responseJsonString));
+      // 调用服务函数执行核心业务逻辑
+      const updatedPages = await executeStep4(blueprint);
       
       // 构建内容完备蓝图
       const contentCompleteBlueprint = {

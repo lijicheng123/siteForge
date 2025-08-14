@@ -13,6 +13,9 @@ export * from './website';
 export * from './blocks';
 export * from './seo';
 
+// 工作流Schema
+export * from './workflow';
+
 // 蓝图Schema - 渐进式定义
 import { objectSchema, arraySchema, nameSchema, pagePathSchema, responseSchema } from './base';
 import { websiteSeoSchema, seoMetaSchema } from './seo';
@@ -77,9 +80,7 @@ export const websiteArchitectureSchema = objectSchema({
     purpose: { type: 'string', minLength: 10, maxLength: 200 },
     priority: { type: 'number', minimum: 1, maximum: 10, default: 5 },
     meta: seoMetaSchema
-  }, ['name', 'path', 'purpose'])),
-  sitemap: { type: 'string', format: 'uri' },
-  robots: { type: 'string', format: 'uri' }
+  }, ['name', 'path', 'purpose']))
 }, ['globalElements', 'pages']);
 
 /**
