@@ -42,10 +42,40 @@ const getGoogleGenAI = () => {
   return new GoogleGenAI({});
 };
 
-const cleanAiJsonResponse = (response: string): string => {
-    // This regex handles JSON within markdown code blocks, with optional language specifier
-    const match = response.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
-    return match ? match[1].trim() : response.trim();
+// 检查是否是rate limit错误
+const isRateLimitError = (error: any, model: string): boolean => {
+  const errorMessage = error.message?.toLowerCase() || '';
+  const errorCode = error.code || error.status || '';
+  
+  // Gemini rate limit 错误特征
+  if (model.startsWith('gemini')) {
+    return errorMessage.includes('rate limit') || 
+           errorMessage.includes('quota exceeded') ||
+           errorMessage.includes('too many requests') ||
+           errorCode === 429 ||
+           errorCode === 'RESOURCE_EXHAUSTED' ||
+           errorCode === 'QUOTA_EXCEEDED';
+  }
+  
+  // OpenAI rate limit 错误特征
+  if (model.startsWith('gpt')) {
+    return errorMessage.includes('rate limit') || 
+           errorMessage.includes('too many requests') ||
+           errorCode === 429 ||
+           errorCode === 'rate_limit_exceeded';
+  }
+  
+  // Claude rate limit 错误特征
+  if (model.startsWith('claude')) {
+    return errorMessage.includes('rate limit') || 
+           errorMessage.includes('too many requests') ||
+           errorCode === 429 ||
+           errorCode === 'rate_limit_exceeded';
+  }
+  
+  return false;
+};
+
 };
 
 export default {
