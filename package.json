@@ -15,7 +15,8 @@
     "test:step4": "node tests/test-workflow-step4.js",
     "test:step5": "node tests/test-workflow-step5.js",
     "test:step6": "node tests/test-workflow-step6.js",
-    "test:complete": "node tests/test-complete-workflow.js"
+    "test:complete": "node tests/test-complete-workflow.js",
+    "test:gateway": "node tests/test-llm-gateway.js"
   },
   "keywords": [
     "ai",
@@ -28,9 +29,10 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.59.0",
     "@fastify/cors": "^11.1.0",
+    "@google/genai": "^1.0.0",
+    "axios": "^1.11.0",
     "dotenv": "^17.2.1",
     "fastify": "^5.4.0",
-    "@google/genai": "^1.0.0",
     "openai": "^5.12.2"
   },
   "devDependencies": {

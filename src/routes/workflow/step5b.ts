@@ -9,7 +9,7 @@ import {
   contentGenerationResponseSchema 
 } from '../../schemas';
 import promptFactory from '../../services/prompt-factory';
-import llmProvider from '../../services/llm-provider';
+import LLMGateway from '../../services/llm-gateway';
 import { MODEL_IDS } from '../../services/model-catalog';
 
 // 完整的路由Schema
@@ -47,14 +47,14 @@ export default async function step5bRoutes(fastify: FastifyInstance, options: Fa
       const prompt = promptFactory.getStep5_5CopywriterPrompt(context, tasks);
       
       // 2. 调用AI模型（使用Gemini），强制返回符合格式的JSON
-      const responseJsonString = await llmProvider.invoke({ 
+      const responseJsonString = await LLMGateway.callText({ 
         model: MODEL_IDS.GEMINI_2_5_PRO, 
         prompt, 
         temperature: 0.7  // 适中的创造性，保持文案的专业性
       });
       
       // 3. 验证AI返回的数据结构
-      const generatedContent = JSON.parse(llmProvider.cleanAiJsonResponse(responseJsonString));
+      const generatedContent = JSON.parse(responseJsonString);
       
       // 4. 验证返回的数据格式是否符合预期
       if (typeof generatedContent !== 'object' || generatedContent === null) {

@@ -4,7 +4,7 @@
  */
 
 import promptFactory from './prompt-factory';
-import llmProvider from './llm-provider';
+import LLMGateway from './llm-gateway';
 import { MODEL_IDS } from './model-catalog';
 import { generateFullGutenbergHtml } from './html-generator';
 import {
@@ -23,12 +23,12 @@ import {
 export async function executeStep1(params: Step1Request) {
   const { rawInput } = params;
   const prompt = promptFactory.getStep1AnalyzerPrompt(rawInput);
-  const response = await llmProvider.invoke({ 
+  const response = await LLMGateway.callText({ 
     model: MODEL_IDS.GEMINI_2_5_PRO, 
     prompt, 
     temperature: 0.2 
   });
-  return JSON.parse(llmProvider.cleanAiJsonResponse(response));
+  return JSON.parse(response);
 }
 
 /**
@@ -39,12 +39,12 @@ export async function executeStep2(params: Step2Request) {
   const { industry, preference, brandPersonality, targetMarket } = params;
   const context = { industry, preference };
   const prompt = promptFactory.getStep2DesignerPrompt(context);
-  const response = await llmProvider.invoke({ 
+  const response = await LLMGateway.callText({ 
     model: MODEL_IDS.GEMINI_2_5_PRO, 
     prompt, 
     temperature: 0.6 
   });
-  return JSON.parse(llmProvider.cleanAiJsonResponse(response));
+  return JSON.parse(response);
 }
 
 /**
@@ -55,12 +55,12 @@ export async function executeStep3(params: Step3Request) {
   const { companyName, products, industry, targetMarket } = params;
   const context = { companyName, products };
   const prompt = promptFactory.getStep3ArchitectPrompt(context);
-  const response = await llmProvider.invoke({ 
+  const response = await LLMGateway.callText({ 
     model: MODEL_IDS.GEMINI_2_5_PRO, 
     prompt, 
     temperature: 0.3 
   });
-  return JSON.parse(llmProvider.cleanAiJsonResponse(response));
+  return JSON.parse(response);
 }
 
 /**
@@ -69,12 +69,12 @@ export async function executeStep3(params: Step3Request) {
  */
 export async function executeStep4(params: Step4Request): Promise<any> {
   const prompt = promptFactory.getStep4PlannerPrompt(params);
-  const response = await llmProvider.invoke({ 
+  const response = await LLMGateway.callText({ 
     model: MODEL_IDS.GEMINI_2_5_PRO, 
     prompt, 
     temperature: 0.7 
   });
-  return JSON.parse(llmProvider.cleanAiJsonResponse(response));
+  return JSON.parse(response);
 }
 
 /**
@@ -86,13 +86,13 @@ export async function executeStep5(params: Step5Request) {
   const enhancedPages = await Promise.all(blueprint.pages.map(async (page: any) => {
     if (page.outline && Array.isArray(page.outline)) {
       const layoutPrompt = promptFactory.getStep5LayoutPrompt(page.outline, blockLibrary);
-      const response = await llmProvider.invoke({ 
+      const response = await LLMGateway.callText({ 
         model: MODEL_IDS.GEMINI_2_5_PRO, 
         prompt: layoutPrompt, 
         temperature: 0.1 
       });
       
-      const blockLayout = JSON.parse(llmProvider.cleanAiJsonResponse(response));
+      const blockLayout = JSON.parse(response);
       
       return {
         ...page,

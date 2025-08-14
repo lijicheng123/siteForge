@@ -6,7 +6,7 @@
  */
 
 import { FastifyInstance, FastifyPluginOptions } from 'fastify';
-import llmProvider from '../services/llm-provider';
+import LLMGateway from '../services/llm-gateway';
 import { SUPPORTED_MODELS, MODEL_IDS } from '../services/model-catalog';
 
 // 统一的最小健康检查 Prompt（要求返回极小 JSON，便于 gpt JSON 模式，也兼容 claude 纯文本）
@@ -20,7 +20,7 @@ const GOOGLE_TEST_MODEL = process.env.HEALTHCHECK_GOOGLE_MODEL || MODEL_IDS.GEMI
 async function testViaWrapper(model: string) {
   const startedAt = Date.now();
   try {
-    const content = await llmProvider.invoke({ model, prompt: HEALTH_PROMPT, temperature: 0.1 });
+    const content = await LLMGateway.callText({ model, prompt: HEALTH_PROMPT, temperature: 0.1 });
     const responseTime = Date.now() - startedAt;
     const ok = typeof content === 'string' && content.trim().length > 0;
     return {
