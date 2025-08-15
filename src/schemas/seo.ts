@@ -30,11 +30,6 @@ export const websiteSeoSchema = objectSchema({
   ...keywordsSchema
 }, ['primaryKeywords', 'longTailKeywords']);
 
-// 页面级别 SEO 信息（用于具体页面的SEO）
-export const pageSeoSchema = objectSchema({
-  title: { type: 'string', minLength: 10, maxLength: 70 },
-  description: { type: 'string', minLength: 50, maxLength: 160 },
-  ...keywordsSchema
-}, ['title', 'description', 'primaryKeywords', 'longTailKeywords']);
+
 
 

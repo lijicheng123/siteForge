@@ -258,12 +258,4 @@ export const finalPageSchema = objectSchema({
   outline: arraySchema(blockFinalSchema)
 }, ['name', 'path', 'purpose', 'seo', 'outline']);
 
-// 可用区块库 Schema
-export const blockLibrarySchema = objectSchema({
-  core_blocks: arraySchema({ type: 'string' }),
-  custom_blocks: arraySchema(objectSchema({
-    name: { type: 'string', minLength: 1, maxLength: 100 },
-    description: { type: 'string', minLength: 1, maxLength: 500 },
-    props: { type: 'object' }
-  }, ['name', 'description', 'props']))
-}, ['core_blocks', 'custom_blocks']);
+

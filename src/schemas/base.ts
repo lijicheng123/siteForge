@@ -10,20 +10,7 @@ export const colorSchema = {
   description: '十六进制颜色值，支持6位或8位格式'
 };
 
-// 文本长度验证
-export const textLengthSchema = {
-  short: { type: 'string', minLength: 1, maxLength: 100 },
-  medium: { type: 'string', minLength: 10, maxLength: 200 },
-  long: { type: 'string', minLength: 50, maxLength: 500 }
-};
 
-// 通用ID Schema
-export const idSchema = {
-  type: 'string',
-  minLength: 1,
-  maxLength: 100,
-  pattern: '^[a-zA-Z0-9_-]+$'
-};
 
 // 通用名称Schema
 export const nameSchema = {

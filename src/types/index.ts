@@ -25,9 +25,7 @@ import type {
   structuredDataSchema,
   paletteSchema,
   typographySchema,
-  spacingSchema,
-  borderRadiusSchema,
-  shadowSchema,
+
   designSystemSchema,
   menuItemSchema,
   footerSectionSchema,
@@ -40,7 +38,7 @@ import type {
   contentCompletePageSchema,
   layoutCompletePageSchema,
   finalPageSchema,
-  blockLibrarySchema,
+
   seoMetaSchema,
   seoDetailedSchema,
   baseBlueprintSchema,
@@ -60,9 +58,7 @@ export type StructuredData = typeof structuredDataSchema;
 
 export type Palette = typeof paletteSchema;
 export type Typography = typeof typographySchema;
-export type Spacing = typeof spacingSchema;
-export type BorderRadius = typeof borderRadiusSchema;
-export type Shadow = typeof shadowSchema;
+
 export type DesignSystem = typeof designSystemSchema;
 
 export type MenuItem = typeof menuItemSchema;
@@ -80,7 +76,7 @@ export type ContentCompletePage = typeof contentCompletePageSchema;
 export type LayoutCompletePage = typeof layoutCompletePageSchema;
 export type FinalPage = typeof finalPageSchema;
 
-export type BlockLibrary = typeof blockLibrarySchema;
+
 
 export type SEOMeta = typeof seoMetaSchema;
 export type SEODetailed = typeof seoDetailedSchema;
@@ -136,9 +132,7 @@ export interface BaseBlueprint {
       font_size_base?: string;
       line_height_base?: number;
     };
-    spacing?: Record<string, string>;
-    borderRadius?: Record<string, string>;
-    shadow?: Record<string, string>;
+
   };
   globalElements: {
     header: {

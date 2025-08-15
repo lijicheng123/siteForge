@@ -30,22 +30,16 @@ import {
 import { 
   paletteSchema,
   typographySchema,
-  spacingSchema,
-  borderRadiusSchema,
-  shadowSchema
+
 } from './design';
 import { 
   globalElementsSchema,
-  menuItemSchema
 } from './website';
 import { 
   basicPageSchema, 
   contentCompletePageSchema, 
   layoutCompletePageSchema, 
-  finalPageSchema,
-  blockSchema,
-  blockFinalSchema,
-  outlineSectionSchema
+  finalPageSchema
 } from './blocks';
 
 /**
@@ -64,9 +58,7 @@ export const structuredDataSchema = objectSchema({
 export const designSystemSchema = objectSchema({
   palette: paletteSchema,
   typography: typographySchema,
-  spacing: spacingSchema,
-  borderRadius: borderRadiusSchema,
-  shadow: shadowSchema
+
 }, ['palette', 'typography']);
 
 /**
