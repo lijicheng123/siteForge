@@ -278,6 +278,7 @@ const callGeminiHuandu = async (request: LLMRequest): Promise<LLMResponse> => {
 
     return { content, usage, thought };
   } catch (error: any) {
+    console.error('Gemini huandu gateway error:', error);
     throw new Error(`Gemini huandu gateway error: ${error.response?.data?.error?.message || error.message}`);
   }
 };

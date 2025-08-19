@@ -27,7 +27,8 @@ const completeWorkflowResponseSchema = responseSchema({
           type: 'object',
           properties: {
             status: { type: 'string', enum: ['success', 'failed', 'skipped'] },
-            data: { type: 'object' },
+            input: { type: 'string', description: '步骤1的输入参数' },
+            output: { type: 'string', description: '步骤1的输出结果' },
             message: { type: 'string' },
             error: { type: 'string' }
           }
@@ -36,7 +37,8 @@ const completeWorkflowResponseSchema = responseSchema({
           type: 'object',
           properties: {
             status: { type: 'string', enum: ['success', 'failed', 'skipped'] },
-            data: { type: 'object' },
+            input: { type: 'string', description: '步骤2的输入参数' },
+            output: { type: 'string', description: '步骤2的输出结果' },
             message: { type: 'string' },
             error: { type: 'string' }
           }
@@ -45,7 +47,8 @@ const completeWorkflowResponseSchema = responseSchema({
           type: 'object',
           properties: {
             status: { type: 'string', enum: ['success', 'failed', 'skipped'] },
-            data: { type: 'object' },
+            input: { type: 'string', description: '步骤3的输入参数' },
+            output: { type: 'string', description: '步骤3的输出结果' },
             message: { type: 'string' },
             error: { type: 'string' }
           }
@@ -54,7 +57,8 @@ const completeWorkflowResponseSchema = responseSchema({
           type: 'object',
           properties: {
             status: { type: 'string', enum: ['success', 'failed', 'skipped'] },
-            data: { type: 'object' },
+            input: { type: 'string', description: '步骤4的输入参数' },
+            output: { type: 'string', description: '步骤4的输出结果' },
             message: { type: 'string' },
             error: { type: 'string' }
           }
@@ -63,7 +67,8 @@ const completeWorkflowResponseSchema = responseSchema({
           type: 'object',
           properties: {
             status: { type: 'string', enum: ['success', 'failed', 'skipped'] },
-            data: { type: 'object' },
+            input: { type: 'string', description: '步骤5的输入参数' },
+            output: { type: 'string', description: '步骤5的输出结果' },
             message: { type: 'string' },
             error: { type: 'string' }
           }
@@ -72,7 +77,8 @@ const completeWorkflowResponseSchema = responseSchema({
           type: 'object',
           properties: {
             status: { type: 'string', enum: ['success', 'failed', 'skipped'] },
-            data: { type: 'object' },
+            input: { type: 'string', description: '步骤6的输入参数' },
+            output: { type: 'string', description: '步骤6的输出结果' },
             message: { type: 'string' },
             error: { type: 'string' }
           }
@@ -124,17 +130,18 @@ export default async function completeWorkflowRoutes(fastify: FastifyInstance, o
     const stepsStatus: {
       [key: string]: {
         status: 'pending' | 'success' | 'failed' | 'skipped';
-        data: any;
+        input: any;
+        output: any;
         message: string;
         error: string;
       };
     } = {
-      step1: { status: 'pending', data: null, message: '', error: '' },
-      step2: { status: 'pending', data: null, message: '', error: '' },
-      step3: { status: 'pending', data: null, message: '', error: '' },
-      step4: { status: 'pending', data: null, message: '', error: '' },
-      step5: { status: 'pending', data: null, message: '', error: '' },
-      step6: { status: 'pending', data: null, message: '', error: '' }
+      step1: { status: 'pending', input: null, output: null, message: '', error: '' },
+      step2: { status: 'pending', input: null, output: null, message: '', error: '' },
+      step3: { status: 'pending', input: null, output: null, message: '', error: '' },
+      step4: { status: 'pending', input: null, output: null, message: '', error: '' },
+      step5: { status: 'pending', input: null, output: null, message: '', error: '' },
+      step6: { status: 'pending', input: null, output: null, message: '', error: '' }
     };
     
     const stepTimes: { [key: string]: number } = {};
@@ -152,16 +159,12 @@ export default async function completeWorkflowRoutes(fastify: FastifyInstance, o
         };
       };
 
-      console.log(`开始执行完整工作流: ${workflowId}`);
-
       // 步骤1: 需求解析与结构化
       const step1Start = Date.now();
       try {
         const step1Input = { rawInput };
-        console.log(`[${workflowId}] Step1 入参:`, JSON.stringify(step1Input, null, 2));
         
         const step1Data = await executeStep1(step1Input);
-        console.log(`[${workflowId}] Step1 出参:`, JSON.stringify(step1Data, null, 2));
         
         // 验证 Step1 返回数据
         if (!step1Data || typeof step1Data !== 'object' || Object.keys(step1Data).length === 0) {
@@ -181,15 +184,26 @@ export default async function completeWorkflowRoutes(fastify: FastifyInstance, o
           throw new Error('Step1 返回数据缺少必需的 targetAudience.preference 字段');
         }
         
-        stepsStatus.step1 = { status: 'success', data: step1Data, message: '需求解析成功', error: '' };
+        stepsStatus.step1 = { 
+          status: 'success', 
+          input: JSON.stringify(step1Input), 
+          output: JSON.stringify(step1Data), 
+          message: '需求解析成功', 
+          error: '' 
+        };
         stepTimes.step1 = Date.now() - step1Start;
         
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : '未知错误';
-        stepsStatus.step1 = { status: 'failed', data: null, message: '需求解析失败', error: errorMsg };
+        stepsStatus.step1 = { 
+          status: 'failed', 
+          input: JSON.stringify({ rawInput }), 
+          output: null, 
+          message: '需求解析失败', 
+          error: errorMsg 
+        };
         stepTimes.step1 = Date.now() - step1Start;
         workflowStatus = 'partial_success';
-        console.error(`[${workflowId}] Step1 执行失败:`, error);
         // 如果第一步失败，后续步骤无法继续，直接返回
         return buildResponse(reply, workflowId, workflowStatus, stepsStatus, stepTimes, startTime);
       }
@@ -198,20 +212,18 @@ export default async function completeWorkflowRoutes(fastify: FastifyInstance, o
       const step2Start = Date.now();
       try {
         // 类型安全检查
-        if (!stepsStatus.step1.data) {
+        if (!stepsStatus.step1.output) {
           throw new Error('Step1 数据不可用');
         }
         
         const step2Input = {
-          industry: stepsStatus.step1.data.companyInfo.industry,
-          preference: `基于${stepsStatus.step1.data.companyInfo.industry}行业特点，${stepsStatus.step1.data.targetAudience.preference}风格`,
+          industry: stepsStatus.step1.output.companyInfo?.industry,
+          preference: `基于${stepsStatus.step1.output.companyInfo?.industry}行业特点，${stepsStatus.step1.output.targetAudience?.preference}风格`,
           brandPersonality: options.brandPersonality,
           targetMarket: options.targetMarket
         };
-        console.log(`[${workflowId}] Step2 入参:`, JSON.stringify(step2Input, null, 2));
         
         const step2Data = await executeStep2(step2Input);
-        console.log(`[${workflowId}] Step2 出参:`, JSON.stringify(step2Data, null, 2));
         
         // 验证 Step2 返回数据
         if (!step2Data || typeof step2Data !== 'object' || Object.keys(step2Data).length === 0) {
@@ -223,15 +235,31 @@ export default async function completeWorkflowRoutes(fastify: FastifyInstance, o
           throw new Error('Step2 返回数据缺少必需的设计系统字段 (palette 或 typography)');
         }
         
-        stepsStatus.step2 = { status: 'success', data: step2Data, message: '设计系统生成成功', error: '' };
+        stepsStatus.step2 = { 
+          status: 'success', 
+          input: JSON.stringify(step2Input), 
+          output: JSON.stringify(step2Data), 
+          message: '设计系统生成成功', 
+          error: '' 
+        };
         stepTimes.step2 = Date.now() - step2Start;
         
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : '未知错误';
-        stepsStatus.step2 = { status: 'failed', data: null, message: '设计系统生成失败', error: errorMsg };
+        stepsStatus.step2 = { 
+          status: 'failed', 
+          input: stepsStatus.step1.output ? JSON.stringify({
+            industry: stepsStatus.step1.output.companyInfo?.industry,
+            preference: `基于${stepsStatus.step1.output.companyInfo?.industry}行业特点，${stepsStatus.step1.output.targetAudience?.preference}风格`,
+            brandPersonality: options.brandPersonality,
+            targetMarket: options.targetMarket
+          }) : null, 
+          output: null, 
+          message: '设计系统生成失败', 
+          error: errorMsg 
+        };
         stepTimes.step2 = Date.now() - step2Start;
         workflowStatus = 'partial_success';
-        console.error(`[${workflowId}] Step2 执行失败:`, error);
         // 如果第二步失败，后续步骤无法继续，直接返回
         return buildResponse(reply, workflowId, workflowStatus, stepsStatus, stepTimes, startTime);
       }
@@ -240,20 +268,18 @@ export default async function completeWorkflowRoutes(fastify: FastifyInstance, o
       const step3Start = Date.now();
       try {
         // 类型安全检查
-        if (!stepsStatus.step1.data) {
+        if (!stepsStatus.step1.output) {
           throw new Error('Step1 数据不可用');
         }
         
         const step3Input = {
-          companyName: stepsStatus.step1.data.companyInfo.name,
-          products: stepsStatus.step1.data.products,
-          industry: stepsStatus.step1.data.companyInfo.industry,
+          companyName: stepsStatus.step1.output.companyInfo?.name,
+          products: stepsStatus.step1.output.products,
+          industry: stepsStatus.step1.output.companyInfo?.industry,
           targetMarket: options.targetMarket
         };
-        console.log(`[${workflowId}] Step3 入参:`, JSON.stringify(step3Input, null, 2));
         
         const step3Data = await executeStep3(step3Input);
-        console.log(`[${workflowId}] Step3 出参:`, JSON.stringify(step3Data, null, 2));
         
         // 验证 Step3 返回数据
         if (!step3Data || typeof step3Data !== 'object' || Object.keys(step3Data).length === 0) {
@@ -265,15 +291,31 @@ export default async function completeWorkflowRoutes(fastify: FastifyInstance, o
           throw new Error('Step3 返回数据缺少必需的网站架构字段 (globalElements 或 pages)');
         }
         
-        stepsStatus.step3 = { status: 'success', data: step3Data, message: '网站架构设计成功', error: '' };
+        stepsStatus.step3 = { 
+          status: 'success', 
+          input: JSON.stringify(step3Input), 
+          output: JSON.stringify(step3Data), 
+          message: '网站架构设计成功', 
+          error: '' 
+        };
         stepTimes.step3 = Date.now() - step3Start;
         
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : '未知错误';
-        stepsStatus.step3 = { status: 'failed', data: null, message: '网站架构设计失败', error: errorMsg };
+        stepsStatus.step3 = { 
+          status: 'failed', 
+          input: stepsStatus.step1.output ? JSON.stringify({
+            companyName: stepsStatus.step1.output.companyInfo?.name,
+            products: stepsStatus.step1.output.products,
+            industry: stepsStatus.step1.output.companyInfo?.industry,
+            targetMarket: options.targetMarket
+          }) : null, 
+          output: null, 
+          message: '网站架构设计失败', 
+          error: errorMsg 
+        };
         stepTimes.step3 = Date.now() - step3Start;
         workflowStatus = 'partial_success';
-        console.error(`[${workflowId}] Step3 执行失败:`, error);
         // 如果第三步失败，后续步骤无法继续，直接返回
         return buildResponse(reply, workflowId, workflowStatus, stepsStatus, stepTimes, startTime);
       }
@@ -282,20 +324,18 @@ export default async function completeWorkflowRoutes(fastify: FastifyInstance, o
       const step4Start = Date.now();
       try {
         // 类型安全检查
-        if (!stepsStatus.step1.data || !stepsStatus.step2.data || !stepsStatus.step3.data) {
+        if (!stepsStatus.step1.output || !stepsStatus.step2.output || !stepsStatus.step3.output) {
           throw new Error('前置步骤数据不可用');
         }
         
         const blueprintV1 = {
-          structuredData: stepsStatus.step1.data,
-          designSystem: stepsStatus.step2.data,
-          globalElements: stepsStatus.step3.data.globalElements,
-          pages: stepsStatus.step3.data.pages
+          structuredData: stepsStatus.step1.output,
+          designSystem: stepsStatus.step2.output,
+          globalElements: stepsStatus.step3.output.globalElements,
+          pages: stepsStatus.step3.output.pages
         };
-        console.log(`[${workflowId}] Step4 入参:`, JSON.stringify(blueprintV1, null, 2));
         
         const step4Data = await executeStep4(blueprintV1);
-        console.log(`[${workflowId}] Step4 出参:`, JSON.stringify(step4Data, null, 2));
         
         // 验证 Step4 返回数据
         if (!step4Data || typeof step4Data !== 'object' || Object.keys(step4Data).length === 0) {
@@ -317,15 +357,31 @@ export default async function completeWorkflowRoutes(fastify: FastifyInstance, o
           }
         }
         
-        stepsStatus.step4 = { status: 'success', data: step4Data, message: '页面内容策划成功', error: '' };
+        stepsStatus.step4 = { 
+          status: 'success', 
+          input: JSON.stringify(blueprintV1), 
+          output: JSON.stringify(step4Data), 
+          message: '页面内容策划成功', 
+          error: '' 
+        };
         stepTimes.step4 = Date.now() - step4Start;
         
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : '未知错误';
-        stepsStatus.step4 = { status: 'failed', data: null, message: '页面内容策划失败', error: errorMsg };
+        stepsStatus.step4 = { 
+          status: 'failed', 
+          input: (stepsStatus.step1.output && stepsStatus.step2.output && stepsStatus.step3.output) ? JSON.stringify({
+            structuredData: stepsStatus.step1.output,
+            designSystem: stepsStatus.step2.output,
+            globalElements: stepsStatus.step3.output.globalElements,
+            pages: stepsStatus.step3.output.pages
+          }) : null, 
+          output: null, 
+          message: '页面内容策划失败', 
+          error: errorMsg 
+        };
         stepTimes.step4 = Date.now() - step4Start;
         workflowStatus = 'partial_success';
-        console.error(`[${workflowId}] Step4 执行失败:`, error);
         // 如果第四步失败，后续步骤无法继续，直接返回
         return buildResponse(reply, workflowId, workflowStatus, stepsStatus, stepTimes, startTime);
       }
@@ -334,7 +390,7 @@ export default async function completeWorkflowRoutes(fastify: FastifyInstance, o
       const step5Start = Date.now();
       try {
         // 类型安全检查
-        if (!stepsStatus.step4.data) {
+        if (!stepsStatus.step4.output) {
           throw new Error('Step4 数据不可用');
         }
         
@@ -346,11 +402,9 @@ export default async function completeWorkflowRoutes(fastify: FastifyInstance, o
           custom_blocks: options.customBlocks || []
         };
         
-        const step5Input = { blueprint: stepsStatus.step4.data, blockLibrary };
-        console.log(`[${workflowId}] Step5 入参:`, JSON.stringify(step5Input, null, 2));
+        const step5Input = { blueprint: stepsStatus.step4.output, blockLibrary };
         
         const blueprintV3 = await executeStep5(step5Input);
-        console.log(`[${workflowId}] Step5 出参:`, JSON.stringify(blueprintV3, null, 2));
         
         // 验证 Step5 返回数据
         if (!blueprintV3 || typeof blueprintV3 !== 'object' || Object.keys(blueprintV3).length === 0) {
@@ -372,16 +426,36 @@ export default async function completeWorkflowRoutes(fastify: FastifyInstance, o
           }
         }
         
-        stepsStatus.step5 = { status: 'success', data: blueprintV3, message: '区块布局设计成功', error: '' };
+        stepsStatus.step5 = { 
+          status: 'success', 
+          input: JSON.stringify(step5Input), 
+          output: JSON.stringify(blueprintV3), 
+          message: '区块布局设计成功', 
+          error: '' 
+        };
         stepTimes.step5 = Date.now() - step5Start;
         finalBlueprint = blueprintV3;
         
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : '未知错误';
-        stepsStatus.step5 = { status: 'failed', data: null, message: '区块布局设计失败', error: errorMsg };
+        stepsStatus.step5 = { 
+          status: 'failed', 
+          input: stepsStatus.step4.output ? JSON.stringify({
+            blueprint: stepsStatus.step4.output,
+            blockLibrary: {
+              core_blocks: [
+                "core/cover", "core/heading", "core/paragraph", "core/columns", 
+                "core/column", "core/button", "core/image", "core/gallery"
+              ],
+              custom_blocks: options.customBlocks || []
+            }
+          }) : null, 
+          output: null, 
+          message: '区块布局设计失败', 
+          error: errorMsg 
+        };
         stepTimes.step5 = Date.now() - step5Start;
         workflowStatus = 'partial_success';
-        console.error(`[${workflowId}] Step5 执行失败:`, error);
         // 如果第五步失败，后续步骤无法继续，直接返回
         return buildResponse(reply, workflowId, workflowStatus, stepsStatus, stepTimes, startTime);
       }
@@ -394,21 +468,29 @@ export default async function completeWorkflowRoutes(fastify: FastifyInstance, o
           throw new Error('Step5 数据不可用');
         }
         
-        console.log(`[${workflowId}] Step6 入参:`, JSON.stringify(finalBlueprint, null, 2));
-        
         const html = executeStep6(finalBlueprint);
-        console.log(`[${workflowId}] Step6 出参:`, JSON.stringify({ html: html.substring(0, 200) + '...' }, null, 2));
         
-        stepsStatus.step6 = { status: 'success', data: { html }, message: 'HTML代码生成成功', error: '' };
+        stepsStatus.step6 = { 
+          status: 'success', 
+          input: JSON.stringify(finalBlueprint), 
+          output: html, 
+          message: 'HTML代码生成成功', 
+          error: '' 
+        };
         stepTimes.step6 = Date.now() - step6Start;
         finalHTML = html;
         
       } catch (error) {
         const errorMsg = error instanceof Error ? error.message : '未知错误';
-        stepsStatus.step6 = { status: 'failed', data: null, message: 'HTML代码生成失败', error: errorMsg };
+        stepsStatus.step6 = { 
+          status: 'failed', 
+          input: JSON.stringify(finalBlueprint) || null, 
+          output: null, 
+          message: 'HTML代码生成失败', 
+          error: errorMsg 
+        };
         stepTimes.step6 = Date.now() - step6Start;
         workflowStatus = 'partial_success';
-        console.error(`[${workflowId}] Step6 执行失败:`, error);
       }
 
       // 所有步骤完成，返回结果

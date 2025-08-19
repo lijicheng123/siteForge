@@ -5,10 +5,9 @@ import {
   structuredDataSchema,
   designSystemSchema,
   websiteArchitectureSchema,
-  contentCompletePageSchema,
   contentCompleteBlueprintSchema,
-  blockSchema,
 } from '../schemas';
+import { outlineBlockSchema } from '../schemas/blocks';
 
 // 从集中 Schema 源生成可嵌入到 Prompt 的 JSON Schema 文本
 const getSchemaString = (schema: unknown): string => {
@@ -113,15 +112,32 @@ ${getSchemaString(contentCompleteBlueprintSchema)}
 ${JSON.stringify(blueprint, null, 2)}`,
 
   getStep5LayoutPrompt: (pageOutline: any, blockLibrary: any, useJsonMode: boolean = false): string => `
-角色: 你是一名顶级的 WordPress 古腾堡技术架构师和前端设计师。
-背景: 你收到了一份来自 "内容策略师" 的页面大纲 (outline)。你还有一个严格定义的 "可用区块库"。
-目标: 将自然语言的 "意图"，精确地 "翻译" 成一个严格结构化的 JSON 布局指令。将每一个 instruction 都转换成一个或多个嵌套的 Block 对象。
-约束: 只能从下方提供的 "可用区块库" 中选择区块，绝不能发明。必须严格遵循自定义区块 "说明书 (Manifest)" 中定义的 props 结构。所有需要 AI 生成文案的地方，必须以 {"prompt": "..."} 的形式标记。
+角色: 你是一名顶级的 WordPress Gutenberg 技术架构师，兼具高级前端设计师的审美和世界级文案专家的创意。
+任务: 接收页面大纲 (Page Outline)，将其"编译"成结构完美、内容丰富、100% 符合 Gutenberg 验证规则的 JSON 对象数组。
 
-${getJsonFormatRequirement(blockSchema, useJsonMode)}
+📚 输入解析：
+- **页面大纲**: instruction 字段是每个 Section 最重要的部分，是你选择区块、组织结构和创作文案的唯一依据
+- **可用区块库**: 你的技术工具箱，只能使用这里定义的区块，严格遵守每个区块的 attributes 规范
 
-输出必须严格符合以下 JSON Schema (Block 对象结构):
-${getSchemaString(blockSchema)}
+⚙️ 工作流程：
+对于 outline 数组中的每一个 Section：
+1. 深度解读 instruction 字段中的每一个要求
+2. 从 blockLibrary 中选择最合适的区块组合来搭建结构
+3. 根据 instruction 和 estimatedWords 创作高质量文案并填充到区块 attributes 中
+4. 根据视觉要求配置准确的区块属性，组装成符合 Schema 的 Block 对象
+
+⚠️ 关键技术约束：
+1. **按钮父子关系**: core/button 必须被 core/buttons (复数) 区块作为父容器包裹，绝不能单独存在
+2. **对齐属性区分**: textAlign 控制文本对齐 (core/heading, core/paragraph)；align 控制区块容器宽度 (core/cover, core/columns)
+3. **指令优先级**: 所有决策必须直接源于当前 Section 的 instruction
+4. **严格选择**: 只能从可用区块库中选择，绝不能发明区块
+5. **保留 sectionName**: 每个输出的 Block 对象必须保留原始的 sectionName 字段
+6. **图片占位符**: 使用 https://placehold.co/宽度x高度 格式，尺寸符合设计意图
+
+${getJsonFormatRequirement(outlineBlockSchema, useJsonMode)}
+
+输出必须严格符合以下 JSON Schema:
+${getSchemaString(outlineBlockSchema)}
 
 [可用区块库]:
 ${JSON.stringify(blockLibrary, null, 2)}

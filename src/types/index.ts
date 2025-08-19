@@ -33,18 +33,15 @@ import type {
   websiteArchitectureSchema,
   outlineSectionSchema,
   blockSchema,
-  blockFinalSchema,
   basicPageSchema,
   contentCompletePageSchema,
   layoutCompletePageSchema,
-  finalPageSchema,
 
   seoMetaSchema,
   seoDetailedSchema,
   baseBlueprintSchema,
   contentCompleteBlueprintSchema,
-  layoutCompleteBlueprintSchema,
-  contentAndLayoutCompleteBlueprintSchema
+  layoutCompleteBlueprintSchema
 } from '../schemas';
 
 // 从Schema推导出TypeScript类型
@@ -68,13 +65,11 @@ export type WebsiteArchitecture = typeof websiteArchitectureSchema;
 
 export type OutlineSection = typeof outlineSectionSchema;
 export type Block = typeof blockSchema;
-export type BlockFinal = typeof blockFinalSchema;
 
 // 页面类型 - 渐进式定义
 export type BasicPage = typeof basicPageSchema;
 export type ContentCompletePage = typeof contentCompletePageSchema;
 export type LayoutCompletePage = typeof layoutCompletePageSchema;
-export type FinalPage = typeof finalPageSchema;
 
 
 

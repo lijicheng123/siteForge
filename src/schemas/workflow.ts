@@ -2,6 +2,8 @@
  * 工作流步骤Schema统一定义
  * 包含所有步骤的请求和响应Schema
  */
+import { arraySchema } from './base';
+import { layoutCompletePageSchema } from './blocks';
 
 // Step1: 需求解析与结构化
 export const step1RequestSchema = {
@@ -178,6 +180,16 @@ export const step4ResponseSchema = {
   additionalProperties: false
 };
 
+const blockLibraryBlockSchema = {
+  type: 'object',
+  properties: {
+    name: { type: 'string' },
+    description: { type: 'string' },
+    attributes: { type: 'object' }
+  },
+  required: ['name', 'description'],
+  additionalProperties: false
+}
 // Step5: 区块布局设计 - 输入内容完备蓝图，输出布局完备蓝图
 export const step5RequestSchema = {
   type: 'object',
@@ -191,88 +203,20 @@ export const step5RequestSchema = {
       properties: {
         core_blocks: {
           type: 'array',
-          items: { type: 'string' },
+          items: blockLibraryBlockSchema,
           description: '核心区块列表'
         },
         custom_blocks: {
           type: 'array',
-          items: {
-            type: 'object',
-            properties: {
-              name: { type: 'string' },
-              description: { type: 'string' },
-              props: { type: 'object' }
-            },
-            required: ['name', 'description']
-          },
-          description: '自定义区块定义'
-        }
+          items: blockLibraryBlockSchema,
+          description: '自定义区块列表'
+        },
       },
       required: ['core_blocks', 'custom_blocks'],
       additionalProperties: false
     }
   },
   required: ['blueprint', 'blockLibrary'],
-  additionalProperties: false
-};
-
-// Step5响应Schema - 布局完备蓝图
-export const step5ResponseSchema = {
-  type: 'object',
-  properties: {
-    structuredData: {
-      type: 'object',
-      description: '结构化数据'
-    },
-    designSystem: {
-      type: 'object',
-      description: '设计系统'
-    },
-    globalElements: {
-      type: 'object',
-      description: '全局元素'
-    },
-    pages: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          name: { type: 'string' },
-          path: { type: 'string' },
-          purpose: { type: 'string' },
-          seo: {
-            type: 'object',
-            properties: {
-              title: { type: 'string' },
-              description: { type: 'string' },
-              primaryKeywords: { type: 'array', items: { type: 'string' } },
-              longTailKeywords: { type: 'array', items: { type: 'string' } }
-            },
-            required: ['title', 'description', 'primaryKeywords', 'longTailKeywords']
-          },
-          outline: {
-            type: 'array',
-            items: {
-              type: 'object',
-              properties: {
-                component: { type: 'string' },
-                level: { type: 'number' },
-                config: { type: 'object' },
-                props: { type: 'object' },
-                children: { type: 'array' },
-                content: { type: 'object' },
-                link: { type: 'object' },
-                style: { type: 'object' }
-              },
-              required: ['component']
-            }
-          }
-        },
-        required: ['name', 'path', 'purpose', 'seo', 'outline']
-      }
-    }
-  },
-  required: ['structuredData', 'designSystem', 'globalElements', 'pages'],
   additionalProperties: false
 };
 
@@ -292,105 +236,7 @@ export const step6RequestSchema = {
       type: 'object',
       description: '全局元素'
     },
-    pages: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          name: { type: 'string' },
-          path: { type: 'string' },
-          purpose: { type: 'string' },
-          seo: {
-            type: 'object',
-            properties: {
-              title: { type: 'string' },
-              description: { type: 'string' },
-              primaryKeywords: { type: 'array', items: { type: 'string' } },
-              longTailKeywords: { type: 'array', items: { type: 'string' } }
-            },
-            required: ['title', 'description', 'primaryKeywords', 'longTailKeywords']
-          },
-          outline: {
-            type: 'array',
-            items: {
-              type: 'object',
-              properties: {
-                component: { type: 'string' },
-                level: { type: 'number' },
-                config: { type: 'object' },
-                props: { type: 'object' },
-                children: { type: 'array' },
-                content: { type: 'object' },
-                link: { type: 'object' },
-                style: { type: 'object' }
-              },
-              required: ['component']
-            }
-          }
-        },
-        required: ['name', 'path', 'purpose', 'seo', 'outline']
-      }
-    }
-  },
-  required: ['structuredData', 'designSystem', 'globalElements', 'pages'],
-  additionalProperties: false
-};
-
-// Step6响应Schema - 最终蓝图
-export const step6ResponseSchema = {
-  type: 'object',
-  properties: {
-    structuredData: {
-      type: 'object',
-      description: '结构化数据'
-    },
-    designSystem: {
-      type: 'object',
-      description: '设计系统'
-    },
-    globalElements: {
-      type: 'object',
-      description: '全局元素'
-    },
-    pages: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          name: { type: 'string' },
-          path: { type: 'string' },
-          purpose: { type: 'string' },
-          seo: {
-            type: 'object',
-            properties: {
-              title: { type: 'string' },
-              description: { type: 'string' },
-              primaryKeywords: { type: 'array', items: { type: 'string' } },
-              longTailKeywords: { type: 'array', items: { type: 'string' } }
-            },
-            required: ['title', 'description', 'primaryKeywords', 'longTailKeywords']
-          },
-          outline: {
-            type: 'array',
-            items: {
-              type: 'object',
-              properties: {
-                component: { type: 'string' },
-                level: { type: 'number' },
-                config: { type: 'object' },
-                props: { type: 'object' },
-                children: { type: 'array' },
-                content: { type: 'object' },
-                link: { type: 'object' },
-                style: { type: 'object' }
-              },
-              required: ['component']
-            }
-          }
-        },
-        required: ['name', 'path', 'purpose', 'seo', 'outline']
-      }
-    }
+    pages: arraySchema(layoutCompletePageSchema)
   },
   required: ['structuredData', 'designSystem', 'globalElements', 'pages'],
   additionalProperties: false

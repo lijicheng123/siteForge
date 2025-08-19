@@ -8,7 +8,23 @@ import routes from './routes';
 dotenv.config();
 
 const app = fastify({
-  logger: true,
+  logger: {
+    transport: {
+      target: 'pino-pretty',
+      options: {
+        colorize: true,
+        singleLine: false,
+        translateTime: 'SYS:yyyy-mm-dd HH:MM:ss.l',
+        ignore: 'pid,hostname'
+      }
+    }
+  },
+  ajv: {
+    customOptions: {
+      allErrors: true,   // 一次性输出所有校验错误
+      strict: true       // 保持严格模式，避免隐患；若历史Schema较混乱可临时设为 false
+    }
+  }
 });
 
 // Register Plugins

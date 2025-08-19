@@ -4,7 +4,7 @@
  */
 
 import { FastifyInstance, FastifyPluginOptions, FastifySchema } from 'fastify';
-import { contentCompleteBlueprintSchema, layoutCompleteBlueprintSchema, responseSchema, step5RequestSchema } from '../../schemas';
+import { layoutCompleteBlueprintSchema, responseSchema, step5RequestSchema } from '../../schemas';
 import { executeStep5 } from '../../services/workflow-steps.service';
 
 // 响应Schema
@@ -15,6 +15,16 @@ const step5Schema: FastifySchema = {
   body: step5RequestSchema,
   response: step5ResponseSchema
 };
+
+type blockType = {
+  name: string;
+  description: string;
+  attributes: object;
+}
+interface BlockLibraryType {
+  core_blocks: Array<blockType>;
+  custom_blocks: Array<blockType>;
+}
 
 /**
  * 步骤5路由注册
@@ -33,10 +43,7 @@ export default async function step5Routes(fastify: FastifyInstance, options: Fas
     try {
       const { blueprint, blockLibrary } = request.body as {
         blueprint: any;
-        blockLibrary: {
-          core_blocks: string[];
-          custom_blocks: Array<{ name: string; description: string; props: any }>;
-        };
+        blockLibrary: BlockLibraryType;
       };
       
       // 核心业务逻辑

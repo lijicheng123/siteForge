@@ -6,223 +6,94 @@
 import { objectSchema, arraySchema, nameSchema, pagePathSchema } from './base';
 import { seoDetailedSchema } from './seo';
 
-// 内容大纲Schema
+// 基础区块Schema - 支持一层嵌套，包含prompt字段
+export const blockSchema = {
+  "title": "Final WordPress Block Structure (3-Level Depth)",
+  "description": "为WordPress区块编辑器定义的、最多嵌套3层的最终版JSON Schema。此版本不包含$ref等引用关键字，并增强了对blockName格式的验证。",
+  "type": "object",
+  "properties": {
+    "sectionName": {
+      "type": "string",
+      "description": "区块所属的section名称。",
+    },
+      "blockName": {
+        "type": "string",
+        "description": "区块的唯一名称, 必须遵循 'namespace/block-name' 格式。",
+        "pattern": "^[a-z0-9\\-]+/[a-z0-9\\-]+$"
+      },
+      "attributes": {
+        "type": "object",
+        "description": "区块属性的键值对集合，结构由具体区块决定。",
+        "additionalProperties": true
+      },
+      "innerBlocks": {
+        "type": "array",
+        "description": "第2层嵌套 (Nesting Level 2)",
+        "items": {
+          "description": "第2层区块对象 (Level 2 Block Object)",
+          "type": "object",
+          "properties": {
+            "blockName": {
+              "type": "string",
+              "description": "区块的唯一名称, 必须遵循 'namespace/block-name' 格式。",
+              "pattern": "^[a-z0-9\\-]+/[a-z0-9\\-]+$"
+            },
+            "attributes": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "innerBlocks": {
+              "type": "array",
+              "description": "第3层嵌套 (Nesting Level 3)",
+              "items": {
+                "description": "第3层区块对象 (Level 3 Block Object)",
+                "type": "object",
+                "properties": {
+                  "blockName": {
+                    "type": "string",
+                    "description": "区块的唯一名称, 必须遵循 'namespace/block-name' 格式。",
+                    "pattern": "^[a-z0-9\\-]+/[a-z0-9\\-]+$"
+                  },
+                  "attributes": {
+                    "type": "object",
+                    "additionalProperties": true
+                  }
+                },
+                "required": [
+                  "blockName",
+                  "attributes"
+                ]
+              }
+            }
+          },
+          "required": [
+            "blockName",
+            "attributes"
+          ]
+        }
+      }
+    },
+  "required": [
+      "blockName",
+      "attributes"
+    ]
+}
+
+//内容规划大纲协议（规划内容）
 export const outlineSectionSchema = objectSchema({
   sectionName: nameSchema,
   instruction: { type: 'string', minLength: 10, maxLength: 500 },
-  priority: { type: 'number', minimum: 1, maximum: 10, default: 5 },
   estimatedWords: { type: 'number', minimum: 50, maximum: 2000 }
 }, ['sectionName', 'instruction']);
 
-// 基础区块Schema - 支持一层嵌套，包含prompt字段
-export const blockSchema = {
-  type: 'object',
-  properties: {
-    component: { type: 'string', minLength: 1, maxLength: 100 },
-    level: { type: 'number', minimum: 0, maximum: 10, default: 0 },
-    config: { type: 'object', additionalProperties: true },
-    props: { type: 'object', additionalProperties: true },
-    children: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          component: { type: 'string', minLength: 1, maxLength: 100 },
-          level: { type: 'number', minimum: 0, maximum: 10, default: 0 },
-          config: { type: 'object', additionalProperties: true },
-          props: { type: 'object', additionalProperties: true },
-          content: {
-            oneOf: [
-              { 
-                type: 'object', 
-                properties: { 
-                  source: { type: 'string', format: 'uri' },
-                  alt: { type: 'string', minLength: 1, maxLength: 200 }
-                }, 
-                required: ['source'] 
-              },
-              { 
-                type: 'object', 
-                properties: { 
-                  text: { type: 'string', minLength: 1, maxLength: 2000 } 
-                }, 
-                required: ['text'] 
-              },
-              { 
-                type: 'object', 
-                properties: { 
-                  prompt: { type: 'string', minLength: 10, maxLength: 500 } 
-                }, 
-                required: ['prompt'] 
-              }
-            ]
-          },
-          link: {
-            type: 'object',
-            properties: {
-              source: { type: 'string', format: 'uri' },
-              target: { type: 'string', enum: ['_self', '_blank', '_parent', '_top'], default: '_self' },
-              rel: { type: 'string', enum: ['noopener', 'noreferrer'], default: 'noopener' }
-            },
-            required: ['source']
-          },
-          style: {
-            type: 'object',
-            properties: {
-              className: { type: 'string', minLength: 1, maxLength: 200 },
-              customCSS: { type: 'string', minLength: 1, maxLength: 1000 }
-            }
-          }
-        },
-        required: ['component'],
-        additionalProperties: false
-      },
-      minItems: 0
-    },
-    content: {
-      oneOf: [
-        { 
-          type: 'object', 
-          properties: { 
-            source: { type: 'string', format: 'uri' },
-            alt: { type: 'string', minLength: 1, maxLength: 200 }
-          }, 
-          required: ['source'] 
-        },
-        { 
-          type: 'object', 
-          properties: { 
-            text: { type: 'string', minLength: 1, maxLength: 2000 } 
-          }, 
-          required: ['text'] 
-        },
-        { 
-          type: 'object', 
-          properties: { 
-            prompt: { type: 'string', minLength: 10, maxLength: 500 } 
-          }, 
-          required: ['prompt'] 
-        }
-      ]
-    },
-    link: {
-      type: 'object',
-      properties: {
-        source: { type: 'string', format: 'uri' },
-        target: { type: 'string', enum: ['_self', '_blank', '_parent', '_top'], default: '_self' },
-        rel: { type: 'string', enum: ['noopener', 'noreferrer'], default: 'noopener' }
-      },
-      required: ['source']
-    },
-    style: {
-      type: 'object',
-      properties: {
-        className: { type: 'string', minLength: 1, maxLength: 200 },
-        customCSS: { type: 'string', minLength: 1, maxLength: 1000 }
-      }
-    }
-  },
-  required: ['component'],
-  additionalProperties: false
-};
+// 布局规划大纲协议（根据内容规划布局及文案）
+export const outlineBlockSchema = objectSchema({
+  sectionName: nameSchema,
+  blockName: { type: 'string', minLength: 1, maxLength: 100 },
+  attributes: { type: 'object', additionalProperties: true },
+  innerBlocks: { type: 'array', items: blockSchema },
+}, ['sectionName', 'blockName', 'attributes']);
 
-// 最终区块Schema - 移除prompt，只保留确定内容，支持一层嵌套
-export const blockFinalSchema = {
-  type: 'object',
-  properties: {
-    component: { type: 'string', minLength: 1, maxLength: 100 },
-    level: { type: 'number', minimum: 0, maximum: 10, default: 0 },
-    config: { type: 'object', additionalProperties: true },
-    props: { type: 'object', additionalProperties: true },
-    children: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          component: { type: 'string', minLength: 1, maxLength: 100 },
-          level: { type: 'number', minimum: 0, maximum: 10, default: 0 },
-          config: { type: 'object', additionalProperties: true },
-          props: { type: 'object', additionalProperties: true },
-          content: {
-            oneOf: [
-              {
-                type: 'object',
-                properties: {
-                  source: { type: 'string', format: 'uri' },
-                  alt: { type: 'string', minLength: 1, maxLength: 200 }
-                },
-                required: ['source']
-              },
-              {
-                type: 'object',
-                properties: {
-                  text: { type: 'string', minLength: 1, maxLength: 2000 }
-                },
-                required: ['text']
-              }
-            ]
-          },
-          link: {
-            type: 'object',
-            properties: {
-              source: { type: 'string', format: 'uri' },
-              target: { type: 'string', enum: ['_self', '_blank', '_parent', '_top'], default: '_self' },
-              rel: { type: 'string', enum: ['noopener', 'noreferrer'], default: 'noopener' }
-            },
-            required: ['source']
-          },
-          style: {
-            type: 'object',
-            properties: {
-              className: { type: 'string', minLength: 1, maxLength: 200 },
-              customCSS: { type: 'string', minLength: 1, maxLength: 1000 }
-            }
-          }
-        },
-        required: ['component'],
-        additionalProperties: false
-      },
-      minItems: 0
-    },
-    content: {
-      oneOf: [
-        {
-          type: 'object',
-          properties: {
-            source: { type: 'string', format: 'uri' },
-            alt: { type: 'string', minLength: 1, maxLength: 200 }
-          },
-          required: ['source']
-        },
-        {
-          type: 'object',
-          properties: {
-            text: { type: 'string', minLength: 1, maxLength: 2000 }
-          },
-          required: ['text']
-        }
-      ]
-    },
-    link: {
-      type: 'object',
-      properties: {
-        source: { type: 'string', format: 'uri' },
-        target: { type: 'string', enum: ['_self', '_blank', '_parent', '_top'], default: '_self' },
-        rel: { type: 'string', enum: ['noopener', 'noreferrer'], default: 'noopener' }
-      },
-      required: ['source']
-    },
-    style: {
-      type: 'object',
-      properties: {
-        className: { type: 'string', minLength: 1, maxLength: 200 },
-        customCSS: { type: 'string', minLength: 1, maxLength: 1000 }
-      }
-    }
-  },
-  required: ['component'],
-  additionalProperties: false
-};
 
 // 基础页面Schema - 只包含基本信息
 export const basicPageSchema = objectSchema({
@@ -240,22 +111,12 @@ export const contentCompletePageSchema = objectSchema({
   outline: arraySchema(outlineSectionSchema)
 }, ['name', 'path', 'purpose', 'seo', 'outline']);
 
-// 布局完备页面Schema - 包含区块布局
+// 第五步的出参、第六步的入参：布局完备页面Schema - 包含区块布局
 export const layoutCompletePageSchema = objectSchema({
   name: nameSchema,
   path: pagePathSchema,
   purpose: { type: 'string', minLength: 10, maxLength: 200 },
   seo: seoDetailedSchema,
-  outline: arraySchema(blockSchema)
+  outline: arraySchema(outlineBlockSchema)
 }, ['name', 'path', 'purpose', 'seo', 'outline']);
-
-// 最终页面Schema - 包含最终区块布局
-export const finalPageSchema = objectSchema({
-  name: nameSchema,
-  path: pagePathSchema,
-  purpose: { type: 'string', minLength: 10, maxLength: 200 },
-  seo: seoDetailedSchema,
-  outline: arraySchema(blockFinalSchema)
-}, ['name', 'path', 'purpose', 'seo', 'outline']);
-
 

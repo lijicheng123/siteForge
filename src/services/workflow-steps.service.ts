@@ -22,6 +22,7 @@ import {
   Step5Request,
   Step6Request
 } from '../schemas/workflow';
+import { arraySchema } from '../schemas/base';
 
 /**
  * 步骤1: 需求解析与结构化
@@ -130,7 +131,7 @@ export async function executeStep5(params: Step5Request) {
         prompt: layoutPrompt, 
         temperature: 0.1,
         jsonMode: true, // 启用原生 JSON 模式
-        jsonSchema: blockSchema
+        jsonSchema: arraySchema(blockSchema) // 让AI生成指定格式的JSON
       });
       
       const blockLayout = JSON.parse(response);
@@ -142,11 +143,15 @@ export async function executeStep5(params: Step5Request) {
     }
     return page;
   }));
-  
-  return {
+
+  const step5Result = {
     ...blueprint,
     pages: enhancedPages
-  };
+  }
+
+  console.log('=== 步骤5: 区块布局设计 ===step5Result:', step5Result?.pages);
+  
+  return step5Result;
 }
 
 /**

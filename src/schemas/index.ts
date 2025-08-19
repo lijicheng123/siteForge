@@ -39,7 +39,6 @@ import {
   basicPageSchema, 
   contentCompletePageSchema, 
   layoutCompletePageSchema, 
-  finalPageSchema
 } from './blocks';
 
 /**
@@ -101,13 +100,6 @@ export const layoutCompleteBlueprintSchema = objectSchema({
   pages: arraySchema(layoutCompletePageSchema)
 }, ['structuredData', 'designSystem', 'globalElements', 'pages']);
 
-// 内容和布局都完备的蓝图Schema - 用于Step6生成HTML
-export const contentAndLayoutCompleteBlueprintSchema = objectSchema({
-  structuredData: structuredDataSchema,
-  designSystem: designSystemSchema,
-  globalElements: globalElementsSchema,
-  pages: arraySchema(finalPageSchema)
-}, ['structuredData', 'designSystem', 'globalElements', 'pages']);
 
 /**
  * Step5b: 文案生成相关Schema
