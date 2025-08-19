@@ -1,31 +1,106 @@
-// Deterministic Gutenberg HTML generator shared by routes/services
+// WordPress古腾堡HTML生成器 - 插件化架构
+// 根据区块数据结构生成标准的古腾堡HTML代码
 
-export type BlockNode = any;
+export type BlockNode = {
+  sectionName: string;
+  blockName: string;
+  attributes: Record<string, any>;
+  innerBlocks: BlockNode[];
+};
 
-export function generateGutenbergHTML(block: BlockNode, level: number = 0): string {
-  switch (block.component) {
-    case 'core/cover':
-      return generateCoverBlock(block, level);
-    case 'core/group':
-      return generateGroupBlock(block, level);
-    case 'core/columns':
-      return generateColumnsBlock(block, level);
-    case 'core/column':
-      return generateColumnBlock(block, level);
-    case 'core/heading':
-      return generateHeadingBlock(block, level);
-    case 'core/paragraph':
-      return generateParagraphBlock(block, level);
-    case 'core/image':
-      return generateImageBlock(block, level);
-    case 'core/buttons':
-      return generateButtonsBlock(block, level);
-    case 'core/button':
-      return generateButtonBlock(block, level);
-    default:
-      return generateGenericBlock(block, level);
+// 区块渲染器接口
+export interface BlockRenderer {
+  blockName: string;
+  renderHTML(attributes: Record<string, any>, innerBlocks: BlockNode[]): string;
+  generateAttributes(attributes: Record<string, any>): string;
+  generateCSSClasses(attributes: Record<string, any>): string[];
+}
+
+// 区块渲染器注册中心
+export class BlockRendererRegistry {
+  private renderers = new Map<string, BlockRenderer>();
+
+  register(renderer: BlockRenderer): void {
+    this.renderers.set(renderer.blockName, renderer);
+  }
+
+  getRenderer(blockName: string): BlockRenderer | undefined {
+    // 移除命名空间前缀，只保留区块名称
+    const blockType = blockName.replace(/^[^\/]+\//, '');
+    return this.renderers.get(blockType);
+  }
+
+  renderBlock(block: BlockNode): string {
+    const renderer = this.getRenderer(block.blockName);
+    if (!renderer) {
+      // 使用通用渲染器作为fallback
+      return this.renderGenericBlock(block);
+    }
+
+    const { blockName, attributes, innerBlocks } = block;
+    const blockType = blockName.replace(/^[^\/]+\//, '');
+    
+    // 生成区块注释开始
+    let html = `<!-- wp:${blockType}`;
+    
+    // 生成属性JSON（如果有属性）
+    const attributesJson = renderer.generateAttributes(attributes);
+    if (attributesJson) {
+      html += ` ${attributesJson}`;
+    }
+    
+    html += ` -->`;
+    
+    // 生成区块HTML内容
+    html += renderer.renderHTML(attributes, innerBlocks);
+    
+    // 生成区块注释结束
+    html += `<!-- /wp:${blockType} -->`;
+    
+    return html;
+  }
+
+  private renderGenericBlock(block: BlockNode): string {
+    const { blockName, attributes, innerBlocks } = block;
+    const blockType = blockName.replace(/^[^\/]+\//, '');
+    
+    let html = `<!-- wp:${blockType}`;
+    
+    // 过滤并添加属性
+    const filteredAttributes = this.filterEmptyAttributes(attributes);
+    if (Object.keys(filteredAttributes).length > 0) {
+      html += ` ${JSON.stringify(filteredAttributes)}`;
+    }
+    
+    html += ` -->`;
+    html += `<div class="wp-block-${blockType}">`;
+    
+    // 递归渲染内部区块
+    if (innerBlocks && innerBlocks.length > 0) {
+      innerBlocks.forEach(innerBlock => {
+        html += this.renderBlock(innerBlock);
+      });
+    }
+    
+    html += `</div>`;
+    html += `<!-- /wp:${blockType} -->`;
+    
+    return html;
+  }
+
+  private filterEmptyAttributes(attributes: Record<string, any>): Record<string, any> {
+    const filtered: Record<string, any> = {};
+    for (const [key, value] of Object.entries(attributes)) {
+      if (value !== undefined && value !== null && value !== '') {
+        filtered[key] = value;
+      }
+    }
+    return filtered;
   }
 }
+
+// 全局区块渲染器注册中心实例
+const globalRegistry = new BlockRendererRegistry();
 
 export function generateFullGutenbergHtml(params: {
   structuredData: any;
@@ -34,220 +109,658 @@ export function generateFullGutenbergHtml(params: {
   const { structuredData, pages } = params;
 
   let fullHTML = '';
-  fullHTML += `<!DOCTYPE html>\n<html lang="zh-CN">\n<head>\n`;
-  fullHTML += `  <meta charset="UTF-8">\n`;
-  fullHTML += `  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n`;
-  fullHTML += `  <title>${structuredData.companyInfo?.name ?? ''}</title>\n`;
-  fullHTML += `  <meta name="description" content="${structuredData.companyInfo?.description ?? ''}">\n`;
-  fullHTML += `</head>\n<body>\n`;
-  fullHTML += `<!-- wp:template-part {"slug":"header","area":"header"} /-->\n\n`;
-  fullHTML += `<!-- wp:group {"tagName":"main","style":{"spacing":{"margin":{"top":"0"},"padding":{"top":"0"}}}} -->\n`;
-  fullHTML += `<main class="wp-block-group" style="margin-top:0;padding-top:0">\n`;
-
+  
+  // 生成页面内容，不包含HTML文档结构
   pages.forEach(page => {
-    fullHTML += `<!-- wp:group {"className":"page-${page.path.replace(/\//g, '-')}"} -->\n`;
-    fullHTML += `<div class="wp-block-group page-${page.path.replace(/\//g, '-')}">\n`;
     if (page.outline && page.outline.length > 0) {
-      page.outline.forEach(block => {
-        fullHTML += generateGutenbergHTML(block, 0);
+      page.outline.forEach((block, index) => {
+        fullHTML += globalRegistry.renderBlock(block);
+        // 只在非最后一个区块后添加分隔符
+        if (index < page.outline.length - 1) {
+          fullHTML += ' '; // 使用空格代替换行作为分隔符
+        }
       });
     }
-    fullHTML += `</div>\n`;
-    fullHTML += `<!-- /wp:group -->\n\n`;
   });
 
-  fullHTML += `</main>\n`;
-  fullHTML += `<!-- /wp:group -->\n\n`;
-  fullHTML += `<!-- wp:template-part {"slug":"footer","area":"footer"} /-->\n`;
-  fullHTML += `</body>\n</html>`;
-  return fullHTML;
+  return fullHTML.trim();
 }
 
-function generateCoverBlock(block: any, level: number): string {
-  const indent = '  '.repeat(level);
-  const config = block.config || {};
-  const props = block.props || {};
+// 工具函数：WordPress属性工具类
+class WordPressAttributeUtils {
+  static filterEmptyAttributes(attributes: Record<string, any>): Record<string, any> {
+    const filtered: Record<string, any> = {};
+    for (const [key, value] of Object.entries(attributes)) {
+      if (value !== undefined && value !== null && value !== '') {
+        filtered[key] = value;
+      }
+    }
+    return filtered;
+  }
 
-  let html = `${indent}<!-- wp:cover ${JSON.stringify(config)} -->\n`;
-  html += `${indent}<div class="wp-block-cover"`;
-  if (config.align) html += ` align="${config.align}"`;
-  if (config.overlayColor) html += ` style="--wp-block-cover-overlay-color: ${config.overlayColor};"`;
-  if (config.minHeight) html += ` style="min-height: ${config.minHeight}px;"`;
-  html += `>\n`;
-  if (props.backgroundType === 'image') {
-    html += `${indent}  <img src="/images/hero-bg.jpg" alt="背景图片" />\n`;
+  static generateCSSClasses(baseClass: string, attributes: Record<string, any>): string[] {
+    const classes = [baseClass];
+    
+    // 处理alignment属性
+    if (attributes.align) {
+      if (attributes.align === 'full') {
+        classes.push('alignfull');
+      } else if (attributes.align === 'wide') {
+        classes.push('alignwide');
+      } else if (attributes.align === 'center') {
+        classes.push('aligncenter');
+      } else if (attributes.align === 'left') {
+        classes.push('alignleft');
+      } else if (attributes.align === 'right') {
+        classes.push('alignright');
+      }
+    }
+
+    // 处理背景颜色
+    if (attributes.backgroundColor) {
+      classes.push(`has-${attributes.backgroundColor}-background-color`);
+      classes.push('has-background');
+    }
+
+    // 处理文字颜色
+    if (attributes.textColor) {
+      classes.push(`has-${attributes.textColor}-color`);
+      classes.push('has-text-color');
+    }
+
+    return classes;
   }
-  if (block.children && block.children.length > 0) {
-    html += `${indent}  <div class="wp-block-cover__inner-container">\n`;
-    block.children.forEach((child: any) => {
-      html += generateGutenbergHTML(child, level + 2);
-    });
-    html += `${indent}  </div>\n`;
-  }
-  html += `${indent}</div>\n`;
-  html += `${indent}<!-- /wp:cover -->\n`;
-  return html;
 }
 
-function generateGroupBlock(block: any, level: number): string {
-  const indent = '  '.repeat(level);
-  const config = block.config || {};
-  const props = block.props || {};
+// WordPress核心区块渲染器实现
+abstract class BaseBlockRenderer implements BlockRenderer {
+  abstract blockName: string;
+  abstract renderHTML(attributes: Record<string, any>, innerBlocks: BlockNode[]): string;
 
-  let html = `${indent}<!-- wp:group ${JSON.stringify(config)} -->\n`;
-  html += `${indent}<div class="wp-block-group ${props.className || ''}"`;
-  if (config.backgroundColor) html += ` style="background-color: ${config.backgroundColor};"`;
-  html += `>\n`;
-  if (block.children && block.children.length > 0) {
-    block.children.forEach((child: any) => {
-      html += generateGutenbergHTML(child, level + 1);
-    });
+  generateAttributes(attributes: Record<string, any>): string {
+    // 获取这个区块类型应该保留的属性
+    const validAttributes = this.getValidAttributes(attributes);
+    const filtered = WordPressAttributeUtils.filterEmptyAttributes(validAttributes);
+    return Object.keys(filtered).length > 0 ? JSON.stringify(filtered) : '';
   }
-  html += `${indent}</div>\n`;
-  html += `${indent}<!-- /wp:group -->\n`;
-  return html;
+
+  generateCSSClasses(attributes: Record<string, any>): string[] {
+    return WordPressAttributeUtils.generateCSSClasses(`wp-block-${this.blockName}`, attributes);
+  }
+
+  protected renderInnerBlocks(innerBlocks: BlockNode[]): string {
+    if (!innerBlocks || innerBlocks.length === 0) return '';
+    return innerBlocks.map(block => globalRegistry.renderBlock(block)).join('');
+  }
+
+  /**
+   * 获取对于此区块类型有效的WordPress属性
+   * 子类可以重写此方法来定制属性过滤逻辑
+   */
+  protected getValidAttributes(attributes: Record<string, any>): Record<string, any> {
+    // 默认的通用属性过滤
+    const validKeys = [
+      'align', 'backgroundColor', 'textColor', 'fontSize', 'fontFamily',
+      'style', 'className', 'anchor', 'lock'
+    ];
+    
+    const filtered: Record<string, any> = {};
+    for (const key of validKeys) {
+      if (attributes[key] !== undefined) {
+        filtered[key] = attributes[key];
+      }
+    }
+    
+    return filtered;
+  }
 }
 
-function generateColumnsBlock(block: any, level: number): string {
-  const indent = '  '.repeat(level);
-  const config = block.config || {};
-  const props = block.props || {};
+// Cover区块渲染器
+// Cover区块渲染器
+class CoverBlockRenderer extends BaseBlockRenderer {
+  blockName = 'cover';
 
-  let html = `${indent}<!-- wp:columns ${JSON.stringify(config)} -->\n`;
-  html += `${indent}<div class="wp-block-columns ${props.className || ''}">\n`;
-  if (block.children && block.children.length > 0) {
-    block.children.forEach((child: any) => {
-      html += generateGutenbergHTML(child, level + 1);
-    });
+  protected getValidAttributes(attributes: Record<string, any>): Record<string, any> {
+    // ... (这个方法无需改动)
+    const validKeys = ['align', 'dimRatio', 'minHeight', 'overlayColor', 'url', 'backgroundColor'];
+    const filtered: Record<string, any> = {};
+    
+    for (const key of validKeys) {
+      if (attributes[key] !== undefined) {
+        filtered[key] = attributes[key];
+      }
+    }
+    
+    return filtered;
   }
-  html += `${indent}</div>\n`;
-  html += `${indent}<!-- /wp:columns -->\n`;
-  return html;
+
+  renderHTML(attributes: Record<string, any>, innerBlocks: BlockNode[]): string {
+    // --- 开始修改 ---
+
+    // 1. 处理最外层容器的类和样式
+    const mainClasses = this.generateCSSClasses(attributes); // 假设这个方法会返回 'wp-block-cover', 'alignfull' 等基础类
+    const mainStyles: string[] = [];
+    
+    if (attributes.minHeight) {
+      mainStyles.push(`min-height:${attributes.minHeight}px`);
+    }
+
+    // **修正点1：如果设置的是 backgroundColor，则将颜色类添加到主div上**
+    if (attributes.backgroundColor) {
+      mainClasses.push(`has-${attributes.backgroundColor}-background-color`);
+      mainClasses.push('has-background'); // 通常背景颜色会伴随这个类
+    }
+
+    const mainStyleAttr = mainStyles.length > 0 ? ` style="${mainStyles.join(';')}"` : '';
+    let html = `<div class="${mainClasses.join(' ')}"${mainStyleAttr}>`;
+    
+    // 2. 处理背景图片 (这部分逻辑不变)
+    if (attributes.url) {
+      html += `<img class="wp-block-cover__image-background" alt="" src="${attributes.url}" data-object-fit="cover"/>`;
+    }
+    
+    // 3. 处理背景遮罩<span>
+    const backgroundClasses = ['wp-block-cover__background'];
+    const backgroundStyles: string[] = [];
+
+    // **修正点2：只有 overlayColor (图片遮罩颜色) 才应用到span上**
+    if (attributes.overlayColor) {
+        backgroundClasses.push(`has-${attributes.overlayColor}-background-color`);
+    }
+
+    // **修正点3：使用内联样式处理 dimRatio，而不是用class**
+    if (attributes.dimRatio !== undefined && attributes.dimRatio > 0) {
+        backgroundClasses.push('has-background-dim');
+    } else if (Object.keys(attributes).includes('dimRatio') && attributes.dimRatio === 0) {
+      // dimRatio 为 0 的特殊情况
+      backgroundClasses.push('has-background-dim');
+      backgroundClasses.push('has-background-dim-0');
+    }
+
+    const backgroundStyleAttr = backgroundStyles.length > 0 ? ` style="${backgroundStyles.join(';')}"` : '';
+    html += `<span aria-hidden="true" class="${backgroundClasses.join(' ')}"${backgroundStyleAttr}></span>`;
+    
+    // 4. 内容容器 (这部分逻辑不变)
+    html += `<div class="wp-block-cover__inner-container">`;
+    if (innerBlocks && innerBlocks.length > 0) {
+      html += this.renderInnerBlocks(innerBlocks);
+    }
+    html += `</div>`;
+    
+    html += `</div>`;
+    return html;
+
+    // --- 结束修改 ---
+  }
 }
 
-function generateColumnBlock(block: any, level: number): string {
-  const indent = '  '.repeat(level);
-  const config = block.config || {};
-  const props = block.props || {};
+// Heading区块渲染器
+class HeadingBlockRenderer extends BaseBlockRenderer {
+  blockName = 'heading';
 
-  let html = `${indent}<!-- wp:column ${JSON.stringify(config)} -->\n`;
-  html += `${indent}<div class="wp-block-column ${props.className || ''}">\n`;
-  if (block.children && block.children.length > 0) {
-    block.children.forEach((child: any) => {
-      html += generateGutenbergHTML(child, level + 1);
-    });
+  protected getValidAttributes(attributes: Record<string, any>): Record<string, any> {
+    const validKeys = ['content', 'level', 'textAlign', 'textColor'];
+    const filtered: Record<string, any> = {};
+    
+    for (const key of validKeys) {
+      if (attributes[key] !== undefined) {
+        filtered[key] = attributes[key];
+      }
+    }
+    
+    return filtered;
   }
-  html += `${indent}</div>\n`;
-  html += `${indent}<!-- /wp:column -->\n`;
-  return html;
+
+  renderHTML(attributes: Record<string, any>, innerBlocks: BlockNode[]): string {
+    const level = attributes.level || 2;
+    const content = attributes.content || '';
+    const classes = ['wp-block-heading'];
+    
+    // 处理文字对齐
+    if (attributes.textAlign) {
+      classes.push(`has-text-align-${attributes.textAlign}`);
+    }
+    
+    // 处理颜色类
+    if (attributes.textColor) {
+      classes.push(`has-${attributes.textColor}-color`);
+      classes.push('has-text-color');
+    }
+    
+    return `<h${level} class="${classes.join(' ')}">${content}</h${level}>`;
+  }
 }
 
-function generateHeadingBlock(block: any, level: number): string {
-  const indent = '  '.repeat(level);
-  const config = block.config || {};
-  const props = block.props || {};
+// Paragraph区块渲染器
+class ParagraphBlockRenderer extends BaseBlockRenderer {
+  blockName = 'paragraph';
 
-  let html = `${indent}<!-- wp:heading ${JSON.stringify(config)} -->\n`;
-  html += `${indent}<h${config.level || 2} class="${props.className || ''}">`;
-  if (block.content && block.content.text) {
-    html += block.content.text;
-  } else if ((props as any).content) {
-    html += (props as any).content;
-  } else {
-    html += '标题内容';
+  protected getValidAttributes(attributes: Record<string, any>): Record<string, any> {
+    const validKeys = ['content', 'textAlign', 'fontSize', 'textColor'];
+    const filtered: Record<string, any> = {};
+    
+    for (const key of validKeys) {
+      if (attributes[key] !== undefined) {
+        filtered[key] = attributes[key];
+      }
+    }
+    
+    return filtered;
   }
-  html += `</h${config.level || 2}>\n`;
-  html += `${indent}<!-- /wp:heading -->\n`;
-  return html;
+
+  renderHTML(attributes: Record<string, any>, innerBlocks: BlockNode[]): string {
+    const content = attributes.content || '';
+    const classes = ['wp-block-paragraph'];
+    
+    // 处理文字对齐
+    if (attributes.textAlign) {
+      classes.push(`has-text-align-${attributes.textAlign}`);
+    }
+    
+    // 处理字体大小
+    if (attributes.fontSize) {
+      classes.push(`has-${attributes.fontSize}-font-size`);
+    }
+    
+    // 处理颜色类
+    if (attributes.textColor) {
+      classes.push(`has-${attributes.textColor}-color`);
+      classes.push('has-text-color');
+    }
+    
+    const classAttr = classes.length > 1 ? ` class="${classes.join(' ')}"` : '';
+    return `<p${classAttr}>${content}</p>`;
+  }
 }
 
-function generateParagraphBlock(block: any, level: number): string {
-  const indent = '  '.repeat(level);
-  const config = block.config || {};
-  const props = block.props || {};
+// Button区块渲染器
+class ButtonBlockRenderer extends BaseBlockRenderer {
+  blockName = 'button';
 
-  let html = `${indent}<!-- wp:paragraph ${JSON.stringify(config)} -->\n`;
-  html += `${indent}<p class="${props.className || ''}">`;
-  if (block.content && (block.content as any).text) {
-    html += (block.content as any).text;
-  } else if (block.content && (block.content as any).prompt) {
-    html += `[AI生成文案: ${(block.content as any).prompt}]`;
-  } else {
-    html += '段落内容';
+  protected getValidAttributes(attributes: Record<string, any>): Record<string, any> {
+    const validKeys = ['backgroundColor', 'borderRadius', 'text', 'textColor', 'url'];
+    const filtered: Record<string, any> = {};
+    
+    for (const key of validKeys) {
+      if (attributes[key] !== undefined) {
+        filtered[key] = attributes[key];
+      }
+    }
+    
+    return filtered;
   }
-  html += `</p>\n`;
-  html += `${indent}<!-- /wp:paragraph -->\n`;
-  return html;
+
+  renderHTML(attributes: Record<string, any>, innerBlocks: BlockNode[]): string {
+    const text = attributes.text || '按钮';
+    const url = attributes.url || '#';
+    const classes = ['wp-block-button__link'];
+    
+    // 按照WordPress期望的顺序添加颜色类
+    if (attributes.textColor) {
+      classes.push(`has-${attributes.textColor}-color`);
+    }
+    
+    if (attributes.backgroundColor) {
+      classes.push(`has-${attributes.backgroundColor}-background-color`);
+    }
+    
+    // 在颜色类之后添加通用类
+    if (attributes.textColor) {
+      classes.push('has-text-color');
+    }
+    
+    if (attributes.backgroundColor) {
+      classes.push('has-background');
+    }
+    
+    classes.push('wp-element-button');
+    
+    // 不添加内联样式，borderRadius应该通过CSS类处理
+    return `<div class="wp-block-button"><a class="${classes.join(' ')}" href="${url}">${text}</a></div>`;
+  }
 }
 
-function generateImageBlock(block: any, level: number): string {
-  const indent = '  '.repeat(level);
-  const config = block.config || {};
-  const props = block.props || {};
+// Buttons区块渲染器
+class ButtonsBlockRenderer extends BaseBlockRenderer {
+  blockName = 'buttons';
 
-  let html = `${indent}<!-- wp:image ${JSON.stringify(config)} -->\n`;
-  html += `${indent}<figure class="wp-block-image ${props.className || ''}">\n`;
-  if (block.content && (block.content as any).source) {
-    html += `${indent}  <img src="${(block.content as any).source}" alt="${props.alt || '图片'}" />\n`;
-  } else {
-    html += `${indent}  <img src="/images/placeholder.jpg" alt="占位图片" />\n`;
+  protected getValidAttributes(attributes: Record<string, any>): Record<string, any> {
+    const validKeys = ['layout'];
+    const filtered: Record<string, any> = {};
+    
+    for (const key of validKeys) {
+      if (attributes[key] !== undefined) {
+        filtered[key] = attributes[key];
+      }
+    }
+    
+    return filtered;
   }
-  html += `${indent}</figure>\n`;
-  html += `${indent}<!-- /wp:image -->\n`;
-  return html;
+
+  renderHTML(attributes: Record<string, any>, innerBlocks: BlockNode[]): string {
+    const classes = ['wp-block-buttons'];
+    
+    // 处理布局
+    if (attributes.layout?.justifyContent === 'center') {
+      classes.push('is-content-justification-center');
+    }
+    
+    let html = `<div class="${classes.join(' ')}">`;
+    html += this.renderInnerBlocks(innerBlocks);
+    html += `</div>`;
+    return html;
+  }
 }
 
-function generateButtonsBlock(block: any, level: number): string {
-  const indent = '  '.repeat(level);
-  const config = block.config || {};
-  const props = block.props || {};
+// Columns区块渲染器
+class ColumnsBlockRenderer extends BaseBlockRenderer {
+  blockName = 'columns';
 
-  let html = `${indent}<!-- wp:buttons ${JSON.stringify(config)} -->\n`;
-  html += `${indent}<div class="wp-block-buttons ${props.className || ''}">\n`;
-  if (block.children && block.children.length > 0) {
-    block.children.forEach((child: any) => {
-      html += generateGutenbergHTML(child, level + 1);
-    });
+  protected getValidAttributes(attributes: Record<string, any>): Record<string, any> {
+    const validKeys = ['align', 'isStackedOnMobile', 'verticalAlignment'];
+    const filtered: Record<string, any> = {};
+    
+    for (const key of validKeys) {
+      if (attributes[key] !== undefined) {
+        filtered[key] = attributes[key];
+      }
+    }
+    
+    return filtered;
   }
-  html += `${indent}</div>\n`;
-  html += `${indent}<!-- /wp:buttons -->\n`;
-  return html;
+
+  renderHTML(attributes: Record<string, any>, innerBlocks: BlockNode[]): string {
+    const classes = this.generateCSSClasses(attributes);
+    
+    if (attributes.isStackedOnMobile) {
+      classes.push('is-stacked-on-mobile');
+    }
+    
+    if (attributes.verticalAlignment) {
+      classes.push(`are-vertically-aligned-${attributes.verticalAlignment}`);
+    }
+    
+    let html = `<div class="${classes.join(' ')}">`;
+    html += this.renderInnerBlocks(innerBlocks);
+    html += `</div>`;
+    return html;
+  }
 }
 
-function generateButtonBlock(block: any, level: number): string {
-  const indent = '  '.repeat(level);
-  const config = block.config || {};
-  const props = block.props || {};
+// Column区块渲染器
+class ColumnBlockRenderer extends BaseBlockRenderer {
+  blockName = 'column';
 
-  let html = `${indent}<!-- wp:button ${JSON.stringify(config)} -->\n`;
-  html += `${indent}<div class="wp-block-button ${props.className || ''}">\n`;
-  html += `${indent}  <a class="wp-block-button__link" href="${props.url || '#'}">`;
-  if (props.text) {
-    html += props.text;
-  } else {
-    html += '按钮文本';
+  protected getValidAttributes(attributes: Record<string, any>): Record<string, any> {
+    const validKeys = ['width'];
+    const filtered: Record<string, any> = {};
+    
+    for (const key of validKeys) {
+      if (attributes[key] !== undefined) {
+        filtered[key] = attributes[key];
+      }
+    }
+    
+    return filtered;
   }
-  html += `</a>\n`;
-  html += `${indent}</div>\n`;
-  html += `${indent}<!-- /wp:button -->\n`;
-  return html;
+
+  renderHTML(attributes: Record<string, any>, innerBlocks: BlockNode[]): string {
+    const classes = ['wp-block-column'];
+    
+    let style = '';
+    if (attributes.width) {
+      style = ` style="flex-basis:${attributes.width}"`;
+    }
+    
+    let html = `<div class="${classes.join(' ')}"${style}>`;
+    html += this.renderInnerBlocks(innerBlocks);
+    html += `</div>`;
+    return html;
+  }
 }
 
-function generateGenericBlock(block: any, level: number): string {
-  const indent = '  '.repeat(level);
-  const config = block.config || {};
-  const props = block.props || {};
+// Spacer区块渲染器
+class SpacerBlockRenderer extends BaseBlockRenderer {
+  blockName = 'spacer';
 
-  let html = `${indent}<!-- wp:${block.component} ${JSON.stringify(config)} -->\n`;
-  html += `${indent}<div class="wp-block-${String(block.component).replace('core/', '')} ${props.className || ''}">\n`;
-  if (block.children && block.children.length > 0) {
-    block.children.forEach((child: any) => {
-      html += generateGutenbergHTML(child, level + 1);
-    });
+  protected getValidAttributes(attributes: Record<string, any>): Record<string, any> {
+    const validKeys = ['height'];
+    const filtered: Record<string, any> = {};
+    
+    for (const key of validKeys) {
+      if (attributes[key] !== undefined) {
+        filtered[key] = attributes[key];
+      }
+    }
+    
+    return filtered;
   }
-  html += `${indent}</div>\n`;
-  html += `${indent}<!-- /wp:${block.component} -->\n`;
-  return html;
+
+  renderHTML(attributes: Record<string, any>, innerBlocks: BlockNode[]): string {
+    const height = attributes.height || '100px';
+    return `<div style="height:${height}" aria-hidden="true" class="wp-block-spacer"></div>`;
+  }
 }
+
+// Group区块渲染器
+class GroupBlockRenderer extends BaseBlockRenderer {
+  blockName = 'group';
+
+  protected getValidAttributes(attributes: Record<string, any>): Record<string, any> {
+    const validKeys = ['align', 'backgroundColor', 'layout'];
+    const filtered: Record<string, any> = {};
+    
+    for (const key of validKeys) {
+      if (attributes[key] !== undefined) {
+        filtered[key] = attributes[key];
+      }
+    }
+    
+    return filtered;
+  }
+
+  renderHTML(attributes: Record<string, any>, innerBlocks: BlockNode[]): string {
+    const classes = this.generateCSSClasses(attributes);
+    
+    let html = `<div class="${classes.join(' ')}">`;
+    html += this.renderInnerBlocks(innerBlocks);
+    html += `</div>`;
+    return html;
+  }
+}
+
+// 注册所有WordPress核心区块渲染器
+function registerCoreBlockRenderers(): void {
+  globalRegistry.register(new CoverBlockRenderer());
+  globalRegistry.register(new HeadingBlockRenderer());
+  globalRegistry.register(new ParagraphBlockRenderer());
+  globalRegistry.register(new ButtonBlockRenderer());
+  globalRegistry.register(new ButtonsBlockRenderer());
+  globalRegistry.register(new ColumnsBlockRenderer());
+  globalRegistry.register(new ColumnBlockRenderer());
+  globalRegistry.register(new SpacerBlockRenderer());
+  globalRegistry.register(new GroupBlockRenderer());
+}
+
+// 自动注册核心区块
+registerCoreBlockRenderers();
+
+// 导出注册中心，供自定义区块注册使用
+export { globalRegistry as blockRendererRegistry };
+
+// =================
+// 自定义区块渲染器架构
+// =================
+
+/**
+ * 自定义区块渲染器基类
+ * 继承此类来创建自定义区块渲染器
+ */
+export abstract class CustomBlockRenderer extends BaseBlockRenderer {
+  /**
+   * 自定义区块的命名空间，通常为 'custom'
+   */
+  protected namespace = 'custom';
+
+  /**
+   * 生成自定义区块的CSS类
+   */
+  generateCSSClasses(attributes: Record<string, any>): string[] {
+    return WordPressAttributeUtils.generateCSSClasses(`wp-block-${this.namespace}-${this.blockName}`, attributes);
+  }
+
+  /**
+   * 处理自定义属性，子类可以重写此方法
+   */
+  protected processCustomAttributes(attributes: Record<string, any>): Record<string, any> {
+    return attributes;
+  }
+
+  /**
+   * 生成自定义样式，子类可以重写此方法
+   */
+  protected generateCustomStyles(attributes: Record<string, any>): string {
+    return '';
+  }
+}
+
+/**
+ * 自定义区块注册工具函数
+ */
+export function registerCustomBlockRenderer(renderer: BlockRenderer): void {
+  globalRegistry.register(renderer);
+}
+
+// =================
+// 自定义区块渲染器示例
+// =================
+
+/**
+ * 示例：产品展示卡片区块渲染器
+ */
+export class ProductCardBlockRenderer extends CustomBlockRenderer {
+  blockName = 'product-card';
+
+  renderHTML(attributes: Record<string, any>, innerBlocks: BlockNode[]): string {
+    const { title, price, image, description, buttonText, buttonUrl } = attributes;
+    const classes = this.generateCSSClasses(attributes);
+    const customStyles = this.generateCustomStyles(attributes);
+    
+    const styleAttr = customStyles ? ` style="${customStyles}"` : '';
+    
+    let html = `<div class="${classes.join(' ')}"${styleAttr}>`;
+    
+    if (image) {
+      html += `<div class="wp-block-custom-product-card__image">`;
+      html += `<img src="${image}" alt="${title || ''}" />`;
+      html += `</div>`;
+    }
+    
+    html += `<div class="wp-block-custom-product-card__content">`;
+    
+    if (title) {
+      html += `<h3 class="wp-block-custom-product-card__title">${title}</h3>`;
+    }
+    
+    if (price) {
+      html += `<div class="wp-block-custom-product-card__price">${price}</div>`;
+    }
+    
+    if (description) {
+      html += `<p class="wp-block-custom-product-card__description">${description}</p>`;
+    }
+    
+    // 渲染内部区块（可能包含更多自定义内容）
+    if (innerBlocks && innerBlocks.length > 0) {
+      html += `<div class="wp-block-custom-product-card__inner">`;
+      html += this.renderInnerBlocks(innerBlocks);
+      html += `</div>`;
+    }
+    
+    if (buttonText && buttonUrl) {
+      html += `<div class="wp-block-custom-product-card__button">`;
+      html += `<a href="${buttonUrl}" class="wp-block-custom-product-card__link">${buttonText}</a>`;
+      html += `</div>`;
+    }
+    
+    html += `</div>`; // content
+    html += `</div>`; // card
+    
+    return html;
+  }
+
+  protected generateCustomStyles(attributes: Record<string, any>): string {
+    const styles: string[] = [];
+    
+    if (attributes.cardBackgroundColor) {
+      styles.push(`background-color: ${attributes.cardBackgroundColor}`);
+    }
+    
+    if (attributes.cardBorderRadius) {
+      styles.push(`border-radius: ${attributes.cardBorderRadius}px`);
+    }
+    
+    return styles.join('; ');
+  }
+}
+
+/**
+ * 示例：团队成员介绍区块渲染器
+ */
+export class TeamMemberBlockRenderer extends CustomBlockRenderer {
+  blockName = 'team-member';
+
+  renderHTML(attributes: Record<string, any>, innerBlocks: BlockNode[]): string {
+    const { name, position, avatar, bio, social } = attributes;
+    const classes = this.generateCSSClasses(attributes);
+    
+    let html = `<div class="${classes.join(' ')}">`;
+    
+    if (avatar) {
+      html += `<div class="wp-block-custom-team-member__avatar">`;
+      html += `<img src="${avatar}" alt="${name || ''}" />`;
+      html += `</div>`;
+    }
+    
+    html += `<div class="wp-block-custom-team-member__info">`;
+    
+    if (name) {
+      html += `<h4 class="wp-block-custom-team-member__name">${name}</h4>`;
+    }
+    
+    if (position) {
+      html += `<div class="wp-block-custom-team-member__position">${position}</div>`;
+    }
+    
+    if (bio) {
+      html += `<p class="wp-block-custom-team-member__bio">${bio}</p>`;
+    }
+    
+    // 社交媒体链接
+    if (social && Array.isArray(social) && social.length > 0) {
+      html += `<div class="wp-block-custom-team-member__social">`;
+      social.forEach((link: any) => {
+        if (link.url && link.platform) {
+          html += `<a href="${link.url}" class="wp-block-custom-team-member__social-link" data-platform="${link.platform}">${link.platform}</a>`;
+        }
+      });
+      html += `</div>`;
+    }
+    
+    // 渲染内部区块
+    if (innerBlocks && innerBlocks.length > 0) {
+      html += this.renderInnerBlocks(innerBlocks);
+    }
+    
+    html += `</div>`; // info
+    html += `</div>`; // team-member
+    
+    return html;
+  }
+}
+
+// 使用示例：注册自定义区块渲染器
+// registerCustomBlockRenderer(new ProductCardBlockRenderer());
+// registerCustomBlockRenderer(new TeamMemberBlockRenderer());
 
 

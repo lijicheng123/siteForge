@@ -4,16 +4,13 @@
  */
 
 import { FastifyInstance, FastifyPluginOptions, FastifySchema } from 'fastify';
-import { contentAndLayoutCompleteBlueprintSchema, responseSchema, step6RequestSchema } from '../../schemas';
+import { responseSchema, step6RequestSchema } from '../../schemas';
 import { executeStep6 } from '../../services/workflow-steps.service';
 
-// 响应数据Schema
+// 响应数据Schema - 直接返回HTML字符串
 const step6ResponseDataSchema = {
-  type: 'object',
-  properties: {
-    html: { type: 'string', description: '完整的、可被WordPress编辑器解析的古腾堡HTML' }
-  },
-  required: ['html']
+  type: 'string',
+  description: '完整的、可被WordPress编辑器解析的古腾堡HTML'
 };
 
 // 响应Schema - 使用通用的responseSchema函数
@@ -55,9 +52,9 @@ export default async function step6Routes(fastify: FastifyInstance, options: Fas
       
       // 核心业务逻辑 (此步骤不调用AI)
       // 1. 获取请求体中的内容和布局都完备的蓝图数据
-      // 2. 实现一个确定性的JS/TS函数 `generateGutenbergHTML`
-      // 3. 该函数需要递归遍历蓝图中的所有 Block 对象
-      // 4. 根据每个 block 的 `component`, `config`, `props`, `content` 和 `children`，精确地生成对应的古腾堡HTML注释语法
+      // 2. 使用插件化的区块渲染器架构生成古腾堡HTML
+      // 3. 支持WordPress核心区块和自定义区块的渲染
+      // 4. 根据每个 block 的 `blockName`, `attributes` 和 `innerBlocks`，精确地生成对应的古腾堡HTML注释语法
       // 5. 返回包含完整HTML字符串的JSON对象
       // 构建蓝图数据
       const blueprint = {
@@ -69,15 +66,20 @@ export default async function step6Routes(fastify: FastifyInstance, options: Fas
       
       // 调用服务函数执行核心业务逻辑
       const fullHTML = executeStep6(blueprint);
-      
-      return reply.send({
-        success: true,
-        data: {
-          html: fullHTML
-        },
-        message: 'HTML代码生成成功',
-        timestamp: new Date().toISOString()
-      });
+
+      console.log('fullHTML---->', fullHTML);
+      return reply
+        .header('Content-Type', 'text/html; charset=utf-8')
+        .send(fullHTML);
+      // return reply.send({
+      //   success: true,
+      //   data: {
+      //     html: fullHTML,
+      //     pages: blueprint.pages
+      //   },
+      //   message: 'HTML代码生成成功',
+      //   timestamp: new Date().toISOString()
+      // });
 
     } catch (error) {
       fastify.log.error('步骤6执行失败');
