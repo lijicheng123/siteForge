@@ -85,8 +85,8 @@ export class PlaybookManager {
   async installDocker(server: ServerConfig): Promise<AnsiblePlaybookResult> {
     const extraVars = {
       target_server: server.ip,
-      docker_version: '24.0.7',
-      docker_compose_version: '2.21.0'
+      docker_version: '27.1.0',           // Docker LTS长期支持版本
+      docker_compose_version: '2.28.1',   // 最新稳定版本
     };
 
     return await this.ansibleClient.runPlaybook('docker-install', [server], extraVars);

@@ -163,6 +163,7 @@ export class AnsibleClient {
   }
 
   /**
+   * TODO: 这个方法是不是可以删除了？
    * 测试服务器连接
    */
   async testConnection(server: ServerConfig): Promise<boolean> {
@@ -191,7 +192,7 @@ export class AnsibleClient {
       const inventoryFile = await this.generateInventory([server]);
       
       // 使用最简单的命令，避免复杂语法
-      const command = `ansible all -i ${inventoryFile} -m shell --become -a 'cat /etc/redhat-release 2>/dev/null || cat /etc/os-release | head -1; hostname; uname -m; cat /proc/cpuinfo | grep processor | wc -l; free -m | grep Mem; df -h /; python3 --version 2>/dev/null || python --version 2>/dev/null || echo No Python; docker --version 2>/dev/null || echo No Docker; wp --version 2>/dev/null || echo No WP-CLI'`;
+      const command = `ansible all -i ${inventoryFile} -m shell --become -a 'cat /etc/redhat-release 2>/dev/null || cat /etc/os-release | head -1; hostname; uname -m; cat /proc/cpuinfo | grep processor | wc -l; free -m | grep Mem; df -h /; python3 --version 2>/dev/null || python --version 2>/dev/null || echo No Python; docker --version 2>/dev/null || echo No Docker; docker compose version 2>/dev/null || docker-compose --version 2>/dev/null || echo No Docker Compose; wp --version 2>/dev/null || echo No WP-CLI'`;
       
       const result = await this.executeCommand(command);
       await this.cleanupTempFile(inventoryFile);
@@ -224,7 +225,7 @@ export class AnsibleClient {
         ansible_user: server.username,
         ansible_password: server.password,
         ansible_port: server.port || 22,
-        ansible_ssh_common_args: '-o StrictHostKeyChecking=no'
+        ansible_ssh_common_args: '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o PasswordAuthentication=yes -o PubkeyAuthentication=no'
       };
     });
 
@@ -400,6 +401,11 @@ export class AnsibleClient {
         if (line.includes('Docker version') && !line.includes('No Docker')) {
           result.docker.installed = true;
           result.docker.version = line;
+        }
+        
+        if ((line.includes('Docker Compose version') || line.includes('docker-compose version')) && !line.includes('No Docker Compose')) {
+          result.docker.composeInstalled = true;
+          result.docker.composeVersion = line;
         }
         
         if (line.includes('WP-CLI') && !line.includes('No WP-CLI')) {
