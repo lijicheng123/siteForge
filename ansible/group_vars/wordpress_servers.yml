@@ -1,0 +1,113 @@
+# WordPress服务器组特定变量
+# 仅适用于wordpress_servers组的配置
+
+# 服务器角色
+server_role: "wordpress"
+
+# WordPress特定配置
+wordpress_config:
+  # 性能优化
+  wp_memory_limit: "256M"
+  wp_max_memory_limit: "512M"
+  
+  # 缓存配置
+  object_cache: false
+  page_cache: false
+  
+  # 插件配置
+  auto_updates: true
+  plugin_updates: true
+  theme_updates: true
+  
+  # 媒体配置
+  media_upload_limit: "64M"
+  
+  # 安全配置
+  disable_file_edit: true
+  force_ssl_admin: false
+  
+# Docker Compose服务配置
+services:
+  nginx:
+    image: "nginx:{{ nginx.version }}"
+    ports:
+      - "{{ nginx.port }}:80"
+    restart_policy: "unless-stopped"
+    
+  mysql:
+    image: "mariadb:{{ mysql.version }}"
+    restart_policy: "unless-stopped"
+    environment:
+      MYSQL_ROOT_PASSWORD: "{{ mysql.root_password }}"
+      MYSQL_DATABASE: "{{ wordpress.database.name }}"
+      MYSQL_USER: "{{ wordpress.database.user }}"
+      MYSQL_PASSWORD: "{{ wordpress_db_password }}"
+    volumes:
+      - "mysql_data:/var/lib/mysql"
+      
+  wordpress:
+    image: "wordpress:{{ wordpress.version }}"
+    restart_policy: "unless-stopped"
+    environment:
+      WORDPRESS_DB_HOST: "{{ wordpress.database.host }}:{{ wordpress.database.port }}"
+      WORDPRESS_DB_NAME: "{{ wordpress.database.name }}"
+      WORDPRESS_DB_USER: "{{ wordpress.database.user }}"
+      WORDPRESS_DB_PASSWORD: "{{ wordpress_db_password }}"
+      WORDPRESS_TABLE_PREFIX: "{{ wordpress.table_prefix }}"
+      WORDPRESS_DEBUG: "{{ wordpress.debug }}"
+    volumes:
+      - "wordpress_data:/var/www/html"
+      
+  wp_cli:
+    image: "wordpress:cli"
+    restart_policy: "no"
+    environment:
+      WORDPRESS_DB_HOST: "{{ wordpress.database.host }}:{{ wordpress.database.port }}"
+      WORDPRESS_DB_NAME: "{{ wordpress.database.name }}"
+      WORDPRESS_DB_USER: "{{ wordpress.database.user }}"
+      WORDPRESS_DB_PASSWORD: "{{ wordpress_db_password }}"
+    volumes:
+      - "wordpress_data:/var/www/html"
+    depends_on:
+      - mysql
+      - wordpress
+
+# 网络配置
+networks:
+  wordpress_network:
+    driver: bridge
+    
+# 数据卷配置
+volumes:
+  mysql_data:
+    driver: local
+  wordpress_data:
+    driver: local
+    
+# 健康检查配置
+health_checks:
+  wordpress:
+    test: ["CMD", "curl", "-f", "http://localhost"]
+    interval: "30s"
+    timeout: "10s"
+    retries: 3
+    start_period: "60s"
+    
+  mysql:
+    test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+    interval: "30s"
+    timeout: "10s"
+    retries: 3
+    start_period: "30s"
+
+# 资源限制
+resource_limits:
+  wordpress:
+    memory: "512m"
+    cpus: "1.0"
+  mysql:
+    memory: "512m"
+    cpus: "1.0"
+  nginx:
+    memory: "128m"
+    cpus: "0.5"

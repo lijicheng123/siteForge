@@ -6,6 +6,7 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify';
 import workflowRoutes from './workflow';
 import healthCheckRoutes from './health-check';
+import provisioningRoutes from './provisioning';
 
 /**
  * 主路由注册插件
@@ -18,6 +19,9 @@ export default async function routes(fastify: FastifyInstance, options: FastifyP
   
   // 注册健康检查路由
   await fastify.register(healthCheckRoutes, { prefix: '/api' });
+  
+  // 注册部署路由
+  await fastify.register(provisioningRoutes, { prefix: '/api' });
   
   // TODO: 注册其他模块的路由
   // await fastify.register(authRoutes, { prefix: '/api/auth' });

@@ -1,0 +1,199 @@
+---
+# 服务器检查Playbook
+# 检查服务器基本状态、系统信息和资源使用情况
+
+- name: 服务器状态检查
+  hosts: all
+  gather_facts: yes
+  become: yes
+  
+  vars:
+    check_results: {}
+    
+  tasks:
+    - name: 检查服务器连通性
+      ping:
+      register: ping_result
+      
+    - name: 收集系统信息
+      setup:
+        gather_subset:
+          - "all"
+      register: system_facts
+      
+    - name: 检查系统负载
+      shell: |
+        uptime | awk -F'load average:' '{ print $2 }'
+      register: system_load
+      changed_when: false
+      
+    - name: 检查磁盘使用情况
+      shell: |
+        df -h / | tail -1 | awk '{print $5}' | sed 's/%//'
+      register: disk_usage
+      changed_when: false
+      
+    - name: 检查内存使用情况
+      shell: |
+        free | grep Mem | awk '{printf "%.1f", ($3/$2) * 100.0}'
+      register: memory_usage
+      changed_when: false
+      
+    - name: 检查CPU使用情况
+      shell: |
+        top -bn1 | grep "Cpu(s)" | awk '{print $2}' | awk -F'%' '{print $1}'
+      register: cpu_usage
+      changed_when: false
+      
+    - name: 检查网络连接
+      shell: |
+        netstat -tuln | grep LISTEN | wc -l
+      register: network_connections
+      changed_when: false
+      
+    - name: 检查防火墙状态
+      shell: |
+        if command -v firewall-cmd >/dev/null 2>&1; then
+          firewall-cmd --state 2>/dev/null || echo "inactive"
+        elif command -v ufw >/dev/null 2>&1; then
+          ufw status | head -1 | awk '{print $2}'
+        else
+          echo "not_installed"
+        fi
+      register: firewall_status
+      changed_when: false
+      
+    - name: 检查SELinux状态
+      shell: |
+        if command -v getenforce >/dev/null 2>&1; then
+          getenforce
+        else
+          echo "not_installed"
+        fi
+      register: selinux_status
+      changed_when: false
+      
+    - name: 检查Docker安装状态
+      shell: |
+        if command -v docker >/dev/null 2>&1; then
+          docker --version | awk '{print $3}' | sed 's/,//'
+        else
+          echo "not_installed"
+        fi
+      register: docker_version
+      changed_when: false
+      
+    - name: 检查Docker Compose安装状态
+      shell: |
+        if command -v docker-compose >/dev/null 2>&1; then
+          docker-compose --version | awk '{print $3}' | sed 's/,//'
+        elif docker compose version >/dev/null 2>&1; then
+          docker compose version --short
+        else
+          echo "not_installed"
+        fi
+      register: docker_compose_version
+      changed_when: false
+      
+    - name: 检查Docker服务状态
+      shell: |
+        if command -v docker >/dev/null 2>&1; then
+          if systemctl is-active docker >/dev/null 2>&1; then
+            echo "running"
+          else
+            echo "stopped"
+          fi
+        else
+          echo "not_installed"
+        fi
+      register: docker_service_status
+      changed_when: false
+      
+    - name: 检查WordPress容器状态
+      shell: |
+        if command -v docker >/dev/null 2>&1; then
+          docker ps --filter "name=wordpress" --format "table {{.Names}}\t{{.Status}}" | grep -v NAMES | wc -l
+        else
+          echo "0"
+        fi
+      register: wordpress_containers
+      changed_when: false
+      
+    - name: 检查端口占用情况
+      shell: |
+        netstat -tuln | grep -E ':80|:443|:3306|:22' | wc -l
+      register: port_usage
+      changed_when: false
+      
+    - name: 生成检查报告
+      debug:
+        msg: |
+          ========== 服务器检查报告 ==========
+          主机名: {{ ansible_hostname }}
+          操作系统: {{ ansible_distribution }} {{ ansible_distribution_version }}
+          内核版本: {{ ansible_kernel }}
+          架构: {{ ansible_architecture }}
+          
+          ========== 资源使用情况 ==========
+          CPU使用率: {{ cpu_usage.stdout }}%
+          内存使用率: {{ memory_usage.stdout }}%
+          磁盘使用率: {{ disk_usage.stdout }}%
+          系统负载: {{ system_load.stdout.strip() }}
+          
+          ========== 网络和安全 ==========
+          网络连接数: {{ network_connections.stdout }}
+          防火墙状态: {{ firewall_status.stdout }}
+          SELinux状态: {{ selinux_status.stdout }}
+          端口占用: {{ port_usage.stdout }}
+          
+          ========== Docker环境 ==========
+          Docker版本: {{ docker_version.stdout }}
+          Docker Compose版本: {{ docker_compose_version.stdout }}
+          Docker服务状态: {{ docker_service_status.stdout }}
+          WordPress容器数: {{ wordpress_containers.stdout }}
+          
+          ========== 系统详情 ==========
+          总内存: {{ ansible_memtotal_mb }}MB
+          可用内存: {{ ansible_memfree_mb }}MB
+          CPU核心数: {{ ansible_processor_vcpus }}
+          磁盘总空间: {{ ansible_mounts[0].size_total | filesizeformat }}
+          磁盘可用空间: {{ ansible_mounts[0].size_available | filesizeformat }}
+          
+    - name: 保存检查结果到文件
+      copy:
+        content: |
+          # 服务器检查结果 - {{ ansible_date_time.iso8601 }}
+          
+          ## 基本信息
+          - 主机名: {{ ansible_hostname }}
+          - 操作系统: {{ ansible_distribution }} {{ ansible_distribution_version }}
+          - 内核版本: {{ ansible_kernel }}
+          - 架构: {{ ansible_architecture }}
+          - IP地址: {{ ansible_default_ipv4.address }}
+          
+          ## 资源状态
+          - CPU使用率: {{ cpu_usage.stdout }}%
+          - 内存使用率: {{ memory_usage.stdout }}%
+          - 磁盘使用率: {{ disk_usage.stdout }}%
+          - 系统负载: {{ system_load.stdout.strip() }}
+          
+          ## Docker环境
+          - Docker版本: {{ docker_version.stdout }}
+          - Docker Compose版本: {{ docker_compose_version.stdout }}
+          - Docker服务状态: {{ docker_service_status.stdout }}
+          - WordPress容器数: {{ wordpress_containers.stdout }}
+          
+          ## 安全状态
+          - 防火墙状态: {{ firewall_status.stdout }}
+          - SELinux状态: {{ selinux_status.stdout }}
+          
+        dest: "/tmp/server_check_{{ ansible_hostname }}_{{ ansible_date_time.epoch }}.txt"
+        mode: '0644'
+      delegate_to: localhost
+      
+  handlers:
+    - name: 清理临时文件
+      file:
+        path: "/tmp/server_check_*"
+        state: absent
+      delegate_to: localhost

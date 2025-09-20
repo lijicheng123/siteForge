@@ -1,0 +1,286 @@
+---
+# WordPress管理Playbook
+# 管理WordPress服务的启动、停止、重启等操作
+
+- name: 管理WordPress服务
+  hosts: all
+  gather_facts: yes
+  become: yes
+  
+  vars:
+    project_dir: "{{ project_dir | default('/opt/wordpress') }}"
+    action: "{{ action | default('status') }}"  # start, stop, restart, status, update, backup
+    
+  pre_tasks:
+    - name: 验证项目目录存在
+      stat:
+        path: "{{ project_dir }}/docker-compose.yml"
+      register: compose_file
+      
+    - name: 检查Docker Compose文件
+      fail:
+        msg: "Docker Compose文件不存在: {{ project_dir }}/docker-compose.yml"
+      when: not compose_file.stat.exists
+      
+    - name: 显示操作信息
+      debug:
+        msg: |
+          WordPress管理操作
+          项目目录: {{ project_dir }}
+          执行操作: {{ action }}
+          
+  tasks:
+    # 启动服务
+    - name: 启动WordPress服务
+      shell: |
+        cd {{ project_dir }}
+        docker-compose up -d
+      register: start_result
+      when: action == 'start'
+      
+    # 停止服务
+    - name: 停止WordPress服务
+      shell: |
+        cd {{ project_dir }}
+        docker-compose down
+      register: stop_result
+      when: action == 'stop'
+      
+    # 重启服务
+    - name: 重启WordPress服务
+      shell: |
+        cd {{ project_dir }}
+        docker-compose restart
+      register: restart_result
+      when: action == 'restart'
+      
+    # 强制重新创建服务
+    - name: 强制重新创建WordPress服务
+      shell: |
+        cd {{ project_dir }}
+        docker-compose down --remove-orphans
+        docker-compose up -d --force-recreate
+      register: recreate_result
+      when: action == 'recreate'
+      
+    # 查看服务状态
+    - name: 查看WordPress服务状态
+      shell: |
+        cd {{ project_dir }}
+        docker-compose ps
+      register: status_result
+      changed_when: false
+      when: action == 'status' or action in ['start', 'restart', 'recreate']
+      
+    # 查看服务日志
+    - name: 查看WordPress服务日志
+      shell: |
+        cd {{ project_dir }}
+        docker-compose logs --tail=50
+      register: logs_result
+      changed_when: false
+      when: action == 'logs'
+      
+    # 更新WordPress
+    - name: 更新WordPress核心
+      shell: |
+        cd {{ project_dir }}
+        docker-compose exec -T wp_cli wp core update --allow-root
+        docker-compose exec -T wp_cli wp core update-db --allow-root
+      register: update_core_result
+      when: action == 'update'
+      
+    - name: 更新WordPress插件
+      shell: |
+        cd {{ project_dir }}
+        docker-compose exec -T wp_cli wp plugin update --all --allow-root
+      register: update_plugins_result
+      when: action == 'update'
+      
+    - name: 更新WordPress主题
+      shell: |
+        cd {{ project_dir }}
+        docker-compose exec -T wp_cli wp theme update --all --allow-root
+      register: update_themes_result
+      when: action == 'update'
+      
+    # 备份WordPress
+    - name: 创建WordPress备份
+      shell: |
+        cd {{ project_dir }}
+        ./backup.sh
+      register: backup_result
+      when: action == 'backup'
+      
+    # 清理Docker资源
+    - name: 清理未使用的Docker资源
+      shell: |
+        docker system prune -f
+        docker volume prune -f
+      register: cleanup_result
+      when: action == 'cleanup'
+      
+    # 监控资源使用
+    - name: 检查容器资源使用情况
+      shell: |
+        cd {{ project_dir }}
+        docker-compose exec -T nginx sh -c 'ps aux && free -m && df -h'
+        echo "=== MySQL ==="
+        docker-compose exec -T mysql sh -c 'ps aux && free -m'
+        echo "=== WordPress ==="
+        docker-compose exec -T wordpress sh -c 'ps aux && free -m'
+      register: resource_usage
+      changed_when: false
+      when: action == 'monitor'
+      
+    # 健康检查
+    - name: WordPress健康检查
+      uri:
+        url: "http://{{ ansible_default_ipv4.address }}"
+        method: GET
+        status_code: 200
+        timeout: 10
+      register: health_check
+      ignore_errors: yes
+      when: action in ['status', 'health', 'start', 'restart']
+      
+    - name: 数据库连接检查
+      shell: |
+        cd {{ project_dir }}
+        docker-compose exec -T mysql mysql -u root -p{{ mysql_root_password | default('changeme123') }} -e "SELECT 1" > /dev/null 2>&1
+      register: db_check
+      ignore_errors: yes
+      when: action in ['status', 'health', 'start', 'restart']
+      
+    # 性能优化
+    - name: 优化WordPress数据库
+      shell: |
+        cd {{ project_dir }}
+        docker-compose exec -T wp_cli wp db optimize --allow-root
+      register: db_optimize
+      when: action == 'optimize'
+      
+    - name: 清理WordPress缓存
+      shell: |
+        cd {{ project_dir }}
+        docker-compose exec -T wp_cli wp cache flush --allow-root
+        docker-compose exec -T wp_cli wp transient delete --all --allow-root
+      register: cache_clean
+      when: action == 'optimize'
+      
+    # 安全检查
+    - name: 检查WordPress安全状态
+      shell: |
+        cd {{ project_dir }}
+        # 检查文件权限
+        docker-compose exec -T wordpress find /var/www/html -type f -perm 777 2>/dev/null | wc -l
+        # 检查可疑文件
+        docker-compose exec -T wordpress find /var/www/html -name "*.php" -exec grep -l "eval\|base64_decode\|gzinflate" {} \; 2>/dev/null | wc -l
+      register: security_check
+      changed_when: false
+      when: action == 'security'
+      
+    # 显示操作结果
+    - name: 显示启动结果
+      debug:
+        msg: |
+          WordPress服务启动完成
+          {{ start_result.stdout if start_result is defined else '' }}
+      when: action == 'start' and start_result is defined
+      
+    - name: 显示停止结果
+      debug:
+        msg: |
+          WordPress服务停止完成
+          {{ stop_result.stdout if stop_result is defined else '' }}
+      when: action == 'stop' and stop_result is defined
+      
+    - name: 显示重启结果
+      debug:
+        msg: |
+          WordPress服务重启完成
+          {{ restart_result.stdout if restart_result is defined else '' }}
+      when: action == 'restart' and restart_result is defined
+      
+    - name: 显示服务状态
+      debug:
+        msg: |
+          ========== WordPress服务状态 ==========
+          {{ status_result.stdout if status_result is defined else '状态信息不可用' }}
+          
+          健康检查: {{ 'PASS' if health_check is defined and health_check.status == 200 else 'FAIL' }}
+          数据库连接: {{ 'OK' if db_check is defined and db_check.rc == 0 else 'ERROR' }}
+      when: action == 'status'
+      
+    - name: 显示更新结果
+      debug:
+        msg: |
+          ========== WordPress更新完成 ==========
+          核心更新: {{ 'SUCCESS' if update_core_result is defined and update_core_result.rc == 0 else 'FAILED' }}
+          插件更新: {{ 'SUCCESS' if update_plugins_result is defined and update_plugins_result.rc == 0 else 'FAILED' }}
+          主题更新: {{ 'SUCCESS' if update_themes_result is defined and update_themes_result.rc == 0 else 'FAILED' }}
+      when: action == 'update'
+      
+    - name: 显示备份结果
+      debug:
+        msg: |
+          ========== WordPress备份完成 ==========
+          {{ backup_result.stdout if backup_result is defined else '备份信息不可用' }}
+      when: action == 'backup' and backup_result is defined
+      
+    - name: 显示资源使用情况
+      debug:
+        msg: |
+          ========== 资源使用情况 ==========
+          {{ resource_usage.stdout if resource_usage is defined else '资源信息不可用' }}
+      when: action == 'monitor' and resource_usage is defined
+      
+    - name: 显示优化结果
+      debug:
+        msg: |
+          ========== WordPress优化完成 ==========
+          数据库优化: {{ 'SUCCESS' if db_optimize is defined and db_optimize.rc == 0 else 'FAILED' }}
+          缓存清理: {{ 'SUCCESS' if cache_clean is defined and cache_clean.rc == 0 else 'FAILED' }}
+      when: action == 'optimize'
+      
+    - name: 显示安全检查结果
+      debug:
+        msg: |
+          ========== WordPress安全检查 ==========
+          危险权限文件数: {{ security_check.stdout_lines[0] if security_check is defined and security_check.stdout_lines|length > 0 else '0' }}
+          可疑文件数: {{ security_check.stdout_lines[1] if security_check is defined and security_check.stdout_lines|length > 1 else '0' }}
+      when: action == 'security' and security_check is defined
+      
+  post_tasks:
+    - name: 创建操作报告
+      copy:
+        content: |
+          # WordPress管理操作报告 - {{ ansible_date_time.iso8601 }}
+          
+          ## 服务器信息
+          - 主机名: {{ ansible_hostname }}
+          - IP地址: {{ ansible_default_ipv4.address }}
+          - 项目目录: {{ project_dir }}
+          
+          ## 执行操作
+          - 操作类型: {{ action }}
+          - 执行时间: {{ ansible_date_time.iso8601 }}
+          - 操作结果: {{ 'SUCCESS' if ansible_failed is not defined else 'FAILED' }}
+          
+          ## 服务状态
+          {% if health_check is defined %}
+          - 网站访问: {{ 'OK' if health_check.status == 200 else 'ERROR' }}
+          {% endif %}
+          {% if db_check is defined %}
+          - 数据库连接: {{ 'OK' if db_check.rc == 0 else 'ERROR' }}
+          {% endif %}
+          
+          ## 详细信息
+          {% if status_result is defined %}
+          {{ status_result.stdout }}
+          {% endif %}
+          
+        dest: "/tmp/wordpress_manage_{{ action }}_{{ ansible_hostname }}_{{ ansible_date_time.epoch }}.txt"
+        mode: '0644'
+      delegate_to: localhost
+      when: action != 'logs'  # 日志操作不需要报告

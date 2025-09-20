@@ -16,6 +16,9 @@ export * from './seo';
 // 工作流Schema
 export * from './workflow';
 
+// 部署相关Schema
+export * from './provisioning';
+
 // 蓝图Schema - 渐进式定义
 import { objectSchema, arraySchema, nameSchema, pagePathSchema, responseSchema } from './base';
 import { websiteSeoSchema, seoMetaSchema } from './seo';

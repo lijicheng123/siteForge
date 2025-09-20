@@ -19,10 +19,10 @@ const step5Schema: FastifySchema = {
 type blockType = {
   name: string;
   description: string;
-  attributes: object;
+  props: any;
 }
 interface BlockLibraryType {
-  core_blocks: Array<blockType>;
+  core_blocks: string[];
   custom_blocks: Array<blockType>;
 }
 

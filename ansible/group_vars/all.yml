@@ -1,0 +1,88 @@
+# 全局变量配置
+# 适用于所有主机的通用配置
+
+# 项目信息
+project_name: "wordpress-siteforge"
+project_version: "1.0.0"
+deployment_user: "deploy"
+
+# 目录配置
+base_dir: "/opt"
+project_dir: "{{ base_dir }}/wordpress"
+backup_dir: "{{ base_dir }}/backups"
+logs_dir: "{{ project_dir }}/logs"
+ssl_dir: "{{ project_dir }}/ssl"
+
+# Docker配置
+docker:
+  version: "24.0.7"
+  compose_version: "2.21.0"
+  network_name: "wordpress_network"
+  
+# WordPress默认配置
+wordpress:
+  version: "latest"
+  site_name: "My WordPress Site"
+  admin_username: "admin"
+  admin_email: "admin@example.com"
+  table_prefix: "wp_"
+  debug: false
+  
+  # 数据库配置
+  database:
+    name: "wordpress"
+    user: "wpuser"
+    host: "mysql"
+    port: 3306
+    
+# MySQL配置
+mysql:
+  version: "10.6"
+  root_password: "{{ mysql_root_password | default('changeme123') }}"
+  
+# Nginx配置
+nginx:
+  version: "latest"
+  port: 80
+  ssl_port: 443
+  
+# PHP配置
+php:
+  version: "8.1"
+  memory_limit: "256M"
+  upload_max_filesize: "64M"
+  post_max_size: "64M"
+  max_execution_time: 300
+  
+# 安全配置
+security:
+  firewall_enabled: true
+  fail2ban_enabled: true
+  ssh_port: 22
+  allowed_ips: []
+  
+# 备份配置
+backup:
+  enabled: true
+  schedule: "0 2 * * *"  # 每天凌晨2点
+  retention_days: 7
+  
+# 监控配置
+monitoring:
+  enabled: false
+  
+# SSL配置
+ssl:
+  enabled: false
+  provider: "letsencrypt"  # letsencrypt, custom
+  email: "admin@example.com"
+  
+# 时区配置
+timezone: "Asia/Shanghai"
+
+# 包管理器配置
+package_manager:
+  centos: "yum"
+  rocky: "dnf"
+  ubuntu: "apt"
+  debian: "apt"

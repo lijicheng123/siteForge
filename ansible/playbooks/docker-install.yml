@@ -1,0 +1,271 @@
+---
+# Docker安装Playbook
+# 在CentOS/Rocky Linux服务器上安装Docker和Docker Compose
+
+- name: 安装Docker和Docker Compose
+  hosts: all
+  gather_facts: yes
+  become: yes
+  
+  vars:
+    docker_version: "{{ docker.version | default('24.0.7') }}"
+    docker_compose_version: "{{ docker.compose_version | default('2.21.0') }}"
+    
+  pre_tasks:
+    - name: 检查操作系统支持
+      fail:
+        msg: "不支持的操作系统: {{ ansible_distribution }}"
+      when: ansible_distribution not in ['CentOS', 'Rocky', 'RedHat', 'Ubuntu', 'Debian']
+      
+    - name: 显示安装信息
+      debug:
+        msg: |
+          开始在 {{ ansible_hostname }} ({{ ansible_distribution }} {{ ansible_distribution_version }}) 上安装Docker
+          Docker版本: {{ docker_version }}
+          Docker Compose版本: {{ docker_compose_version }}
+          
+  tasks:
+    # CentOS/Rocky Linux安装流程
+    - block:
+        - name: 移除旧版本Docker
+          yum:
+            name:
+              - docker
+              - docker-client
+              - docker-client-latest
+              - docker-common
+              - docker-latest
+              - docker-latest-logrotate
+              - docker-logrotate
+              - docker-engine
+            state: absent
+            
+        - name: 安装必要的系统包
+          yum:
+            name:
+              - yum-utils
+              - device-mapper-persistent-data
+              - lvm2
+              - curl
+              - wget
+            state: present
+            
+        - name: 添加Docker官方仓库
+          yum_repository:
+            name: docker-ce
+            description: Docker CE Repository
+            baseurl: https://download.docker.com/linux/centos/7/x86_64/stable/
+            gpgcheck: yes
+            gpgkey: https://download.docker.com/linux/centos/gpg
+            enabled: yes
+            
+        - name: 安装Docker CE
+          yum:
+            name:
+              - docker-ce
+              - docker-ce-cli
+              - containerd.io
+            state: present
+            
+      when: ansible_distribution in ['CentOS', 'Rocky', 'RedHat']
+      
+    # Ubuntu/Debian安装流程
+    - block:
+        - name: 移除旧版本Docker
+          apt:
+            name:
+              - docker
+              - docker-engine
+              - docker.io
+              - containerd
+              - runc
+            state: absent
+            
+        - name: 更新apt包索引
+          apt:
+            update_cache: yes
+            
+        - name: 安装必要的系统包
+          apt:
+            name:
+              - apt-transport-https
+              - ca-certificates
+              - curl
+              - gnupg
+              - lsb-release
+            state: present
+            
+        - name: 添加Docker官方GPG密钥
+          apt_key:
+            url: https://download.docker.com/linux/ubuntu/gpg
+            state: present
+            
+        - name: 添加Docker官方仓库
+          apt_repository:
+            repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+            state: present
+            
+        - name: 更新apt包索引
+          apt:
+            update_cache: yes
+            
+        - name: 安装Docker CE
+          apt:
+            name:
+              - docker-ce
+              - docker-ce-cli
+              - containerd.io
+            state: present
+            
+      when: ansible_distribution in ['Ubuntu', 'Debian']
+      
+    # 通用配置任务
+    - name: 启动并启用Docker服务
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+        daemon_reload: yes
+        
+    - name: 创建docker组
+      group:
+        name: docker
+        state: present
+        
+    - name: 将当前用户添加到docker组
+      user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+      when: ansible_user != 'root'
+      
+    - name: 配置Docker daemon
+      copy:
+        content: |
+          {
+            "log-driver": "json-file",
+            "log-opts": {
+              "max-size": "10m",
+              "max-file": "3"
+            },
+            "storage-driver": "overlay2",
+            "live-restore": true
+          }
+        dest: /etc/docker/daemon.json
+        mode: '0644'
+      notify: restart docker
+      
+    - name: 创建Docker Compose安装目录
+      file:
+        path: /usr/local/bin
+        state: directory
+        mode: '0755'
+        
+    - name: 下载Docker Compose
+      get_url:
+        url: "https://github.com/docker/compose/releases/download/v{{ docker_compose_version }}/docker-compose-{{ ansible_system }}-{{ ansible_architecture }}"
+        dest: /usr/local/bin/docker-compose
+        mode: '0755'
+        timeout: 300
+      retries: 3
+      delay: 10
+      
+    - name: 创建Docker Compose符号链接
+      file:
+        src: /usr/local/bin/docker-compose
+        dest: /usr/bin/docker-compose
+        state: link
+        
+    - name: 验证Docker安装
+      command: docker --version
+      register: docker_version_output
+      changed_when: false
+      
+    - name: 验证Docker Compose安装
+      command: docker-compose --version
+      register: docker_compose_version_output
+      changed_when: false
+      
+    - name: 测试Docker运行
+      command: docker run --rm hello-world
+      register: docker_test
+      changed_when: false
+      retries: 3
+      delay: 5
+      
+    - name: 配置Docker自动启动
+      systemd:
+        name: docker
+        enabled: yes
+        
+    - name: 创建Docker网络
+      docker_network:
+        name: "{{ docker.network_name | default('wordpress_network') }}"
+        driver: bridge
+        state: present
+      ignore_errors: yes
+      
+    - name: 显示安装结果
+      debug:
+        msg: |
+          ========== Docker安装完成 ==========
+          Docker版本: {{ docker_version_output.stdout }}
+          Docker Compose版本: {{ docker_compose_version_output.stdout }}
+          Docker测试: {{ 'SUCCESS' if docker_test.rc == 0 else 'FAILED' }}
+          
+          安装位置:
+          - Docker: /usr/bin/docker
+          - Docker Compose: /usr/local/bin/docker-compose
+          
+          服务状态:
+          - Docker服务已启动并设置为开机自启
+          - Docker网络已创建: {{ docker.network_name | default('wordpress_network') }}
+          
+    - name: 清理安装缓存
+      shell: |
+        if command -v yum >/dev/null 2>&1; then
+          yum clean all
+        elif command -v apt >/dev/null 2>&1; then
+          apt autoremove -y && apt autoclean
+        fi
+      changed_when: false
+      
+  handlers:
+    - name: restart docker
+      systemd:
+        name: docker
+        state: restarted
+        daemon_reload: yes
+        
+  post_tasks:
+    - name: 等待Docker服务完全启动
+      wait_for:
+        port: 2375
+        host: "{{ ansible_default_ipv4.address }}"
+        timeout: 30
+      ignore_errors: yes
+      
+    - name: 创建安装报告
+      copy:
+        content: |
+          # Docker安装报告 - {{ ansible_date_time.iso8601 }}
+          
+          ## 服务器信息
+          - 主机名: {{ ansible_hostname }}
+          - 操作系统: {{ ansible_distribution }} {{ ansible_distribution_version }}
+          - IP地址: {{ ansible_default_ipv4.address }}
+          
+          ## 安装结果
+          - Docker版本: {{ docker_version_output.stdout }}
+          - Docker Compose版本: {{ docker_compose_version_output.stdout }}
+          - 安装状态: SUCCESS
+          - 测试结果: {{ 'PASSED' if docker_test.rc == 0 else 'FAILED' }}
+          
+          ## 配置信息
+          - Docker服务: 已启动并设置开机自启
+          - Docker网络: {{ docker.network_name | default('wordpress_network') }}
+          - 用户组: {{ ansible_user }} 已添加到docker组
+          
+        dest: "/tmp/docker_install_{{ ansible_hostname }}_{{ ansible_date_time.epoch }}.txt"
+        mode: '0644'
+      delegate_to: localhost
