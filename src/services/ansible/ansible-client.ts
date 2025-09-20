@@ -184,70 +184,25 @@ export class AnsibleClient {
   }
 
   /**
-   * 获取服务器信息（完整版）
+   * 获取服务器信息（超简单版本）
    */
-  async gatherFacts(server: ServerConfig): Promise<any> {
+  async getServerInfo(server: ServerConfig): Promise<any> {
     try {
       const inventoryFile = await this.generateInventory([server]);
       
-      // 只收集必要的系统信息，大大减少数据量和执行时间
-      const gatherSubset = [
-        'hardware',     // CPU、内存、磁盘信息
-        'network',      // 网络接口信息
-        'virtual',      // 虚拟化信息
-        'distribution', // 操作系统信息
-        'date_time'     // 时间信息
-      ].join(',');
-      
-      const command = `ansible all -i ${inventoryFile} -m setup --become -a "gather_subset=${gatherSubset}"`;
+      // 使用最简单的命令，避免复杂语法
+      const command = `ansible all -i ${inventoryFile} -m shell --become -a 'cat /etc/redhat-release 2>/dev/null || cat /etc/os-release | head -1; hostname; uname -m; cat /proc/cpuinfo | grep processor | wc -l; free -m | grep Mem; df -h /; python3 --version 2>/dev/null || python --version 2>/dev/null || echo No Python; docker --version 2>/dev/null || echo No Docker; wp --version 2>/dev/null || echo No WP-CLI'`;
       
       const result = await this.executeCommand(command);
       await this.cleanupTempFile(inventoryFile);
       
       if (result.success) {
-        // 解析setup模块的输出
-        return this.parseSetupOutput(result.stdout);
+        return this.parseSimpleInfo(result.stdout);
       }
       
       return null;
     } catch (error) {
-      console.error('收集系统信息失败:', error);
-      return null;
-    }
-  }
-
-  /**
-   * 快速获取基本服务器信息（轻量版）
-   */
-  async getBasicServerInfo(server: ServerConfig): Promise<any> {
-    try {
-      const inventoryFile = await this.generateInventory([server]);
-      
-      // 只收集最基本的信息：分发版本和硬件概要
-      const command = `ansible all -i ${inventoryFile} -m setup --become -a "gather_subset=min"`;
-      
-      const result = await this.executeCommand(command);
-      await this.cleanupTempFile(inventoryFile);
-      
-      if (result.success) {
-        const facts = this.parseSetupOutput(result.stdout);
-        if (facts) {
-          // 提取关键信息
-          return {
-            os: facts.ansible_distribution + ' ' + facts.ansible_distribution_version,
-            hostname: facts.ansible_hostname,
-            architecture: facts.ansible_architecture,
-            python_version: facts.ansible_python_version,
-            memory_mb: facts.ansible_memtotal_mb,
-            processor_count: facts.ansible_processor_count,
-            uptime: facts.ansible_uptime_seconds
-          };
-        }
-      }
-      
-      return null;
-    } catch (error) {
-      console.error('获取基本服务器信息失败:', error);
+      console.error('获取服务器信息失败:', error);
       return null;
     }
   }
@@ -367,70 +322,111 @@ export class AnsibleClient {
   }
 
   /**
-   * 解析setup模块输出
+   * 解析简单信息（超简单解析）
    */
-  private parseSetupOutput(stdout: string): any {
-    try {
-      // 先去除ansible输出的前缀（server_0 | SUCCESS => ）
-      const lines = stdout.split('\n');
-      let jsonStart = -1;
-      let jsonEnd = -1;
-      let braceCount = 0;
-      
-      // 查找JSON开始位置
-      for (let i = 0; i < lines.length; i++) {
-        if (lines[i].includes('SUCCESS =>') || lines[i].trim().startsWith('{')) {
-          if (lines[i].trim().endsWith('{') || lines[i].includes('{')) {
-            jsonStart = i;
-            if (lines[i].includes('{')) {
-              braceCount = (lines[i].match(/\{/g) || []).length - (lines[i].match(/\}/g) || []).length;
-            }
-            break;
+  private parseSimpleInfo(stdout: string): any {
+    const lines = stdout.split('\n').map(l => l.trim()).filter(l => l && !l.includes('SUCCESS') && !l.includes('CHANGED'));
+    
+    
+    const result = {
+      os: 'unknown',
+      osVersion: '',
+      hostname: 'unknown',
+      architecture: 'unknown',
+      pythonVersions: [] as string[],
+      cpu: { count: 0, cores: 0, model: 'unknown' },
+      memory: { total: 0, free: 0 },
+      disk: { total: 0, used: 0, available: 0, percentage: 0 },
+      docker: { installed: false, version: '', composeInstalled: false, composeVersion: '', running: false },
+      wpCli: { installed: false, version: '' }
+    };
+
+    if (lines.length >= 4) {
+      // 第1行: OS信息
+      const osLine = lines[0];
+      if (osLine.includes('Rocky') || osLine.includes('CentOS')) {
+        result.os = osLine.includes('Rocky') ? 'Rocky Linux' : 'CentOS';
+        result.osVersion = osLine.match(/[\d\.]+/)?.[0] || '';
+      } else {
+        result.os = osLine;
+      }
+
+      // 第2行: 主机名
+      result.hostname = lines[1];
+
+      // 第3行: 架构
+      result.architecture = lines[2];
+
+      // 第4行: CPU核心数
+      result.cpu.count = parseInt(lines[3]) || 0;
+      result.cpu.cores = result.cpu.count;
+
+      // 查找内存信息 (格式: Mem: 1699 292 327...)
+      for (let i = 4; i < lines.length; i++) {
+        const line = lines[i];
+        if (line.includes('Mem:')) {
+          const memParts = line.split(/\s+/);
+          if (memParts.length >= 4) {
+            result.memory.total = Math.round(parseInt(memParts[1]) / 1024 * 100) / 100; // MB转GB
+            result.memory.free = Math.round(parseInt(memParts[3]) / 1024 * 100) / 100;
           }
+          break;
         }
       }
-      
-      if (jsonStart === -1) return null;
-      
-      // 查找JSON结束位置
-      for (let i = jsonStart + 1; i < lines.length; i++) {
-        if (lines[i].trim()) {
-          braceCount += (lines[i].match(/\{/g) || []).length - (lines[i].match(/\}/g) || []).length;
-          if (braceCount === 0) {
-            jsonEnd = i;
-            break;
+
+      // 查找磁盘信息 (查找包含/dev/的行，格式: /dev/vda3 40G 3.6G 37G 9% /)
+      for (let i = 4; i < lines.length; i++) {
+        const line = lines[i];
+        if (line.startsWith('/dev/') && line.includes('G')) {
+          const diskParts = line.split(/\s+/);
+          if (diskParts.length >= 5) {
+            result.disk.total = this.parseSize(diskParts[1]);
+            result.disk.used = this.parseSize(diskParts[2]);
+            result.disk.available = this.parseSize(diskParts[3]);
+            result.disk.percentage = parseInt(diskParts[4].replace('%', '')) || 0;
           }
+          break;
         }
       }
-      
-      if (jsonEnd === -1) return null;
-      
-      // 提取并解析JSON
-      let jsonStr = '';
-      for (let i = jsonStart; i <= jsonEnd; i++) {
-        let line = lines[i];
-        if (i === jsonStart && line.includes('SUCCESS =>')) {
-          line = line.substring(line.indexOf('{'));
+
+      // 查找软件版本信息
+      for (let i = 4; i < lines.length; i++) {
+        const line = lines[i];
+        
+        if (line.includes('Python') && !line.includes('No Python')) {
+          result.pythonVersions.push(line);
         }
-        jsonStr += line + '\n';
-      }
-      
-      const parsed = JSON.parse(jsonStr.trim());
-      return parsed.ansible_facts || parsed;
-      
-    } catch (error) {
-      console.error('解析setup输出失败:', error);
-      // 备用解析方法：直接查找JSON块
-      try {
-        const jsonMatch = stdout.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          const parsed = JSON.parse(jsonMatch[0]);
-          return parsed.ansible_facts || parsed;
+        
+        if (line.includes('Docker version') && !line.includes('No Docker')) {
+          result.docker.installed = true;
+          result.docker.version = line;
         }
-      } catch (backupError) {
-        console.error('备用解析也失败:', backupError);
+        
+        if (line.includes('WP-CLI') && !line.includes('No WP-CLI')) {
+          result.wpCli.installed = true;
+          result.wpCli.version = line;
+        }
       }
-      return null;
+    }
+
+    return result;
+  }
+
+  /**
+   * 解析磁盘大小（将K、M、G、T转换为GB）
+   */
+  private parseSize(sizeStr: string): number {
+    if (!sizeStr) return 0;
+    
+    const size = parseFloat(sizeStr);
+    const unit = sizeStr.slice(-1).toUpperCase();
+    
+    switch (unit) {
+      case 'K': return Math.round(size / 1024 / 1024 * 100) / 100;
+      case 'M': return Math.round(size / 1024 * 100) / 100;
+      case 'G': return Math.round(size * 100) / 100;
+      case 'T': return Math.round(size * 1024 * 100) / 100;
+      default: return Math.round(size / 1024 / 1024 / 1024 * 100) / 100;
     }
   }
 
