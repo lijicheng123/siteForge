@@ -81,10 +81,12 @@ export class AnsibleClient {
     extraVars?: Record<string, any>
   ): Promise<AnsiblePlaybookResult> {
     const startTime = new Date();
+    let inventoryFile: string | null = null;
+    let extraVarsFile: string | null = null;
     
     try {
       // 生成临时inventory文件
-      const inventoryFile = await this.generateInventory(servers);
+      inventoryFile = await this.generateInventory(servers);
       
       // 构建Ansible命令
       const playbookPath = path.join(this.playbooksPath, `${playbookName}.yml`);
@@ -92,15 +94,15 @@ export class AnsibleClient {
       
       // 添加额外变量
       if (extraVars) {
-        const varsString = Object.entries(extraVars)
-          .map(([key, value]) => `${key}=${JSON.stringify(value)}`)
-          .join(' ');
-        command += ` --extra-vars "${varsString}"`;
+        // 使用临时文件传递变量，避免命令行转义问题
+        extraVarsFile = await this.createTempVarsFile(extraVars);
+        command += ` --extra-vars @${extraVarsFile}`;
       }
       
       // 添加其他选项
       command += ' --become --become-method=sudo';
-      command += ' -v'; // 详细输出
+      // 只在调试模式下显示详细输出，正常情况下保持简洁
+      // command += ' -v'; // 详细输出 - 已禁用以减少日志噪音
       
       console.log(`执行Ansible命令: ${command}`);
       
@@ -115,6 +117,9 @@ export class AnsibleClient {
       
       // 清理临时文件
       await this.cleanupTempFile(inventoryFile);
+      if (extraVarsFile) {
+        await this.cleanupTempFile(extraVarsFile);
+      }
       
       return {
         playbookName,
@@ -133,6 +138,14 @@ export class AnsibleClient {
     } catch (error) {
       const endTime = new Date();
       const duration = (endTime.getTime() - startTime.getTime()) / 1000;
+      
+      // 清理临时文件（即使发生异常）
+      try {
+        if (inventoryFile) await this.cleanupTempFile(inventoryFile);
+        if (extraVarsFile) await this.cleanupTempFile(extraVarsFile);
+      } catch {
+        // 忽略清理错误
+      }
       
       return {
         playbookName,
@@ -246,15 +259,18 @@ export class AnsibleClient {
     try {
 
       const { stdout, stderr } = await execAsync(command, {
-        timeout: 300000, // 5分钟超时
-        maxBuffer: 1024 * 1024 * 10 // 10MB缓冲区
+        timeout: 1800000, // 15分钟超时 - 适应完整的WordPress部署流程
+        maxBuffer: 1024 * 1024 * 50 // 50MB缓冲区 - 增加以处理详细输出
       });
 
 
       
       const duration = (Date.now() - startTime) / 1000;
-      console.log('执行系统命令stdout===>', stdout, duration);
-      console.log('执行系统命令stderr===>', stderr, duration);
+      // 只显示关键信息，避免日志截断
+      console.log(`执行系统命令完成 (${duration}s) - stdout长度: ${stdout.length}, stderr长度: ${stderr.length}`);
+      if (stderr && stderr.length > 0) {
+        console.log('执行系统命令stderr===>', stderr.length > 1000 ? stderr.substring(stderr.length - 1000) : stderr);
+      }
 
       return {
         success: true,
@@ -265,7 +281,16 @@ export class AnsibleClient {
       };
     } catch (error: any) {
       const duration = (Date.now() - startTime) / 1000;
-      console.log('执行系统命令error===>', error, duration);
+      console.log(`执行系统命令失败 (${duration}s):`);
+      console.log('错误码:', error.code);
+      console.log('错误消息:', error.message);
+      if (error.stdout) {
+        console.log('最后的stdout (最多1000字符):', error.stdout.length > 1000 ? 
+          error.stdout.substring(error.stdout.length - 1000) : error.stdout);
+      }
+      if (error.stderr) {
+        console.log('完整stderr:', error.stderr);
+      }
       return {
         success: false,
         stdout: error.stdout || '',
@@ -434,6 +459,19 @@ export class AnsibleClient {
       case 'T': return Math.round(size * 1024 * 100) / 100;
       default: return Math.round(size / 1024 / 1024 / 1024 * 100) / 100;
     }
+  }
+
+  /**
+   * 创建临时变量文件
+   */
+  private async createTempVarsFile(extraVars: Record<string, any>): Promise<string> {
+    const tempFileName = `vars_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.json`;
+    const tempFilePath = path.join('/tmp', tempFileName);
+    
+    const jsonContent = JSON.stringify(extraVars, null, 2);
+    await fs.writeFile(tempFilePath, jsonContent, 'utf8');
+    
+    return tempFilePath;
   }
 
   /**

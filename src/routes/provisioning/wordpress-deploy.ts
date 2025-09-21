@@ -35,9 +35,23 @@ export default async function wordpressDeployRoutes(fastify: FastifyInstance, op
       
       fastify.log.info(`开始在服务器 ${server.ip} 上部署WordPress`);
       
+      // 增强WordPressConfig，添加必要的默认值
+      const enhancedConfig = {
+        ...wordpressConfig,
+        siteDomain: wordpressConfig.siteDomain || server.ip,
+        mysqlRootPassword: wordpressConfig.mysqlRootPassword || `root_${Math.random().toString(36).slice(-12)}`,
+        enableHttps: wordpressConfig.enableHttps !== false, // 默认启用HTTPS
+        nginxConfig: {
+          version: 'latest',
+          httpPort: 80,
+          httpsPort: 443,
+          ...wordpressConfig.nginxConfig
+        }
+      };
+
       // 调用服务层执行WordPress部署
       const orchestrator = new DeploymentOrchestrator();
-      const playbookResult = await orchestrator.deployWordPressOnly(server, wordpressConfig);
+      const playbookResult = await orchestrator.deployWordPressOnly(server, enhancedConfig);
       
       // 生成部署状态对象
       const deploymentId = `wp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;

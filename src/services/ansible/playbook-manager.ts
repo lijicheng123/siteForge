@@ -18,6 +18,15 @@ export interface WordPressConfig {
   dbUser: string;
   dbPassword: string;
   tablePrefix?: string;
+  // 新增字段用于HTTPS部署
+  siteDomain?: string;
+  mysqlRootPassword?: string;
+  enableHttps?: boolean;
+  nginxConfig?: {
+    version?: string;
+    httpPort?: number;
+    httpsPort?: number;
+  };
 }
 
 /**
@@ -96,12 +105,47 @@ export class PlaybookManager {
    * 部署WordPress
    */
   async deployWordPress(server: ServerConfig, config: WordPressConfig): Promise<AnsiblePlaybookResult> {
+    // 生成安全的默认密码
+    const generateSecurePassword = () => {
+      return Math.random().toString(36).slice(-12) + Math.random().toString(36).slice(-12);
+    };
+
     const extraVars = {
       target_server: server.ip,
-      wordpress_config: config,
+      wordpress_config: {
+        site_name: config.siteName,
+        admin_username: config.adminUsername,
+        admin_password: config.adminPassword,
+        admin_email: config.adminEmail,
+        db_name: config.dbName,
+        db_user: config.dbUser,
+        db_password: config.dbPassword,
+        table_prefix: config.tablePrefix || 'wp_'
+      },
       project_dir: '/opt/wordpress',
-      nginx_port: 80,
-      mysql_port: 3306
+      // 修复缺失的site_domain变量
+      site_domain: config.siteDomain || server.ip,
+      // 修复缺失的mysql_root_password变量
+      mysql_root_password: config.mysqlRootPassword || generateSecurePassword(),
+      // 修复缺失的nginx配置变量
+      nginx: {
+        version: config.nginxConfig?.version || 'latest',
+        port: config.nginxConfig?.httpPort || 80,
+        https_port: config.nginxConfig?.httpsPort || 443
+      },
+      // 新增MySQL版本配置
+      mysql: {
+        version: '10.6'
+      },
+      // 新增WordPress版本配置
+      wordpress: {
+        version: 'latest',
+        table_prefix: config.tablePrefix || 'wp_'
+      },
+      // 新增备份配置
+      backup: {
+        enabled: true
+      }
     };
 
     return await this.ansibleClient.runPlaybook('wordpress-deploy', [server], extraVars);

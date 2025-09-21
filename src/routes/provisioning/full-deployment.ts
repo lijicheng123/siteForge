@@ -120,7 +120,16 @@ export default async function fullDeploymentRoutes(fastify: FastifyInstance, opt
         dbName: 'wordpress',
         dbUser: 'wpuser',
         dbPassword: `db_${Math.random().toString(36).substr(2, 12)}`,
-        tablePrefix: 'wp_'
+        tablePrefix: 'wp_',
+        // 新增HTTPS相关配置
+        siteDomain: server.ip, // 快速部署默认使用IP
+        mysqlRootPassword: `root_${Math.random().toString(36).substr(2, 12)}`,
+        enableHttps: true,
+        nginxConfig: {
+          version: 'latest',
+          httpPort: 80,
+          httpsPort: 443
+        }
       };
       
       // 生成部署ID

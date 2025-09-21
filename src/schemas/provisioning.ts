@@ -202,6 +202,44 @@ export const wordpressConfigSchema = objectSchema({
     type: 'string',
     pattern: '^[a-zA-Z0-9_]+$',
     default: 'wp_'
+  },
+  // 新增HTTPS部署相关字段
+  siteDomain: {
+    type: 'string',
+    description: '网站域名，用于HTTPS证书申请',
+    pattern: '^[a-zA-Z0-9.-]+$'
+  },
+  mysqlRootPassword: {
+    type: 'string',
+    minLength: 8,
+    maxLength: 100,
+    description: 'MySQL root用户密码'
+  },
+  enableHttps: {
+    type: 'boolean',
+    default: true,
+    description: '是否启用HTTPS（Let\'s Encrypt）'
+  },
+  nginxConfig: {
+    type: 'object',
+    properties: {
+      version: {
+        type: 'string',
+        default: 'latest'
+      },
+      httpPort: {
+        type: 'number',
+        minimum: 1,
+        maximum: 65535,
+        default: 80
+      },
+      httpsPort: {
+        type: 'number',
+        minimum: 1,
+        maximum: 65535,
+        default: 443
+      }
+    }
   }
 }, ['siteName', 'adminUsername', 'adminPassword', 'adminEmail', 'dbName', 'dbUser', 'dbPassword']);
 
