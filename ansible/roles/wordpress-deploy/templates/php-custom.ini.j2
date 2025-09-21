@@ -1,0 +1,48 @@
+# PHP 自定义配置 - WordPress 性能优化
+# 生成时间: {{ ansible_date_time.iso8601 }}
+
+[PHP]
+# 内存限制
+memory_limit = {{ php.memory_limit | default('512M') }}
+max_execution_time = {{ php.max_execution_time | default('300') }}
+max_input_time = {{ php.max_input_time | default('300') }}
+
+# 文件上传
+upload_max_filesize = {{ php.upload_max_filesize | default('64M') }}
+post_max_size = {{ php.post_max_size | default('64M') }}
+max_file_uploads = {{ php.max_file_uploads | default('20') }}
+
+# 会话配置
+session.gc_maxlifetime = {{ php.session_gc_maxlifetime | default('3600') }}
+session.cookie_lifetime = {{ php.session_cookie_lifetime | default('0') }}
+session.save_handler = redis
+session.save_path = "tcp://redis:6379"
+
+# OPcache 优化 (重要!)
+opcache.enable = 1
+opcache.enable_cli = 1
+opcache.memory_consumption = {{ php.opcache_memory | default('256') }}
+opcache.interned_strings_buffer = {{ php.opcache_strings_buffer | default('16') }}
+opcache.max_accelerated_files = {{ php.opcache_max_files | default('10000') }}
+opcache.revalidate_freq = {{ php.opcache_revalidate_freq | default('2') }}
+opcache.fast_shutdown = 1
+opcache.save_comments = 1
+opcache.enable_file_override = 1
+
+# 错误报告 (生产环境建议关闭显示)
+display_errors = {{ 'On' if php.display_errors | default(false) else 'Off' }}
+log_errors = On
+error_log = /var/log/wordpress/php_errors.log
+
+# 时区设置
+date.timezone = {{ php.timezone | default('Asia/Shanghai') }}
+
+# 其他性能设置
+realpath_cache_size = {{ php.realpath_cache_size | default('4096K') }}
+realpath_cache_ttl = {{ php.realpath_cache_ttl | default('600') }}
+max_input_vars = {{ php.max_input_vars | default('3000') }}
+
+# 安全设置
+expose_php = Off
+allow_url_fopen = {{ 'On' if php.allow_url_fopen | default(true) else 'Off' }}
+allow_url_include = Off

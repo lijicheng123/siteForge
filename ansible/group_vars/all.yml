@@ -40,11 +40,20 @@ mysql:
   version: "10.6"
   root_password: "{{ mysql_root_password | default('changeme123') }}"
   
-# Nginx配置
-nginx:
-  version: "latest"
+# Caddy配置 (替代Nginx+Certbot)
+caddy:
+  version: "2-alpine"
   port: 80
   ssl_port: 443
+  auto_https: true  # 自动HTTPS证书管理
+  admin_port: 2019
+  
+# Redis配置 (强制启用以提升性能)
+redis:
+  version: "7-alpine"
+  enabled: true  # 强制启用
+  max_memory: "256mb"
+  persistence: true
   
 # PHP配置
 php:
@@ -71,18 +80,24 @@ backup:
 monitoring:
   enabled: false
   
-# SSL配置
+# SSL配置 (由Caddy自动管理)
 ssl:
-  enabled: false
-  provider: "letsencrypt"  # letsencrypt, custom
+  enabled: true
+  provider: "caddy_auto"  # Caddy自动HTTPS
   email: "admin@example.com"
+  auto_https: true
   
 # 时区配置
 timezone: "Asia/Shanghai"
 
-# 包管理器配置
+# 包管理器配置 (专注Rocky Linux)
 package_manager:
-  centos: "yum"
   rocky: "dnf"
-  ubuntu: "apt"
-  debian: "apt"
+  default: "dnf"  # 默认使用dnf
+
+# Rocky Linux特定配置
+rocky_linux:
+  tuned_profile: "throughput-performance"
+  firewall_backend: "iptables"
+  optimize_kernel: true
+  optimize_network: true

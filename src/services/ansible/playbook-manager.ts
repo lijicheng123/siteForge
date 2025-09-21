@@ -22,10 +22,11 @@ export interface WordPressConfig {
   siteDomain?: string;
   mysqlRootPassword?: string;
   enableHttps?: boolean;
-  nginxConfig?: {
+  caddyConfig?: {
     version?: string;
     httpPort?: number;
     httpsPort?: number;
+    autoHttps?: boolean;
   };
 }
 
@@ -102,53 +103,123 @@ export class PlaybookManager {
   }
 
   /**
-   * 部署WordPress
+   * 部署WordPress (现代化v2.0版本)
    */
   async deployWordPress(server: ServerConfig, config: WordPressConfig): Promise<AnsiblePlaybookResult> {
     // 生成安全的默认密码
     const generateSecurePassword = () => {
-      return Math.random().toString(36).slice(-12) + Math.random().toString(36).slice(-12);
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+      let password = '';
+      for (let i = 0; i < 16; i++) {
+        password += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return password;
     };
 
+    // 现代化变量结构 (v2.0)
     const extraVars = {
-      target_server: server.ip,
-      wordpress_config: {
-        site_name: config.siteName,
-        admin_username: config.adminUsername,
-        admin_password: config.adminPassword,
-        admin_email: config.adminEmail,
-        db_name: config.dbName,
-        db_user: config.dbUser,
-        db_password: config.dbPassword,
-        table_prefix: config.tablePrefix || 'wp_'
-      },
-      project_dir: '/opt/wordpress',
-      // 修复缺失的site_domain变量
+      // 核心配置
+      project_name: config.siteName?.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase() || 'wordpress-site',
       site_domain: config.siteDomain || server.ip,
-      // 修复缺失的mysql_root_password变量
+      
+      // WordPress应用配置
+      wordpress_config: {
+        version: '6-fpm-alpine',
+        site_name: config.siteName || 'My WordPress Site',
+        admin_username: config.adminUsername || 'admin',
+        admin_password: config.adminPassword,
+        admin_email: config.adminEmail || `admin@${config.siteDomain || server.ip}`,
+        db_name: config.dbName || 'wordpress',
+        db_user: config.dbUser || 'wpuser',
+        db_password: config.dbPassword,
+        table_prefix: config.tablePrefix || 'wp_',
+        memory_limit: '512M',
+        upload_max_size: '64M',
+        debug: false
+      },
+
+      // 数据库配置
+      mysql_config: {
+        version: '10.11',
+        innodb_buffer_pool_size: '512M',
+        max_connections: '200',
+        slow_query_log: true
+      },
       mysql_root_password: config.mysqlRootPassword || generateSecurePassword(),
-      // 修复缺失的nginx配置变量
-      nginx: {
-        version: config.nginxConfig?.version || 'latest',
-        port: config.nginxConfig?.httpPort || 80,
-        https_port: config.nginxConfig?.httpsPort || 443
+
+      // Web服务器配置 (Caddy)
+      caddy_config: {
+        version: config.caddyConfig?.version || '2-alpine',
+        http_port: config.caddyConfig?.httpPort || 80,
+        https_port: config.caddyConfig?.httpsPort || 443,
+        client_max_body_size: '64M',
+        auto_https: config.caddyConfig?.autoHttps !== false
       },
-      // 新增MySQL版本配置
-      mysql: {
-        version: '10.6'
+
+      // 缓存配置
+      redis_config: {
+        version: '7-alpine',
+        enabled: true,
+        max_memory: '256mb'
       },
-      // 新增WordPress版本配置
-      wordpress: {
-        version: 'latest',
-        table_prefix: config.tablePrefix || 'wp_'
+
+      // SSL配置 (Caddy自动管理)
+      ssl_config: {
+        enabled: config.enableHttps !== false,
+        provider: config.siteDomain && !this.isIpAddress(config.siteDomain) ? 'caddy_auto' : 'caddy_auto',
+        email: config.adminEmail || `admin@${config.siteDomain || server.ip}`,
+        auto_https: config.caddyConfig?.autoHttps !== false
       },
-      // 新增备份配置
-      backup: {
-        enabled: true
+
+      // PHP配置
+      php_config: {
+        memory_limit: '512M',
+        upload_max_filesize: '64M',
+        max_execution_time: '300',
+        opcache_memory: '256'
+      },
+
+      // 缓存配置
+      cache_config: {
+        enabled: true,
+        api_enabled: true,
+        valid_time: '10m'
+      },
+
+      // 备份配置
+      backup_config: {
+        enabled: true,
+        retention_days: '7',
+        database_enabled: true,
+        files_enabled: true,
+        compress: true,
+        schedule_hour: '2'
+      },
+
+      // 监控配置 (可选)
+      monitoring_config: {
+        enabled: false,  // 默认禁用，可根据需求启用
+        prometheus_port: '9090',
+        grafana_port: '3000',
+        grafana_password: generateSecurePassword().substring(0, 12)
+      },
+
+      // 部署配置
+      deployment_config: {
+        project_dir: '/opt/wordpress'
       }
     };
 
     return await this.ansibleClient.runPlaybook('wordpress-deploy', [server], extraVars);
+  }
+
+  /**
+   * 检查是否为IP地址
+   */
+  private isIpAddress(domain: string): boolean {
+    const ipv4Regex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+    const ipv6Regex = /^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/;
+    return ipv4Regex.test(domain) || ipv6Regex.test(domain);
   }
 
   /**

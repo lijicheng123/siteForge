@@ -1,0 +1,88 @@
+# MySQL/MariaDB 自定义配置 - WordPress 性能优化
+# 生成时间: {{ ansible_date_time.iso8601 }}
+
+[mysqld]
+# 基础设置
+bind-address = 0.0.0.0
+port = 3306
+socket = /var/run/mysqld/mysqld.sock
+
+# 字符集和排序规则
+character-set-server = utf8mb4
+collation-server = utf8mb4_unicode_ci
+init_connect = 'SET NAMES utf8mb4'
+
+# InnoDB 引擎优化
+innodb_buffer_pool_size = {{ mysql.innodb_buffer_pool_size | default('512M') }}
+innodb_buffer_pool_instances = {{ mysql.innodb_buffer_pool_instances | default('4') }}
+innodb_log_file_size = {{ mysql.innodb_log_file_size | default('128M') }}
+innodb_log_buffer_size = {{ mysql.innodb_log_buffer_size | default('16M') }}
+innodb_flush_log_at_trx_commit = {{ mysql.innodb_flush_log_at_trx_commit | default('2') }}
+innodb_file_per_table = 1
+innodb_flush_method = O_DIRECT
+
+# 连接设置
+max_connections = {{ mysql.max_connections | default('200') }}
+max_connect_errors = {{ mysql.max_connect_errors | default('10000') }}
+connect_timeout = {{ mysql.connect_timeout | default('10') }}
+wait_timeout = {{ mysql.wait_timeout | default('600') }}
+interactive_timeout = {{ mysql.interactive_timeout | default('600') }}
+
+# 查询缓存 (MySQL 5.7及以下，MySQL 8.0已移除)
+query_cache_type = 1
+query_cache_size = {{ mysql.query_cache_size | default('64M') }}
+query_cache_limit = {{ mysql.query_cache_limit | default('2M') }}
+
+# 临时表设置
+tmp_table_size = {{ mysql.tmp_table_size | default('64M') }}
+max_heap_table_size = {{ mysql.max_heap_table_size | default('64M') }}
+
+# MyISAM 设置 (虽然WordPress主要用InnoDB)
+key_buffer_size = {{ mysql.key_buffer_size | default('32M') }}
+
+# 线程设置
+thread_cache_size = {{ mysql.thread_cache_size | default('50') }}
+thread_stack = {{ mysql.thread_stack | default('256K') }}
+
+# 排序和分组
+sort_buffer_size = {{ mysql.sort_buffer_size | default('2M') }}
+read_buffer_size = {{ mysql.read_buffer_size | default('1M') }}
+read_rnd_buffer_size = {{ mysql.read_rnd_buffer_size | default('2M') }}
+join_buffer_size = {{ mysql.join_buffer_size | default('2M') }}
+
+# 表设置
+table_open_cache = {{ mysql.table_open_cache | default('4096') }}
+table_definition_cache = {{ mysql.table_definition_cache | default('2048') }}
+open_files_limit = {{ mysql.open_files_limit | default('65535') }}
+
+# 日志设置
+log_error = /var/log/mysql/error.log
+
+# 慢查询日志
+slow_query_log = {{ '1' if mysql.slow_query_log | default(true) else '0' }}
+slow_query_log_file = /var/log/mysql/mysql-slow.log
+long_query_time = {{ mysql.long_query_time | default('2') }}
+log_queries_not_using_indexes = {{ '1' if mysql.log_queries_not_using_indexes | default(false) else '0' }}
+
+# 二进制日志 (主从复制需要)
+{% if mysql.replication_enabled | default(false) %}
+server-id = {{ mysql.server_id | default('1') }}
+log-bin = mysql-bin
+binlog_format = ROW
+expire_logs_days = {{ mysql.expire_logs_days | default('7') }}
+max_binlog_size = {{ mysql.max_binlog_size | default('100M') }}
+{% endif %}
+
+# 安全设置
+skip-name-resolve = 1
+sql_mode = STRICT_TRANS_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO
+
+[mysqld_safe]
+log-error = /var/log/mysql/error.log
+pid-file = /var/run/mysqld/mysqld.pid
+
+[mysql]
+default-character-set = utf8mb4
+
+[client]
+default-character-set = utf8mb4

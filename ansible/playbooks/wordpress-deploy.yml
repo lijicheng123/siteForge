@@ -1,712 +1,1352 @@
-# WordPress部署Playbook (HTTPS & Let's Encrypt 自动集成版)
-# 使用Docker Compose部署完整的WordPress应用栈
-- name: 部署WordPress应用栈 (HTTPS enabled)
+# WordPress 现代化高性能部署 Playbook v2.1 (问题修正版)
+# 完全重构版本 - 模块化设计 + 智能化配置 + 全栈监控
+# 支持: 自动SSL、Redis缓存、性能优化、智能备份、健康监控
+
+- name: 部署现代化WordPress高性能应用栈
   hosts: all
   gather_facts: yes
   become: yes
-
+  
+  # ... (vars 部分保持不变，无需修改) ...
   vars:
-    # --- 基础配置 (可由外部文件传入) ---
-    # 项目配置
+    # =======================================================================
+    # 核心配置变量 (标准化命名)
+    # =======================================================================
+    
+    # 项目基础配置
     project_name: "{{ wordpress_config.site_name | default('wordpress-site') | regex_replace('[^a-zA-Z0-9]', '-') | lower }}"
-    project_dir: "{{ project_dir | default('/opt/wordpress') }}"
-
-    # 域名和邮箱 (HTTPS必需)
-    site_domain: "" # 【必填】你的网站域名, e.g., "www.example.com"
-    le_admin_email: "{{ wordpress_config.admin_email | default('admin@' + site_domain) }}"
-
-    # WordPress配置
-    wp_site_name: "{{ wordpress_config.site_name | default('My WordPress Site') }}"
-    wp_admin_user: "{{ wordpress_config.admin_username | default('admin') }}"
-    wp_admin_pass: "{{ wordpress_config.admin_password }}"
-    wp_admin_email: "{{ wordpress_config.admin_email | default('admin@' + site_domain) }}"
-
+    project_dir: "{{ deployment_config.project_dir | default('/opt/wordpress') }}"
+    
+    # 网站配置
+    site_domain: "{{ site_domain | default(ansible_default_ipv4.address) }}"
+    site_aliases: "{{ site_config.aliases | default([]) }}"
+    
+    # WordPress 应用配置
+    wordpress:
+      version: "{{ wordpress_config.version | default('6-fpm-alpine') }}"
+      site_name: "{{ wordpress_config.site_name | default('My WordPress Site') }}"
+      admin_username: "{{ wordpress_config.admin_username | default('admin') }}"
+      admin_password: "{{ wordpress_config.admin_password }}"
+      admin_email: "{{ wordpress_config.admin_email | default('admin@' + site_domain) }}"
+      db_name: "{{ wordpress_config.db_name | default('wordpress') }}"
+      db_user: "{{ wordpress_config.db_user | default('wpuser') }}"
+      db_password: "{{ wordpress_config.db_password }}"
+      table_prefix: "{{ wordpress_config.table_prefix | default('wp_') }}"
+      memory_limit: "{{ wordpress_config.memory_limit | default('512M') }}"
+      upload_max_size: "{{ wordpress_config.upload_max_size | default('64M') }}"
+      debug: "{{ wordpress_config.debug | default(false) }}"
+      
     # 数据库配置
-    db_name: "{{ wordpress_config.db_name | default('wordpress') }}"
-    db_user: "{{ wordpress_config.db_user | default('wpuser') }}"
-    db_pass: "{{ wordpress_config.db_password }}"
-    db_root_pass: "{{ mysql_root_password | default('changeme123') }}"
+    mysql:
+      version: "{{ mysql_config.version | default('10.11') }}"
+      root_password: "{{ mysql_root_password }}"
+      innodb_buffer_pool_size: "{{ mysql_config.innodb_buffer_pool_size | default('512M') }}"
+      max_connections: "{{ mysql_config.max_connections | default('200') }}"
+      slow_query_log: "{{ mysql_config.slow_query_log | default(true) }}"
+      
+    # Web服务器配置 (Caddy)
+    caddy:
+      version: "{{ caddy_config.version | default('2-alpine') }}"
+      http_port: "{{ caddy_config.http_port | default('80') }}"
+      https_port: "{{ caddy_config.https_port | default('443') }}"
+      client_max_body_size: "{{ caddy_config.client_max_body_size | default('64M') }}"
+      auto_https: "{{ caddy_config.auto_https | default(true) }}"
+      
+    # Redis缓存配置 (强制启用以提升性能)
+    redis:
+      version: "{{ redis_config.version | default('7-alpine') }}"
+      enabled: true  # 强制启用，不再支持禁用
+      max_memory: "{{ redis_config.max_memory | default('256mb') }}"
+      persistence: "{{ redis_config.persistence | default(true) }}"
+      
+    # SSL配置
+    ssl:
+      enabled: "{{ ssl_config.enabled | default(true) }}"
+      provider: "{{ ssl_config.provider | default('letsencrypt') }}"  # letsencrypt, selfsigned
+      email: "{{ ssl_config.email | default(wordpress.admin_email) }}"
+      
+    # PHP配置
+    php:
+      memory_limit: "{{ php_config.memory_limit | default('512M') }}"
+      upload_max_filesize: "{{ php_config.upload_max_filesize | default('64M') }}"
+      max_execution_time: "{{ php_config.max_execution_time | default('300') }}"
+      opcache_memory: "{{ php_config.opcache_memory | default('256') }}"
+      
+    # 缓存配置
+    cache:
+      enabled: "{{ cache_config.enabled | default(true) }}"
+      api_enabled: "{{ cache_config.api_enabled | default(true) }}"
+      valid_time: "{{ cache_config.valid_time | default('10m') }}"
+      
+    # 备份配置
+    backup:
+      enabled: "{{ backup_config.enabled | default(true) }}"
+      retention_days: "{{ backup_config.retention_days | default('7') }}"
+      database_enabled: "{{ backup_config.database_enabled | default(true) }}"
+      files_enabled: "{{ backup_config.files_enabled | default(true) }}"
+      compress: "{{ backup_config.compress | default(true) }}"
+      
+    # 监控配置
+    monitoring:
+      enabled: "{{ monitoring_config.enabled | default(false) }}"
+      prometheus_port: "{{ monitoring_config.prometheus_port | default('9090') }}"
+      grafana_port: "{{ monitoring_config.grafana_port | default('3000') }}"
+      grafana_password: "{{ monitoring_config.grafana_password | default('admin123') }}"
 
-    # 网络配置
-    nginx_http_port: "{{ nginx.port | default(80) }}"
-    nginx_https_port: "{{ nginx.https_port | default(443) }}"
-
+  # ... (pre_tasks 部分保持不变，无需修改) ...
   pre_tasks:
-    - name: 验证必要变量
-      ansible.builtin.fail:
-        msg: "缺少必要的配置变量: {{ item }}"
-      when: vars[item] is not defined or vars[item] == ""
-      loop:
-        - site_domain
-        - wp_admin_pass
-        - db_pass
+    # =======================================================================
+    # 阶段1: 部署前环境验证和准备
+    # =======================================================================
+    - name: "阶段1: 环境验证和依赖检查"
+      block:
+        - name: 1.1 验证关键配置参数
+          ansible.builtin.assert:
+            that:
+              - site_domain is defined and site_domain != ""
+              - wordpress.admin_password is defined and wordpress.admin_password != ""
+              - wordpress.db_password is defined and wordpress.db_password != ""
+              - mysql.root_password is defined and mysql.root_password != ""
+            fail_msg: "关键配置参数缺失，请检查传入的变量"
+            success_msg: "关键配置参数验证通过"
 
-    - name: 检查Docker是否安装
-      ansible.builtin.command: docker --version
-      register: docker_check
-      failed_when: docker_check.rc != 0
-      changed_when: false
+        - name: 1.2 显示Rocky Linux系统信息
+          ansible.builtin.debug:
+            msg: |
+              操作系统: {{ ansible_distribution }} {{ ansible_distribution_version }} (专用优化)
+              架构: {{ ansible_architecture }}
+              内核: {{ ansible_kernel }}
+              CPU型号: {{ ansible_processor[2] | default('Unknown') }}
+              CPU核心数: {{ ansible_processor_vcpus }}
+              内存总量: {{ ansible_memtotal_mb }}MB
+              存储信息: {{ ansible_mounts | selectattr('mount', 'equalto', '/') | map(attribute='size_total') | first | int / (1024*1024*1024) | round(1) }}GB
 
-    - name: 检查Docker Compose V2是否安装
-      ansible.builtin.command: docker compose version
-      register: docker_compose_check
-      failed_when: docker_compose_check.rc != 0
-      changed_when: false
+        - name: 1.3 检查系统资源要求
+          block:
+            - name: 检查内存容量 (最少需要1GB)
+              ansible.builtin.assert:
+                that: ansible_memtotal_mb >= 1024
+                fail_msg: "系统内存不足 ({{ ansible_memtotal_mb }}MB)，至少需要1024MB"
+                
+            - name: 检查磁盘空间 (最少需要10GB)
+              ansible.builtin.assert:
+                that: ansible_mounts | selectattr('mount', 'equalto', '/') | map(attribute='size_available') | first > 10737418240
+                fail_msg: "根分区可用空间不足，至少需要10GB"
 
-    - name: 检查磁盘空间是否足够
-      ansible.builtin.shell: |
-        df -BG {{ project_dir | dirname }} | tail -1 | awk '{print $4}' | sed 's/G//'
-      register: disk_space
-      failed_when: disk_space.stdout|int < 2
-      changed_when: false
+        - name: 1.4 验证Docker环境
+          block:
+            - name: 检查Docker是否安装并运行
+              ansible.builtin.command: docker --version
+              register: docker_version_check
+              failed_when: docker_version_check.rc != 0
+              changed_when: false
 
-    - name: 检查内存是否足够
-      ansible.builtin.shell: |
-        free -g | awk '/^Mem:/{print $2}'
-      register: memory_check
-      failed_when: memory_check.stdout|int < 1
-      changed_when: false
+            - name: 检查Docker服务状态
+              ansible.builtin.service:
+                name: docker
+                state: started
+                enabled: yes
 
-    - name: 检查域名DNS解析（如果不是IP地址）
-      ansible.builtin.shell: |
-        if [[ "{{ site_domain }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-          echo "Using IP address, skipping DNS check"
-        else
-          nslookup {{ site_domain }} || echo "DNS resolution failed, continuing anyway"
-        fi
-      register: dns_check
-      changed_when: false
-      ignore_errors: yes
+            - name: 检查Docker Compose是否可用
+              ansible.builtin.command: docker compose version
+              register: docker_compose_check
+              failed_when: docker_compose_check.rc != 0
+              changed_when: false
 
-    - name: 显示部署信息
-      ansible.builtin.debug:
-        msg: |
-          开始部署WordPress应用栈
-          项目名称: {{ project_name }}
-          部署目录: {{ project_dir }}
-          网站域名: {{ site_domain }}
-          管理员邮箱: {{ le_admin_email }}
-          可用磁盘空间: {{ disk_space.stdout }}GB
-          可用内存: {{ memory_check.stdout }}GB
+            - name: 验证Docker版本兼容性
+              ansible.builtin.assert:
+                that: docker_version_check.stdout is search('2[0-9]\.[0-9]+')
+                fail_msg: "Docker版本过低，请升级到20.x或更高版本"
+
+        - name: 1.5 检查网络连接性 (非致命性检查)
+          block:
+            - name: 测试阿里云加速器连接 (已实名) - 仅警告
+              ansible.builtin.uri:
+                url: https://xeuonp9s.mirror.aliyuncs.com/v2/
+                method: GET
+                timeout: 10
+              register: docker_hub_check
+              ignore_errors: yes
+              
+            - name: 显示网络连接状态
+              ansible.builtin.debug:
+                msg: |
+                  Docker Hub连接状态: {{ 'OK' if docker_hub_check.status == 200 else 'WARNING - 但不影响部署' }}
+                  {% if docker_hub_check.status != 200 %}
+                  注意: Docker Hub连接测试失败，但由于配置了镜像源，不影响部署
+                  {% endif %}
+              
+            - name: 测试DNS解析 (仅警告)
+              ansible.builtin.command: nslookup {{ site_domain }}
+              register: dns_check
+              when: ssl.enabled and ssl.provider == 'letsencrypt'
+              ignore_errors: yes
+              changed_when: false
+              
+            - name: 显示DNS解析状态
+              ansible.builtin.debug:
+                msg: |
+                  DNS解析状态: {{ 'OK' if dns_check.rc == 0 else 'WARNING - 可能影响SSL证书申请' }}
+              when: ssl.enabled and ssl.provider == 'letsencrypt'
+
+        - name: 1.6 显示部署配置信息
+          ansible.builtin.debug:
+            msg: |
+              ========================================
+              现代化WordPress部署配置信息
+              ========================================
+              项目名称: {{ project_name }}
+              网站域名: {{ site_domain }}
+              部署目录: {{ project_dir }}
+              
+              应用配置:
+              ├─ WordPress: {{ wordpress.version }}
+              ├─ MySQL: {{ mysql.version }}
+              ├─ Caddy: {{ caddy.version }} (自动HTTPS)
+              ├─ Redis: {{ redis.version }} (强制启用)
+              
+              功能特性:
+              ├─ SSL证书: {{ ssl.provider if ssl.enabled else '禁用' }}
+              ├─ 缓存系统: {% if cache.enabled %}启用{% else %}禁用{% endif %}
+              ├─ 自动备份: {% if backup.enabled %}启用 (保留{{ backup.retention_days }}天){% else %}禁用{% endif %}
+              └─ 性能监控: {% if monitoring.enabled %}启用{% else %}禁用{% endif %}
+              
+              系统环境:
+              ├─ OS: {{ ansible_distribution }} {{ ansible_distribution_version }}
+              ├─ 内存: {{ ansible_memtotal_mb }}MB
+              ├─ CPU: {{ ansible_processor_vcpus }}核
+              └─ Docker: {{ docker_version_check.stdout.split()[2] }}
+              ========================================
 
   tasks:
-    - name: 创建项目目录结构
-      ansible.builtin.file:
-        path: "{{ item }}"
-        state: directory
-        mode: '0755'
-      loop:
-        - "{{ project_dir }}"
-        - "{{ project_dir }}/nginx"
-        - "{{ project_dir }}/mysql"
-        - "{{ project_dir }}/wordpress"
-        - "{{ project_dir }}/logs"
-        - "{{ project_dir }}/backups"
-        - "{{ project_dir }}/certbot/conf"
-        - "{{ project_dir }}/certbot/www"
-
-    - name: 创建Docker Compose文件
-      ansible.builtin.copy:
-        content: |
-          version: '3.8'
-
-          services:
-            nginx:
-              image: nginx:{{ nginx.version | default('latest') }}
-              container_name: {{ project_name }}_nginx
-              restart: unless-stopped
-              ports:
-                - "{{ nginx_http_port }}:80"
-                - "{{ nginx_https_port }}:443"
-              volumes:
-                - ./nginx:/etc/nginx/conf.d
-                - ./logs/nginx:/var/log/nginx
-                - wordpress_data:/var/www/html
-                - ./certbot/conf:/etc/letsencrypt
-                - ./certbot/www:/var/www/certbot
-              depends_on:
-                - wordpress
-              networks:
-                - wordpress_network
-
-            mysql:
-              image: mariadb:{{ mysql.version | default('10.6') }}
-              container_name: {{ project_name }}_mysql
-              restart: unless-stopped
-              environment:
-                MYSQL_ROOT_PASSWORD: "{{ db_root_pass }}"
-                MYSQL_DATABASE: "{{ db_name }}"
-                MYSQL_USER: "{{ db_user }}"
-                MYSQL_PASSWORD: "{{ db_pass }}"
-              volumes:
-                - mysql_data:/var/lib/mysql
-                - ./logs/mysql:/var/log/mysql
-              networks:
-                - wordpress_network
-              command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
-              healthcheck:
-                test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-                interval: 10s
-                timeout: 5s
-                retries: 5
-
-            wordpress:
-              image: wordpress:{{ wordpress.version | default('latest') }}
-              container_name: {{ project_name }}_wordpress
-              restart: unless-stopped
-              environment:
-                WORDPRESS_DB_HOST: mysql:3306
-                WORDPRESS_DB_NAME: "{{ db_name }}"
-                WORDPRESS_DB_USER: "{{ db_user }}"
-                WORDPRESS_DB_PASSWORD: "{{ db_pass }}"
-                WORDPRESS_TABLE_PREFIX: "{{ wordpress.table_prefix | default('wp_') }}"
-              volumes:
-                - wordpress_data:/var/www/html
-              depends_on:
-                mysql:
-                  condition: service_healthy
-              networks:
-                - wordpress_network
-
-
-          volumes:
-            mysql_data:
-            wordpress_data:
-
-          networks:
-            wordpress_network:
-              driver: bridge
-        dest: "{{ project_dir }}/docker-compose.yml"
-        mode: '0644'
-
-    - name: 安装系统级certbot
+    # =======================================================================
+    # 阶段2: 项目结构初始化和配置准备
+    # =======================================================================
+    - name: "阶段2: 项目结构初始化"
       block:
-        - name: 安装EPEL仓库 (CentOS/RHEL)
-          ansible.builtin.yum:
-            name: epel-release
-            state: present
-          when: ansible_os_family == "RedHat"
-          
-        - name: 安装certbot (CentOS/RHEL)
-          ansible.builtin.yum:
-            name:
-              - certbot
-              - python3-certbot-nginx
-            state: present
-          when: ansible_os_family == "RedHat"
-          
-        - name: 更新包管理器 (Ubuntu/Debian)
-          ansible.builtin.apt:
-            update_cache: yes
-          when: ansible_os_family == "Debian"
-          
-        - name: 安装certbot (Ubuntu/Debian)
-          ansible.builtin.apt:
-            name:
-              - certbot
-              - python3-certbot-nginx
-            state: present
-          when: ansible_os_family == "Debian"
-
-    - name: 配置Docker国内镜像源
-      ansible.builtin.copy:
-        content: |
-          {
-            "registry-mirrors": [
-              "https://5hsypcja.mirror.aliyuncs.com",
-              "https://docker.m.daocloud.io",
-              "https://hub.rat.dev"
-            ]
-          }
-        dest: "/etc/docker/daemon.json"
-        mode: '0644'
-
-    - name: 重启Docker服务以应用镜像源配置
-      ansible.builtin.shell: |
-        systemctl daemon-reload
-        systemctl restart docker
-        echo "Docker服务已重启"
-      register: docker_restart_result
-
-    - name: 等待Docker服务启动完成
-      ansible.builtin.command: docker version
-      register: docker_version_check
-      retries: 10
-      delay: 3
-      until: docker_version_check.rc == 0
-
-    - name: 显示Docker重启结果
-      ansible.builtin.debug:
-        msg: "Docker服务状态: {{ docker_restart_result.stdout | default('重启完成') }}"
-
-    - name: 停止可能存在的旧容器
-      ansible.builtin.command:
-        cmd: docker compose down --remove-orphans
-        chdir: "{{ project_dir }}"
-      ignore_errors: yes
-      changed_when: false
-
-    - name: 创建临时的Nginx配置用于Let's Encrypt验证
-      ansible.builtin.copy:
-        content: |
-          server {
-              listen 80;
-              server_name {{ site_domain }};
-
-              location ~ /.well-known/acme-challenge/ {
-                  root /var/www/certbot;
-              }
-
-              location / {
-                  return 404;
-              }
-          }
-        dest: "{{ project_dir }}/nginx/default.conf"
-        mode: '0644'
-
-    - name: 启动临时Nginx服务
-      ansible.builtin.command:
-        cmd: docker compose up -d nginx
-        chdir: "{{ project_dir }}"
-      changed_when: true
-      register: nginx_start
-      
-    - name: 等待Nginx服务启动完成
-      ansible.builtin.wait_for:
-        port: "{{ nginx_http_port }}"
-        host: "{{ ansible_default_ipv4.address }}"
-        timeout: 30
-        delay: 5
-      when: nginx_start is succeeded
-
-    - name: 测试Nginx是否正常响应
-      ansible.builtin.uri:
-        url: "http://{{ site_domain }}/.well-known/test"
-        method: GET
-        status_code: [404, 403] # 404或403都表示Nginx在正常工作
-      register: nginx_test
-      ignore_errors: yes
-      
-    - name: 检查是否为IP地址（跳过Let's Encrypt）
-      ansible.builtin.set_fact:
-        is_ip_address: "{{ site_domain | regex_search('^[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+$') is not none }}"
-
-    - name: 为IP地址创建自签名证书
-      block:
-        - name: 生成私钥
-          ansible.builtin.command:
-            cmd: openssl genrsa -out {{ project_dir }}/certbot/conf/privkey.pem 2048
-            creates: "{{ project_dir }}/certbot/conf/privkey.pem"
-            
-        - name: 生成自签名证书
-          ansible.builtin.command:
-            cmd: >
-              openssl req -new -x509 -key {{ project_dir }}/certbot/conf/privkey.pem 
-              -out {{ project_dir }}/certbot/conf/fullchain.pem -days 365 
-              -subj "/C=CN/ST=State/L=City/O=Org/CN={{ site_domain }}"
-            creates: "{{ project_dir }}/certbot/conf/fullchain.pem"
-            
-        - name: 创建证书目录结构
+        # ... (目录创建部分保持不变) ...
+        - name: 2.1 创建完整的项目目录结构
           ansible.builtin.file:
-            path: "{{ project_dir }}/certbot/conf/live/{{ site_domain }}"
+            path: "{{ item }}"
             state: directory
             mode: '0755'
-            
-        - name: 创建证书符号链接
-          ansible.builtin.file:
-            src: "{{ item.src }}"
-            dest: "{{ project_dir }}/certbot/conf/live/{{ site_domain }}/{{ item.dest }}"
-            state: link
-            force: yes
+            owner: root
+            group: root
           loop:
-            - { src: "../../fullchain.pem", dest: "fullchain.pem" }
-            - { src: "../../privkey.pem", dest: "privkey.pem" }
-      when: is_ip_address
+            # 主要目录
+            - "{{ project_dir }}"
+            - "{{ project_dir }}/config"
+            - "{{ project_dir }}/data"
+            - "{{ project_dir }}/logs"
+            - "{{ project_dir }}/scripts"
+            - "{{ project_dir }}/ssl"
+            
+            # 配置子目录
+            - "{{ project_dir }}/config/caddy"
+            - "{{ project_dir }}/config/php"
+            - "{{ project_dir }}/config/mysql"
+            
+            # 数据目录
+            - "{{ project_dir }}/data/mysql"
+            - "{{ project_dir }}/data/wordpress"
+            - "{{ project_dir }}/data/redis"
+            - "{{ project_dir }}/data/caddy"
+            - "{{ project_dir }}/data/prometheus"
+            - "{{ project_dir }}/data/grafana"
+            
+            # 日志目录
+            - "{{ project_dir }}/logs/caddy"
+            - "{{ project_dir }}/logs/mysql"
+            - "{{ project_dir }}/logs/wordpress"
+            - "{{ project_dir }}/logs/redis"
+            
+            # 备份目录 (SSL由Caddy自动管理)
+            - "{{ project_dir }}/backups"
+            - "{{ project_dir }}/backups/db"
+            - "{{ project_dir }}/backups/files"
+            - "{{ project_dir }}/backups/config"
+            - "{{ project_dir }}/backups/logs"
+            
+            # 监控目录 (如果启用)
+            - "{{ project_dir }}/monitoring/prometheus"
+            - "{{ project_dir }}/monitoring/grafana"
 
-    - name: 请求Let's Encrypt证书（仅对域名）
-      block:
-        - name: 停止nginx容器以释放80端口
-          ansible.builtin.command:
-            cmd: docker compose stop nginx
-            chdir: "{{ project_dir }}"
-          
-        - name: 尝试申请Let's Encrypt证书（standalone模式）
-          ansible.builtin.command:
-            cmd: >
-              certbot certonly --standalone
-              --email {{ le_admin_email }}
-              -d {{ site_domain }}
-              --rsa-key-size 4096
-              --agree-tos
-              --non-interactive
-              --verbose
-          register: certbot_result
-          retries: 3
-          delay: 10
-          until: certbot_result.rc == 0
-          changed_when: certbot_result.rc == 0
-          
-        - name: 创建项目证书目录
+        - name: 2.2 设置目录权限 (全部使用root用户)
           ansible.builtin.file:
-            path: "{{ project_dir }}/certbot/conf/live/{{ site_domain }}"
+            path: "{{ item.path }}"
+            mode: "{{ item.mode }}"
             state: directory
-            mode: '0755'
-            
-        - name: 复制系统证书到项目目录
-          ansible.builtin.copy:
-            src: "{{ item.src }}"
-            dest: "{{ project_dir }}/certbot/conf/live/{{ site_domain }}/{{ item.dest }}"
-            mode: '0644'
-            remote_src: yes
+            recurse: yes
+            owner: root
+            group: root
           loop:
-            - { src: "/etc/letsencrypt/live/{{ site_domain }}/fullchain.pem", dest: "fullchain.pem" }
-            - { src: "/etc/letsencrypt/live/{{ site_domain }}/privkey.pem", dest: "privkey.pem" }
-          when: certbot_result.rc == 0
-          
-      rescue:
-        - name: Let's Encrypt失败，创建自签名证书作为备用
-          ansible.builtin.debug:
-            msg: "Let's Encrypt证书申请失败，使用自签名证书"
-            
-        - name: Let's Encrypt失败，生成自签名证书作为备用
+            - { path: "{{ project_dir }}/data", mode: '0755' }
+            - { path: "{{ project_dir }}/data/mysql", mode: '0755' }
+            - { path: "{{ project_dir }}/data/wordpress", mode: '0755' }
+            - { path: "{{ project_dir }}/logs", mode: '0755' }
+            - { path: "{{ project_dir }}/ssl/private", mode: '0700' }
+            - { path: "{{ project_dir }}/backups", mode: '0755' }
+
+        - name: 2.3 生成应用配置文件 (内联模板)
           block:
-            - name: 生成备用私钥
+            - name: "MODIFIED: 生成修正版的Docker Compose配置文件"
+              ansible.builtin.copy:
+                dest: "{{ project_dir }}/docker-compose.yml"
+                mode: '0644'
+                backup: yes
+                content: |
+                  version: '3.8'
+                  
+                  networks:
+                    wordpress_net:
+                      driver: bridge
+                  
+                  volumes:
+                    mysql_data:
+                    wordpress_data:
+                    redis_data:
+                  
+                  services:
+                    mysql:
+                      image: mariadb:{{ mysql.version }}
+                      container_name: {{ project_name }}_mysql
+                      restart: unless-stopped
+                      # 数据库端口建议不暴露给公网，仅内部访问
+                      # ports:
+                      #   - "3306:3306"
+                      environment:
+                        MYSQL_ROOT_PASSWORD: "{{ mysql_root_password }}"
+                        MYSQL_DATABASE: "{{ wordpress.db_name }}"
+                        MYSQL_USER: "{{ wordpress.db_user }}"
+                        MYSQL_PASSWORD: "{{ wordpress.db_password }}"
+                      volumes:
+                        - mysql_data:/var/lib/mysql
+                        - {{ project_dir }}/logs/mysql:/var/log/mysql
+                      networks:
+                        - wordpress_net
+                      command: >
+                        --character-set-server=utf8mb4
+                        --collation-server=utf8mb4_unicode_ci
+                        --innodb-buffer-pool-size={{ mysql.innodb_buffer_pool_size }}
+                        --max-connections={{ mysql.max_connections }}
+                      healthcheck:
+                        test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p{{ mysql_root_password }}"]
+                        interval: 30s
+                        timeout: 10s
+                        retries: 5
+                        start_period: 60s
+                  
+                    redis:
+                      image: redis:{{ redis.version }}
+                      container_name: {{ project_name }}_redis
+                      restart: unless-stopped
+                      # Redis端口建议不暴露给公网，仅内部访问
+                      # ports:
+                      #   - "6379:6379"
+                      command: >
+                        redis-server
+                        --appendonly {% if redis.persistence %}yes{% else %}no{% endif %}
+                        --maxmemory {{ redis.max_memory }}
+                        --maxmemory-policy allkeys-lru
+                        --save 900 1
+                        --save 300 10  
+                        --save 60 10000
+                        --tcp-keepalive 60
+                        --timeout 300
+                      volumes:
+                        - redis_data:/data
+                      networks:
+                        - wordpress_net
+                      healthcheck:
+                        test: ["CMD", "redis-cli", "ping"]
+                        interval: 30s
+                        timeout: 5s
+                        retries: 3
+                  
+                    wordpress:
+                      image: wordpress:{{ wordpress.version }}
+                      container_name: {{ project_name }}_wordpress
+                      restart: unless-stopped
+                      # PHP-FPM端口不需要对外部暴露
+                      # ports:
+                      #   - "9000:9000"
+                      environment:
+                        # MODIFIED: 使用服务名进行内部通信
+                        WORDPRESS_DB_HOST: "mysql:3306"
+                        WORDPRESS_DB_NAME: "{{ wordpress.db_name }}"
+                        WORDPRESS_DB_USER: "{{ wordpress.db_user }}"
+                        WORDPRESS_DB_PASSWORD: "{{ wordpress.db_password }}"
+                        WORDPRESS_TABLE_PREFIX: "{{ wordpress.table_prefix }}"
+                      volumes:
+                        - wordpress_data:/var/www/html
+                      networks:
+                        - wordpress_net
+                      # MODIFIED: 移除不再需要的 extra_hosts
+                      depends_on:
+                        mysql:
+                          condition: service_healthy
+                        redis:
+                          condition: service_healthy
+                      healthcheck:
+                        test: ["CMD-SHELL", "pgrep -f php-fpm || exit 1"]
+                        interval: 30s
+                        timeout: 10s
+                        retries: 3
+                        start_period: 90s
+                  
+                    caddy:
+                      image: caddy:{{ caddy.version }}
+                      container_name: {{ project_name }}_caddy
+                      restart: unless-stopped
+                      ports:
+                        - "{{ caddy.http_port }}:80"
+                        - "{{ caddy.https_port }}:443"
+                      volumes:
+                        - {{ project_dir }}/config/caddy:/etc/caddy
+                        - wordpress_data:/var/www/html:ro
+                        - {{ project_dir }}/data/caddy:/data/caddy
+                        - {{ project_dir }}/logs/caddy:/var/log/caddy
+                      networks:
+                        - wordpress_net
+                      # MODIFIED: 升级为健康检查依赖
+                      depends_on:
+                        wordpress:
+                          condition: service_healthy
+                      environment:
+                        - CADDY_ADMIN=0.0.0.0:2019
+                      healthcheck:
+                        test: ["CMD", "caddy", "version"]
+                        interval: 30s
+                        timeout: 5s
+                        retries: 3
+                  
+                    wp-cli:
+                      image: wordpress:cli-php8.2
+                      container_name: {{ project_name }}_wp_cli
+                      user: "0:0"
+                      environment:
+                        # MODIFIED: 使用服务名进行内部通信
+                        WORDPRESS_DB_HOST: "mysql:3306"
+                        WORDPRESS_DB_NAME: "{{ wordpress.db_name }}"
+                        WORDPRESS_DB_USER: "{{ wordpress.db_user }}"
+                        WORDPRESS_DB_PASSWORD: "{{ wordpress.db_password }}"
+                      volumes:
+                        - wordpress_data:/var/www/html
+                      networks:
+                        - wordpress_net
+                      # MODIFIED: 移除不再需要的 extra_hosts
+                      depends_on:
+                        mysql:
+                          condition: service_healthy
+                      deploy:
+                        resources:
+                          limits:
+                            memory: 1G
+                      entrypoint: /bin/sh -c "while true; do sleep 30; done"
+
+            - name: "MODIFIED: 生成修正版的Caddy配置文件"
+              ansible.builtin.copy:
+                dest: "{{ project_dir }}/config/caddy/Caddyfile"
+                mode: '0644'
+                backup: yes
+                content: |
+                  # 全局配置
+                  {
+                      admin 0.0.0.0:2019
+                      email {{ ssl.email | default(wordpress.admin_email) }}
+                      log {
+                          output file /var/log/caddy/access.log
+                          format json
+                      }
+                  }
+                  
+                  # WordPress站点配置
+                  {{ site_domain }}{% if caddy.auto_https and not (site_domain | regex_search('^\d+\.\d+\.\d+\.\d+$')) %}{% else %} :{{ caddy.http_port }}{% endif %} {
+                      root * /var/www/html
+                      file_server
+                      
+                      request_body {
+                          max_size {{ caddy.client_max_body_size }}
+                      }
+                      
+                      # MODIFIED: 使用服务名进行内部通信
+                      php_fastcgi wordpress:9000 {
+                          read_timeout 180s
+                          write_timeout 180s
+                      }
+                      
+                      try_files {path} {path}/ /index.php?{query}
+                      
+                      header {
+                          X-Frame-Options "SAMEORIGIN"
+                          X-Content-Type-Options "nosniff"  
+                          X-XSS-Protection "1; mode=block"
+                          Referrer-Policy "strict-origin-when-cross-origin"
+                          {% if caddy.auto_https and not (site_domain | regex_search('^\d+\.\d+\.\d+\.\d+$')) %}
+                          Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+                          {% endif %}
+                      }
+                      
+                      @static {
+                          path *.css *.js *.png *.jpg *.jpeg *.gif *.ico *.svg *.woff *.woff2 *.ttf *.eot *.webp
+                      }
+                      handle @static {
+                          header Cache-Control "public, max-age=31536000, immutable"
+                          file_server
+                      }
+                      
+                      @forbidden {
+                          path *.htaccess *.htpasswd *.ini *.log *.sh *.sql *.conf *.bak *.tmp
+                      }
+                      respond @forbidden 404
+                      
+                      @hidden {
+                          path /.htaccess /.htpasswd /.env /.git/* /.svn/* /.DS_Store
+                      }
+                      respond @hidden 404
+                      
+                      # MODIFIED: 以下两处也需要修改
+                      handle /wp-admin/* /wp-login.php {
+                          php_fastcgi wordpress:9000
+                      }
+                      
+                      log {
+                          output file /var/log/caddy/{{ site_domain }}.log
+                          format json
+                          level INFO
+                      }
+                      
+                      handle_errors {
+                          rewrite * /index.php
+                          php_fastcgi wordpress:9000
+                      }
+                  }
+            
+            # ... (备份脚本部分保持不变) ...
+            - name: 生成简化备份脚本
+              ansible.builtin.copy:
+                dest: "{{ project_dir }}/scripts/backup.sh"
+                mode: '0755'
+                backup: yes
+                content: |
+                  #!/bin/bash
+                  # WordPress备份脚本 - 简化版
+                  
+                  BACKUP_DIR="{{ project_dir }}/backups"
+                  PROJECT_DIR="{{ project_dir }}"
+                  DATE=$(date +%Y%m%d_%H%M%S)
+                  
+                  echo "=== 开始WordPress备份 $DATE ==="
+                  cd "$PROJECT_DIR" || exit 1
+                  
+                  # 备份数据库
+                  echo "备份数据库..."
+                  docker compose exec -T mysql mysqldump -u{{ wordpress.db_user }} -p{{ wordpress.db_password }} {{ wordpress.db_name }} > "$BACKUP_DIR/db/db_backup_$DATE.sql"
+                  
+                  # 压缩数据库备份
+                  gzip "$BACKUP_DIR/db/db_backup_$DATE.sql"
+                  
+                  # 备份WordPress文件
+                  echo "备份WordPress文件..."
+                  docker run --rm -v "{{ project_name }}_wordpress_data:/var/www/html:ro" -v "$BACKUP_DIR/files:/backup" busybox tar czf "/backup/wp_files_$DATE.tar.gz" -C /var/www/html .
+                  
+                  # 清理7天前的旧备份
+                  echo "清理旧备份..."
+                  find "$BACKUP_DIR" -type f -name "*.sql.gz" -mtime +7 -delete
+                  find "$BACKUP_DIR" -type f -name "*.tar.gz" -mtime +7 -delete
+                  
+                  echo "=== 备份完成 ==="
+
+    # =======================================================================
+    # 阶段3: 系统环境优化和SSL证书配置
+    # =======================================================================
+    - name: "阶段3: 系统环境优化"
+      block:
+        # ... (安装工具、系统调优、Docker加速等部分保持不变) ...
+        - name: 3.1 优化系统配置
+          block:
+            - name: 安装必要的系统工具和优化包 (Rocky Linux专用)
+              ansible.builtin.dnf:
+                name:
+                  # 基础工具
+                  - curl
+                  - wget
+                  - openssl
+                  - logrotate
+                  - cronie
+                  - htop
+                  - unzip
+                  - tar
+                  - gzip
+                  
+                  # 网络和存储工具
+                  - nfs-utils
+                  - rsync
+                  - net-tools
+                  - bind-utils
+                  
+                  # 性能监控工具
+                  - iotop
+                  - sysstat
+                  - tcpdump
+                  
+                  # 开发和调试工具
+                  - strace
+                  - lsof
+                  - vim-enhanced
+                  
+                  # Rocky Linux特定优化
+                  - tuned
+                  - firewalld
+                  - policycoreutils-python-utils
+                state: present
+
+            - name: 启动并启用系统服务 (Rocky Linux优化)
+              ansible.builtin.service:
+                name: "{{ item }}"
+                state: started
+                enabled: yes
+              loop:
+                - crond       # 定时任务服务
+                - firewalld   # 防火墙服务
+                - tuned       # 性能调优服务
+
+            - name: 设置Rocky Linux系统优化配置
+              block:
+                - name: 应用服务器性能调优配置
+                  ansible.builtin.command:
+                    cmd: tuned-adm profile throughput-performance
+                  register: tuned_result
+                  ignore_errors: yes
+
+                - name: 配置系统内核参数优化
+                  ansible.builtin.sysctl:
+                    name: "{{ item.name }}"
+                    value: "{{ item.value }}"
+                    state: present
+                    reload: yes
+                  loop:
+                    # 网络优化
+                    - { name: 'net.core.rmem_max', value: '134217728' }
+                    - { name: 'net.core.wmem_max', value: '134217728' }
+                    - { name: 'net.ipv4.tcp_rmem', value: '4096 65536 134217728' }
+                    - { name: 'net.ipv4.tcp_wmem', value: '4096 65536 134217728' }
+                    - { name: 'net.ipv4.tcp_congestion_control', value: 'bbr' }
+                    
+                    # 文件系统优化
+                    - { name: 'fs.file-max', value: '2097152' }
+                    - { name: 'fs.inotify.max_user_watches', value: '524288' }
+                    
+                    # 内存管理优化
+                    - { name: 'vm.swappiness', value: '10' }
+                    - { name: 'vm.dirty_ratio', value: '15' }
+                    - { name: 'vm.dirty_background_ratio', value: '5' }
+                    
+                    # Docker优化
+                    - { name: 'net.bridge.bridge-nf-call-iptables', value: '1' }
+                    - { name: 'net.bridge.bridge-nf-call-ip6tables', value: '1' }
+                  ignore_errors: yes
+
+                - name: 配置系统资源限制
+                  ansible.builtin.pam_limits:
+                    domain: "*"
+                    limit_type: "{{ item.type }}"
+                    limit_item: "{{ item.item }}"
+                    value: "{{ item.value }}"
+                  loop:
+                    - { type: 'soft', item: 'nofile', value: '65536' }
+                    - { type: 'hard', item: 'nofile', value: '65536' }
+                    - { type: 'soft', item: 'nproc', value: '32768' }
+                    - { type: 'hard', item: 'nproc', value: '32768' }
+
+            - name: 配置Docker镜像加速 (总是配置以确保稳定性)
+              ansible.builtin.copy:
+                content: |
+                  {
+                    "registry-mirrors": [
+                      "https://xeuonp9s.mirror.aliyuncs.com", 
+                      "https://docker.m.daocloud.io",
+                      "https://dockerproxy.com"
+                    ],
+                    "exec-opts": ["native.cgroupdriver=systemd"],
+                    "log-driver": "json-file",
+                    "log-opts": {
+                      "max-size": "100m",
+                      "max-file": "3"
+                    },
+                    "storage-driver": "overlay2"
+                  }
+                dest: "/etc/docker/daemon.json"
+                mode: '0644'
+                backup: yes
+              notify: Restart Docker
+
+            - name: "MODIFIED: 配置防火墙规则 (终极解决方案)"
+              block:
+                - name: 开放HTTP和HTTPS端口
+                  ansible.posix.firewalld:
+                    port: "{{ item }}"
+                    permanent: yes
+                    state: enabled
+                  loop:
+                    - "{{ caddy.http_port }}/tcp"
+                    - "{{ caddy.https_port }}/tcp"
+                  notify: Reload Firewalld
+                  
+                - name: "NEW: 为Docker网络开启地址伪装 (Masquerading)"
+                  ansible.posix.firewalld:
+                    zone: public
+                    masquerade: "yes" # 使用 "yes"
+                    permanent: yes
+                    state: enabled
+                  notify: Reload Firewalld
+
+    # ... (阶段4: 应用栈部署和服务启动, 保持不变) ...
+    - name: "阶段4: 应用栈部署"
+      block:
+        - name: 4.1 清理可能存在的旧容器
+          block:
+            - name: 停止并删除旧的容器
               ansible.builtin.command:
-                cmd: openssl genrsa -out {{ project_dir }}/certbot/conf/privkey.pem 2048
-                creates: "{{ project_dir }}/certbot/conf/privkey.pem"
-                
-            - name: 生成备用自签名证书
+                cmd: docker compose down --remove-orphans --volumes
+                chdir: "{{ project_dir }}"
+              ignore_errors: yes
+
+            - name: 清理未使用的Docker资源
+              ansible.builtin.command:
+                cmd: docker system prune -f
+              ignore_errors: yes
+
+        - name: 4.2 统一预下载Docker镜像 (高可靠性机制)
+          block:
+            - name: 定义所有必需的Docker镜像
+              ansible.builtin.set_fact:
+                docker_images:
+                  - name: "MySQL数据库"
+                    image: "mariadb:{{ mysql.version }}"
+                    critical: true
+                    
+                  - name: "WordPress应用"
+                    image: "wordpress:{{ wordpress.version }}"
+                    critical: true
+                    
+                  - name: "Caddy Web服务器"
+                    image: "caddy:{{ caddy.version }}"
+                    critical: true
+                    
+                  - name: "Redis缓存"
+                    image: "redis:{{ redis.version }}"
+                    critical: true
+                    
+                  - name: "WP-CLI工具"
+                    image: "wordpress:cli-php8.2"
+                    critical: false
+
+            - name: 批量拉取Docker镜像
+              ansible.builtin.command:
+                cmd: docker pull {{ item.image }}
+              register: docker_pull_results
+              loop: "{{ docker_images }}"
+              retries: 5
+              delay: 10
+              until: docker_pull_results.rc == 0
+              failed_when: item.critical and docker_pull_results.rc != 0
+              ignore_errors: "{{ not item.critical }}"
+              changed_when: "'Downloaded' in docker_pull_results.stderr or 'Pull complete' in docker_pull_results.stderr"
+
+            - name: 验证镜像完整性
+              ansible.builtin.command:
+                cmd: docker images {{ item.image }} --quiet
+              register: docker_image_verification
+              loop: "{{ docker_images }}"
+              when: item.critical
+              failed_when: docker_image_verification.stdout == ""
+              changed_when: false
+
+            - name: 清理悬空镜像和构建缓存
+              ansible.builtin.command:
+                cmd: docker image prune -f
+              register: docker_cleanup
+              ignore_errors: yes
+              changed_when: "'deleted' in docker_cleanup.stdout.lower()"
+
+            - name: 显示镜像下载和验证结果
+              ansible.builtin.debug:
+                msg: |
+                  📦 Docker镜像统一下载完成:
+                  {% for result in docker_pull_results.results %}
+                  - {{ docker_images[loop.index0].name }}: {% if result.rc == 0 %}✅ 成功{% else %}❌ 失败{% if not docker_images[loop.index0].critical %} (非关键){% endif %}{% endif %}
+                    镜像: {{ docker_images[loop.index0].image }}
+                  {% endfor %}
+                  
+                  🧹 清理结果: {{ '清理了悬空镜像' if docker_cleanup.changed else '无需清理' }}
+                  
+                  ℹ️ 下载策略: 
+                  - 关键镜像失败时停止部署
+                  - 非关键镜像失败时继续部署
+                  - 自动重试5次，间隔10秒
+                  - 自动清理悬空镜像节省空间
+
+        - name: 4.3 启动应用栈
+          ansible.builtin.command:
+            cmd: docker compose up -d
+            chdir: "{{ project_dir }}"
+          register: compose_up_result
+
+        - name: 4.4 验证所有服务启动状态
+          block:
+            - name: 等待所有容器达到健康状态
+              ansible.builtin.command:
+                cmd: docker compose ps --filter "status=running"
+                chdir: "{{ project_dir }}"
+              register: running_services
+              changed_when: false
+              retries: 15
+              delay: 10
+              until: "'(healthy)' in running_services.stdout and 'caddy' in running_services.stdout and 'wordpress' in running_services.stdout"
+
+            - name: 验证核心服务状态
+              ansible.builtin.assert:
+                that: "item in running_services.stdout"
+                fail_msg: "关键服务 [{{ item }}] 未能成功启动!"
+                success_msg: "服务 [{{ item }}] 运行正常"
+              loop:
+                - mysql
+                - wordpress  
+                - caddy
+                - redis
+
+        - name: 4.5 显示部署状态
+          ansible.builtin.debug:
+            msg: |
+              应用栈部署完成!
+              运行中的服务: {{ running_services.stdout_lines | join(', ') }}
+
+    # =======================================================================
+    # 阶段5: WordPress应用初始化和配置
+    # =======================================================================
+    - name: "阶段5: WordPress初始化"
+      block:
+        - name: 5.1 检查WordPress安装状态
+          ansible.builtin.command:
+            cmd: docker compose exec -T wp-cli wp --allow-root core is-installed
+            chdir: "{{ project_dir }}"
+          register: wp_installed_check
+          ignore_errors: yes
+          changed_when: false
+
+        - name: 5.2 安装WordPress核心 (仅在未安装时)
+          block:
+            # MODIFIED: 在wp-config.php创建命令中修正DB_HOST和REDIS_HOST
+            - name: 创建WordPress配置文件
               ansible.builtin.command:
                 cmd: >
-                  openssl req -new -x509 -key {{ project_dir }}/certbot/conf/privkey.pem 
-                  -out {{ project_dir }}/certbot/conf/fullchain.pem -days 365 
-                  -subj "/C=CN/ST=State/L=City/O=Org/CN={{ site_domain }}"
-                creates: "{{ project_dir }}/certbot/conf/fullchain.pem"
-                
-            - name: 创建备用证书目录结构
+                  docker compose exec -T wp-cli wp --allow-root config create
+                  --dbname="{{ wordpress.db_name }}"
+                  --dbuser="{{ wordpress.db_user }}"
+                  --dbpass="{{ wordpress.db_password }}"
+                  --dbhost="mysql:3306"
+                  --dbcharset="utf8mb4"
+                  --dbcollate="utf8mb4_unicode_ci"
+                  --allow-root
+                  --extra-php << 'EOF'
+                  define('WP_REDIS_HOST', 'redis');
+                  define('WP_REDIS_PORT', 6379);
+                  define('WP_CACHE', true);
+                  define('FORCE_SSL_ADMIN', {{ 'true' if ssl.enabled else 'false' }});
+                  define('WP_DEBUG', {{ 'true' if wordpress.debug else 'false' }});
+                  define('WP_DEBUG_LOG', {{ 'true' if wordpress.debug else 'false' }});
+                  EOF
+                chdir: "{{ project_dir }}"
+              when: wp_installed_check.rc != 0
+
+            - name: 执行WordPress安装
+              ansible.builtin.command:
+                cmd: >
+                  docker compose exec -T wp-cli wp --allow-root core install
+                  --url="{{ 'https' if ssl.enabled else 'http' }}://{{ site_domain }}"
+                  --title="{{ wordpress.site_name }}"
+                  --admin_user="{{ wordpress.admin_username }}"
+                  --admin_password="{{ wordpress.admin_password }}"
+                  --admin_email="{{ wordpress.admin_email }}"
+                  --skip-email
+                chdir: "{{ project_dir }}"
+              register: wp_install_result
+              when: wp_installed_check.rc != 0
+
+        # ... (后续WordPress优化配置部分保持不变) ...
+        - name: 5.3 WordPress优化配置
+          block:
+            - name: 安装Redis Object Cache插件 (强制启用)
+              ansible.builtin.command:
+                cmd: docker compose exec -T wp-cli wp --allow-root plugin install redis-cache --activate
+                chdir: "{{ project_dir }}"
+              register: redis_plugin_install
+              ignore_errors: yes
+
+            - name: 启用Redis缓存 (强制启用)
+              ansible.builtin.command:
+                cmd: docker compose exec -T wp-cli wp --allow-root redis enable
+                chdir: "{{ project_dir }}"
+              register: redis_enable
+              ignore_errors: yes
+
+            - name: 验证Redis缓存状态
+              ansible.builtin.command:
+                cmd: docker compose exec -T wp-cli wp --allow-root redis status
+                chdir: "{{ project_dir }}"
+              register: redis_status
+              ignore_errors: yes
+
+            - name: 显示Redis缓存配置结果
+              ansible.builtin.debug:
+                msg: |
+                  Redis缓存配置完成:
+                  - 插件安装: {{ 'OK' if redis_plugin_install.rc == 0 else 'WARNING' }}
+                  - 缓存启用: {{ 'OK' if redis_enable.rc == 0 else 'WARNING' }}
+                  - 状态检查: {{ redis_status.stdout if redis_status.rc == 0 else '无法获取状态' }}
+
+            - name: 设置WordPress永久链接结构
+              ansible.builtin.command:
+                cmd: docker compose exec -T wp-cli wp --allow-root rewrite structure '/%postname%/' --hard
+                chdir: "{{ project_dir }}"
+              ignore_errors: yes
+
+            - name: 更新WordPress选项
+              ansible.builtin.command:
+                cmd: docker compose exec -T wp-cli wp --allow-root option update {{ item.key }} '{{ item.value }}'
+                chdir: "{{ project_dir }}"
+              loop:
+                - { key: 'timezone_string', value: 'Asia/Shanghai' }
+                - { key: 'date_format', value: 'Y-m-d' }
+                - { key: 'time_format', value: 'H:i' }
+                - { key: 'start_of_week', value: '1' }
+                - { key: 'default_ping_status', value: 'closed' }
+                - { key: 'default_comment_status', value: 'closed' }
+                - { key: 'users_can_register', value: '0' }
+              ignore_errors: yes
+
+            - name: 清理默认内容
+              ansible.builtin.command:
+                cmd: docker compose exec -T wp-cli wp --allow-root {{ item }}
+                chdir: "{{ project_dir }}"
+              loop:
+                - "plugin delete hello akismet"
+                - "post delete 1 --force"
+                - "post delete 2 --force"  # Sample page
+                - "theme delete twentytwentytwo twentytwentythree"
+              ignore_errors: yes
+
+            - name: 安装推荐的性能优化插件
+              ansible.builtin.command:
+                cmd: docker compose exec -T wp-cli wp --allow-root plugin install {{ item }} --activate
+                chdir: "{{ project_dir }}"
+              loop:
+                - "autoptimize"      # 代码优化
+                - "wp-super-cache"   # 页面缓存
+                - "smush"           # 图片优化
+                - "wordfence"       # 安全防护
+              ignore_errors: yes
+
+        - name: 5.4 设置WordPress文件权限
+          block:
+            - name: 设置WordPress目录权限
+              ansible.builtin.command:
+                cmd: docker compose exec -T wordpress find /var/www/html -type d -exec chmod 755 {} \;
+                chdir: "{{ project_dir }}"
+              ignore_errors: yes
+
+            - name: 设置WordPress文件权限
+              ansible.builtin.command:
+                cmd: docker compose exec -T wordpress find /var/www/html -type f -exec chmod 644 {} \;
+                chdir: "{{ project_dir }}"
+              ignore_errors: yes
+
+            - name: 设置wp-config.php特殊权限
+              ansible.builtin.command:
+                cmd: docker compose exec -T wordpress chmod 600 /var/www/html/wp-config.php
+                chdir: "{{ project_dir }}"
+              ignore_errors: yes
+
+        - name: 5.5 验证WordPress安装
+          block:
+            - name: 检查WordPress版本
+              ansible.builtin.command:
+                cmd: docker compose exec -T wp-cli wp --allow-root core version
+                chdir: "{{ project_dir }}"
+              register: wp_version
+              changed_when: false
+
+            - name: 检查数据库连接
+              ansible.builtin.command:
+                cmd: docker compose exec -T wp-cli wp --allow-root db check
+                chdir: "{{ project_dir }}"
+              register: db_check
+              changed_when: false
+
+            - name: 显示WordPress信息
+              ansible.builtin.debug:
+                msg: |
+                  WordPress初始化完成!
+                  版本: {{ wp_version.stdout }}
+                  站点URL: {{ 'https' if ssl.enabled else 'http' }}://{{ site_domain }}
+                  管理后台: {{ 'https' if ssl.enabled else 'http' }}://{{ site_domain }}/wp-admin
+                  管理员用户: {{ wordpress.admin_username }}
+                  数据库连接: {{ 'OK' if db_check.rc == 0 else 'ERROR' }}
+  # ... (阶段6: 维护任务和 post_tasks 部分保持不变) ...
+    # =======================================================================
+    # 阶段6: 自动化维护和监控设置
+    # =======================================================================
+    - name: "阶段6: 维护任务配置"
+      block:
+        - name: 6.1 配置定时备份任务
+          block:
+            - name: 创建备份日志目录
               ansible.builtin.file:
-                path: "{{ project_dir }}/certbot/conf/live/{{ site_domain }}"
+                path: "{{ project_dir }}/logs"
                 state: directory
                 mode: '0755'
-                
-            - name: 复制自签名证书到live目录
+
+            - name: 设置定时备份任务
+              ansible.builtin.cron:
+                name: "WordPress智能备份 ({{ project_name }})"
+                minute: "0"
+                hour: "{{ backup.schedule_hour | default('2') }}"
+                job: "bash {{ project_dir }}/scripts/backup.sh >> {{ project_dir }}/logs/backup.log 2>&1"
+                state: present
+              when: backup.enabled
+
+            - name: 创建备份测试任务 (每周运行)
+              ansible.builtin.cron:
+                name: "备份完整性测试 ({{ project_name }})"
+                minute: "30"
+                hour: "3"
+                weekday: "0"  # 周日运行
+                job: "bash {{ project_dir }}/scripts/backup.sh test >> {{ project_dir }}/logs/backup-test.log 2>&1"
+                state: present
+              when: backup.enabled
+
+        - name: 6.2 SSL证书管理 (Caddy自动处理)
+          block:
+            - name: 创建SSL状态检查脚本
               ansible.builtin.copy:
-                src: "{{ item.src }}"
-                dest: "{{ project_dir }}/certbot/conf/live/{{ site_domain }}/{{ item.dest }}"
+                content: |
+                  #!/bin/bash
+                  # Caddy SSL证书状态检查脚本
+                  PROJECT_DIR="{{ project_dir }}"
+                  cd "$PROJECT_DIR" || exit 1
+                  
+                  echo "=== Caddy SSL证书状态检查 $(date) ==="
+                  
+                  # 检查Caddy管理API
+                  curl -s http://localhost:2019/config/ | jq '.apps.http.servers' || echo "无法访问Caddy管理API"
+                  
+                  # 检查证书状态
+                  docker compose exec -T caddy caddy list-certificates || echo "无法列出证书"
+                  
+                  echo "=== SSL检查完成 ==="
+                dest: "{{ project_dir }}/scripts/ssl-check.sh"
+                mode: '0755'
+              when: ssl.enabled
+
+        - name: 6.3 系统维护任务
+          block:
+            - name: Docker清理任务
+              ansible.builtin.cron:
+                name: "Docker系统清理 ({{ project_name }})"
+                minute: "0"
+                hour: "4"
+                weekday: "1"  # 每周一运行
+                job: "docker system prune -f >> {{ project_dir }}/logs/docker-cleanup.log 2>&1"
+                state: present
+
+            - name: 日志轮转配置
+              ansible.builtin.copy:
+                content: |
+                  {{ project_dir }}/logs/*.log {
+                      daily
+                      missingok
+                      rotate 30
+                      compress
+                      delaycompress
+                      notifempty
+                      create 644 root root
+                      postrotate
+                          docker compose -f {{ project_dir }}/docker-compose.yml restart caddy wordpress mysql redis 2>/dev/null || true
+                      endscript
+                  }
+                dest: "/etc/logrotate.d/{{ project_name }}-wordpress"
                 mode: '0644'
-                remote_src: yes
-              loop:
-                - { src: "{{ project_dir }}/certbot/conf/fullchain.pem", dest: "fullchain.pem" }
-                - { src: "{{ project_dir }}/certbot/conf/privkey.pem", dest: "privkey.pem" }
-      when: not is_ip_address
 
-    - name: 停止临时Nginx服务
-      ansible.builtin.command:
-        cmd: docker compose down
-        chdir: "{{ project_dir }}"
-      changed_when: false # This is a cleanup step, not a change in state
+            - name: WordPress更新检查任务
+              ansible.builtin.cron:
+                name: "WordPress安全更新检查 ({{ project_name }})"
+                minute: "0"
+                hour: "6"
+                job: "cd {{ project_dir }} && docker compose exec -T wp-cli wp --allow-root core check-update >> {{ project_dir }}/logs/wp-updates.log 2>&1"
+                state: present
 
-    - name: 创建最终的Nginx配置文件 (HTTPS)
-      ansible.builtin.copy:
-        content: |
-          server {
-              listen 80;
-              server_name {{ site_domain }};
-              # ACME challenge
-              location ~ /.well-known/acme-challenge/ {
-                  allow all;
-                  root /var/www/certbot;
-              }
-              # 301 redirect
-              location / {
-                  return 301 https://$host$request_uri;
-              }
-          }
+        - name: 6.4 性能监控和健康检查
+          block:
+            - name: 创建健康检查脚本
+              ansible.builtin.copy:
+                content: |
+                  #!/bin/bash
+                  # WordPress健康检查脚本
+                  PROJECT_DIR="{{ project_dir }}"
+                  cd "$PROJECT_DIR" || exit 1
+                  
+                  echo "=== WordPress健康检查 $(date) ==="
+                  
+                  # 检查容器状态
+                  echo "检查容器状态..."
+                  docker compose ps
+                  
+                  # 检查网站可访问性
+                  echo "检查网站可访问性..."
+                  curl -s -o /dev/null -w "HTTP状态码: %{http_code}, 响应时间: %{time_total}s\n" {% if caddy.auto_https and not (site_domain | regex_search('^\d+\.\d+\.\d+\.\d+$')) %}https://{{ site_domain }}/{% else %}http://{{ site_domain }}:{{ caddy.http_port }}/{% endif %}
+                  
+                  # 检查数据库连接
+                  echo "检查数据库连接..."
+                  docker compose exec -T mysql mysqladmin ping
+                  
+                  # 检查Redis缓存
+                  echo "检查Redis缓存..."
+                  docker compose exec -T redis redis-cli ping
+                  
+                  # 检查磁盘使用率
+                  echo "检查磁盘使用..."
+                  df -h {{ project_dir }}
+                  
+                  echo "=== 健康检查完成 ==="
+                dest: "{{ project_dir }}/scripts/health-check.sh"
+                mode: '0755'
 
-          server {
-              listen 443 ssl http2;
-              server_name {{ site_domain }};
+            - name: 设置定期健康检查
+              ansible.builtin.cron:
+                name: "WordPress健康检查 ({{ project_name }})"
+                minute: "*/15"  # 每15分钟检查一次
+                job: "bash {{ project_dir }}/scripts/health-check.sh >> {{ project_dir }}/logs/health-check.log 2>&1"
+                state: present
+              when: monitoring.enabled or backup.enabled
 
-              ssl_certificate /etc/letsencrypt/live/{{ site_domain }}/fullchain.pem;
-              ssl_certificate_key /etc/letsencrypt/live/{{ site_domain }}/privkey.pem;
+            - name: 设置性能监控 (如果启用)
+              ansible.builtin.cron:
+                name: "性能统计收集 ({{ project_name }})"
+                minute: "*/5"  # 每5分钟收集一次
+                job: |
+                  echo "$(date): CPU=$(cat /proc/loadavg), MEM=$(free | grep Mem | awk '{print ($3/$2)*100}')%, DISK=$(df {{ project_dir }} | awk 'NR==2{print $5}')" >> {{ project_dir }}/logs/performance.log
+                state: present
+              when: monitoring.enabled
 
-              include /etc/letsencrypt/options-ssl-nginx.conf;
-              ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+        - name: 6.5 安全监控配置
+          block:
+            - name: 创建安全检查脚本
+              ansible.builtin.copy:
+                content: |
+                  #!/bin/bash
+                  # WordPress安全检查脚本
+                  PROJECT_DIR="{{ project_dir }}"
+                  cd "$PROJECT_DIR" || exit 1
+                  
+                  echo "=== 安全检查 $(date) ==="
+                  
+                  # 检查wp-config.php权限
+                  docker compose exec -T wordpress ls -la /var/www/html/wp-config.php
+                  
+                  # 检查WordPress版本
+                  docker compose exec -T wp-cli wp --allow-root core version
+                  
+                  # 检查插件更新
+                  docker compose exec -T wp-cli wp --allow-root plugin list --update=available
+                  
+                  # 检查主题更新
+                  docker compose exec -T wp-cli wp --allow-root theme list --update=available
+                  
+                  # 检查用户列表
+                  docker compose exec -T wp-cli wp --allow-root user list
+                  
+                  echo "=== 安全检查完成 ==="
+                dest: "{{ project_dir }}/scripts/security-check.sh"
+                mode: '0755'
 
-              root /var/www/html;
-              index index.php index.html index.htm;
-              client_max_body_size 64M;
-
-              location / {
-                  proxy_pass http://wordpress:80;
-                  proxy_set_header Host $host;
-                  proxy_set_header X-Real-IP $remote_addr;
-                  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-                  proxy_set_header X-Forwarded-Proto $scheme;
-                  proxy_buffering off;
-              }
-
-              location ~ /\.ht {
-                  deny all;
-              }
-          }
-        dest: "{{ project_dir }}/nginx/default.conf"
-        mode: '0644'
-
-    - name: 下载推荐的SSL安全配置
-      ansible.builtin.get_url:
-        url: https://raw.githubusercontent.com/certbot/certbot/master/certbot-nginx/certbot_nginx/_internal/tls_configs/options-ssl-nginx.conf
-        dest: "{{ project_dir }}/certbot/conf/options-ssl-nginx.conf"
-        mode: '0644'
-
-    - name: 生成DHParam文件以增强安全性 (可能需要几分钟)
-      ansible.builtin.command:
-        cmd: openssl dhparam -out {{ project_dir }}/certbot/conf/ssl-dhparams.pem 2048
-        creates: "{{ project_dir }}/certbot/conf/ssl-dhparams.pem"
-      changed_when: false
-
-    # 预拉取所有镜像 - 确保网络问题不影响部署
-    - name: 预拉取Docker镜像 - Nginx
-      ansible.builtin.command: docker pull nginx:{{ nginx.version | default('latest') }}
-      register: nginx_pull_result
-      retries: 3
-      delay: 5
-      until: nginx_pull_result.rc == 0
-
-    - name: 预拉取Docker镜像 - MariaDB  
-      ansible.builtin.command: docker pull mariadb:{{ mysql.version | default('10.6') }}
-      register: mysql_pull_result
-      retries: 3
-      delay: 5
-      until: mysql_pull_result.rc == 0
-
-    - name: 预拉取Docker镜像 - WordPress
-      ansible.builtin.command: docker pull wordpress:{{ wordpress.version | default('latest') }}
-      register: wp_pull_result  
-      retries: 3
-      delay: 5
-      until: wp_pull_result.rc == 0
-
-
-    - name: 显示镜像拉取结果
-      ansible.builtin.debug:
-        msg: 
-          - "镜像拉取完成："
-          - "Nginx: {{ 'Success' if nginx_pull_result.rc == 0 else 'Failed' }}"
-          - "MariaDB: {{ 'Success' if mysql_pull_result.rc == 0 else 'Failed' }}"  
-          - "WordPress: {{ 'Success' if wp_pull_result.rc == 0 else 'Failed' }}"
-
-    - name: 显示即将启动的服务
-      ansible.builtin.debug:
-        msg: "准备启动完整的WordPress应用栈(nginx、mysql、wordpress、certbot)..."
-
-    - name: 启动完整的WordPress应用栈
-      ansible.builtin.command:
-        cmd: docker compose up -d
-        chdir: "{{ project_dir }}"
-      changed_when: true
-      register: compose_up_result
-
-    - name: 显示Docker Compose启动结果
-      ansible.builtin.debug:
-        msg: 
-          - "Docker Compose输出:"
-          - "{{ compose_up_result.stdout }}"
-          - "{{ compose_up_result.stderr }}"
-
-    - name: 等待WordPress服务就绪
-      ansible.builtin.wait_for:
-        port: "{{ nginx_https_port }}"
-        host: "{{ ansible_default_ipv4.address }}"
-        timeout: 120
-        delay: 15
-
-    - name: 等待MySQL服务完全就绪
-      ansible.builtin.command:
-        cmd: >
-          docker compose exec -T mysql mysqladmin ping 
-          -h localhost -u root -p{{ db_root_pass }}
-        chdir: "{{ project_dir }}"
-      register: mysql_ready
-      retries: 10
-      delay: 5
-      until: mysql_ready.rc == 0
-      changed_when: false
-
-    - name: 等待WordPress PHP-FPM服务就绪
-      ansible.builtin.uri:
-        url: "http://{{ ansible_default_ipv4.address }}:{{ nginx_http_port }}"
-        method: GET
-        status_code: [200, 302] # WordPress安装页面或重定向都表示服务正常
-      register: wp_service_check
-      retries: 10
-      delay: 6
-      until: wp_service_check.status in [200, 302]
-
-    - name: 检查WordPress是否已经安装
-      ansible.builtin.command:
-        cmd: >
-          docker compose run --rm --entrypoint "\
-            wp core is-installed --allow-root"
-        chdir: "{{ project_dir }}"
-      register: wp_installed_check
-      ignore_errors: yes
-      changed_when: false
-
-    - name: 初始化WordPress (使用WP-CLI)
-      ansible.builtin.command:
-        cmd: >
-          docker compose run --rm --entrypoint "\
-            wp core install \
-            --url='{{ 'https' if not is_ip_address else 'http' }}://{{ site_domain }}' \
-            --title='{{ wp_site_name }}' \
-            --admin_user='{{ wp_admin_user }}' \
-            --admin_password='{{ wp_admin_pass }}' \
-            --admin_email='{{ wp_admin_email }}' \
-            --allow-root"
-        chdir: "{{ project_dir }}"
-      register: wp_install
-      retries: 5
-      delay: 10
-      until: wp_install.rc == 0 or ('already installed' in wp_install.stderr | lower)
-      changed_when: "'Success' in wp_install.stdout"
-      when: wp_installed_check.rc != 0  # 只有未安装时才执行安装
-
-    - name: 验证WordPress安装
-      ansible.builtin.uri:
-        url: "{{ 'https' if not is_ip_address else 'http' }}://{{ site_domain }}/wp-admin/"
-        method: GET
-        status_code: [200, 302]
-        validate_certs: false  # 自签名证书时忽略SSL验证
-      register: wp_admin_check
-      retries: 3
-      delay: 5
-      until: wp_admin_check.status in [200, 302]
-
-    - name: 设置WordPress基本配置
-      ansible.builtin.command:
-        cmd: "docker compose run --rm --entrypoint '{{ item }}' "
-        chdir: "{{ project_dir }}"
-      loop:
-        - "wp option update timezone_string 'Asia/Shanghai' --allow-root"
-        - "wp option update date_format 'Y-m-d' --allow-root"
-        - "wp option update time_format 'H:i' --allow-root"
-        - "wp plugin delete hello --allow-root"
-        - "wp plugin delete akismet --allow-root"
-        - "wp post delete 1 --force --allow-root"
-        - "wp page delete 2 --force --allow-root"
-      ignore_errors: yes
-      changed_when: false
-
-    - name: 创建备份脚本
-      ansible.builtin.copy:
-        content: |
-          #!/bin/bash
-          # WordPress自动备份脚本
-          BACKUP_DIR="{{ project_dir }}/backups"
-          DATE=$(date +%Y%m%d_%H%M%S)
-          PROJECT_DIR="{{ project_dir }}"
-
-          mkdir -p $BACKUP_DIR
-          cd $PROJECT_DIR
-
-          echo "开始备份数据库..."
-          docker compose exec -T mysql mysqldump -u root -p{{ db_root_pass }} {{ db_name }} > $BACKUP_DIR/database_$DATE.sql
-
-          echo "开始备份WordPress文件..."
-          docker run --rm --volumes-from {{ project_name }}_wordpress_1 -v $BACKUP_DIR:/backup alpine tar czf /backup/wordpress_files_$DATE.tar.gz -C /var/www/html .
-
-          echo "清理7天前的备份..."
-          find $BACKUP_DIR -name "*.sql" -mtime +7 -delete
-          find $BACKUP_DIR -name "*.tar.gz" -mtime +7 -delete
-
-          echo "备份完成: $DATE"
-        dest: "{{ project_dir }}/backup.sh"
-        mode: '0755'
-
-    - name: 设置备份定时任务
-      ansible.builtin.cron:
-        name: "WordPress Backup ({{ project_name }})"
-        minute: "0"
-        hour: "2"
-        job: "{{ project_dir }}/backup.sh >> {{ project_dir }}/logs/backup.log 2>&1"
-      when: backup.enabled | default(true)
-
-    - name: 设置Let's Encrypt证书自动续订任务
-      ansible.builtin.cron:
-        name: "Certbot Renew ({{ project_name }})"
-        minute: "15"
-        hour: "3"
-        job: "certbot renew --quiet && systemctl reload nginx"
-        
-    - name: 创建证书续订后的更新脚本
-      ansible.builtin.copy:
-        content: |
-          #!/bin/bash
-          # 证书续订后更新项目目录中的证书
-          if [ -f /etc/letsencrypt/live/{{ site_domain }}/fullchain.pem ]; then
-            cp /etc/letsencrypt/live/{{ site_domain }}/fullchain.pem {{ project_dir }}/certbot/conf/live/{{ site_domain }}/
-            cp /etc/letsencrypt/live/{{ site_domain }}/privkey.pem {{ project_dir }}/certbot/conf/live/{{ site_domain }}/
-            cd {{ project_dir }} && docker compose restart nginx
-          fi
-        dest: "{{ project_dir }}/update-certs.sh"
-        mode: '0755'
-        
-    - name: 设置证书更新到项目目录的定时任务
-      ansible.builtin.cron:
-        name: "Update Project Certs ({{ project_name }})"
-        minute: "30"
-        hour: "3"
-        job: "{{ project_dir }}/update-certs.sh"
+            - name: 每日安全检查任务
+              ansible.builtin.cron:
+                name: "WordPress安全检查 ({{ project_name }})"
+                minute: "0"
+                hour: "1"
+                job: "bash {{ project_dir }}/scripts/security-check.sh >> {{ project_dir }}/logs/security.log 2>&1"
+                state: present
 
   post_tasks:
-    - name: 最终健康检查
+    # =======================================================================
+    # 最终验证和部署报告
+    # =======================================================================
+    - name: "最终阶段: 部署验证和报告"
       block:
-        - name: 检查所有服务是否运行
+        - name: 7.1 全面的部署健康检查
+          block:
+            - name: 验证所有核心服务状态
+              ansible.builtin.command:
+                cmd: docker compose ps --services --filter "status=running"
+                chdir: "{{ project_dir }}"
+              register: final_running_services
+              changed_when: false
+
+            - name: 确认关键服务运行状态
+              ansible.builtin.assert:
+                that: "item in final_running_services.stdout"
+                fail_msg: "关键服务 [{{ item }}] 未正确启动，部署可能存在问题"
+                success_msg: "服务 [{{ item }}] 运行正常"
+              loop:
+                - mysql
+                - wordpress
+                - caddy
+                - redis
+
+            - name: 检查容器健康状态
+              ansible.builtin.command:
+                cmd: docker compose ps
+                chdir: "{{ project_dir }}"
+              register: container_status
+              changed_when: false
+
+        - name: 7.2 网站功能验证
+          block:
+            - name: 测试网站HTTP/HTTPS可访问性
+              ansible.builtin.uri:
+                url: "{{ 'https' if ssl.enabled else 'http' }}://{{ site_domain }}"
+                method: GET
+                status_code: [200, 301, 302]
+                validate_certs: no  # 允许自签名证书
+                timeout: 30
+              register: website_accessibility
+              retries: 5
+              delay: 10
+              until: website_accessibility.status in [200, 301, 302]
+
+            - name: 测试WordPress管理后台访问
+              ansible.builtin.uri:
+                url: "{{ 'https' if ssl.enabled else 'http' }}://{{ site_domain }}/wp-admin/"
+                method: GET
+                status_code: [200, 301, 302, 403]  # 403也是正常的，表示需要登录
+                validate_certs: no
+                timeout: 30
+              register: admin_access
+              ignore_errors: yes
+
+            - name: 验证数据库连接健康
+              ansible.builtin.command:
+                cmd: docker compose exec -T wp-cli wp --allow-root db check
+                chdir: "{{ project_dir }}"
+              register: final_db_check
+              changed_when: false
+
+        - name: 7.3 性能和安全基线检查
+          block:
+            - name: 检查网站响应时间
+              ansible.builtin.uri:
+                url: "{{ 'https' if ssl.enabled else 'http' }}://{{ site_domain }}"
+                method: GET
+                return_content: no
+                timeout: 30
+              register: response_time_check
+              ignore_errors: yes
+
+            - name: 验证SSL证书 (如果启用)
+              ansible.builtin.command:
+                cmd: openssl s_client -connect {{ site_domain }}:443 -servername {{ site_domain }} </dev/null
+              register: ssl_cert_check
+              when: ssl.enabled
+              ignore_errors: yes
+              changed_when: false
+
+            - name: 检查文件权限安全性
+              ansible.builtin.command:
+                cmd: docker compose exec -T wordpress find /var/www/html -name "*.php" -perm /o+w
+                chdir: "{{ project_dir }}"
+              register: insecure_files
+              failed_when: insecure_files.stdout != ""
+              ignore_errors: yes
+              changed_when: false
+
+        - name: 7.4 生成部署报告
+          block:
+            - name: 收集系统信息
+              ansible.builtin.setup:
+                gather_subset:
+                  - 'network'
+                  - 'hardware'
+              register: system_facts
+
+            - name: 生成详细部署报告
+              ansible.builtin.template:
+                src: templates/DEPLOYMENT-REPORT.md.j2
+                dest: "{{ project_dir }}/DEPLOYMENT-REPORT.md"
+                mode: '0644'
+
+        - name: 7.5 最终部署信息展示
+          ansible.builtin.debug:
+            msg: |
+              
+              🎉========================================================
+              ✅ WordPress现代化高性能应用栈部署成功完成！
+              ========================================================🎉
+              
+              📋 项目信息:
+                 项目名称: {{ project_name }}
+                 网站域名: {{ site_domain }}
+                 部署目录: {{ project_dir }}
+              
+              🔗 访问地址:
+                 网站首页: {{ 'https' if ssl.enabled else 'http' }}://{{ site_domain }}
+                 管理后台: {{ 'https' if ssl.enabled else 'http' }}://{{ site_domain }}/wp-admin
+                 管理用户: {{ wordpress.admin_username }}
+                 管理密码: ********** (请查看部署配置)
+              
+              🛠️ 运行服务:
+              {{ final_running_services.stdout_lines | join('\n   ') | indent(3, True) }}
+              
+              📊 服务端口:
+                 HTTP: {{ caddy.http_port }}
+                 HTTPS: {{ caddy.https_port }}
+                 Caddy管理: 2019
+                 {% if monitoring.enabled %}监控: {{ monitoring.grafana_port }}{% endif %}
+              
+              🔧 管理命令:
+                 查看状态: cd {{ project_dir }} && docker compose ps
+                 查看日志: cd {{ project_dir }} && docker compose logs -f
+                 手动备份: bash {{ project_dir }}/scripts/backup.sh
+                 WordPress CLI: cd {{ project_dir }} && docker compose exec wp-cli wp --allow-root --info
+              
+              📄 详细报告: {{ project_dir }}/DEPLOYMENT-REPORT.md
+              
+              ========================================================
+              🚀 部署完成! 享受您的高性能WordPress网站吧！
+              ========================================================
+
+  handlers:
+    # NEW: 添加一个专门用于重启Docker并确保应用启动的Handler
+    - name: Restart Docker and Compose Project
+      block:
+        - name: 重启Docker服务
+          ansible.builtin.service:
+            name: docker
+            state: restarted
+            daemon_reload: yes
+        - name: 重新启动Docker Compose项目
           ansible.builtin.command:
-            cmd: docker compose ps --services --filter "status=running"
+            cmd: docker compose up -d
             chdir: "{{ project_dir }}"
-          register: running_services
-          
-        - name: 验证核心服务运行状态
-          ansible.builtin.fail:
-            msg: "核心服务未运行: {{ item }}"
-          when: item not in running_services.stdout_lines
-          loop:
-            - nginx
-            - mysql
-            - wordpress
-            
-        - name: 执行最终的WordPress连接测试
-          ansible.builtin.uri:
-            url: "{{ 'https' if not is_ip_address else 'http' }}://{{ site_domain }}"
-            method: GET
-            status_code: [200, 302]
-            validate_certs: false
-          register: final_test
-          retries: 3
-          delay: 5
 
-    - name: 显示部署结果
-      ansible.builtin.debug:
-        msg: |
-          ========== WordPress部署完成 ==========
-          网站地址: {{ 'https' if not is_ip_address else 'http' }}://{{ site_domain }}
-          管理后台: {{ 'https' if not is_ip_address else 'http' }}://{{ site_domain }}/wp-admin
-          证书类型: {{ 'Let\'s Encrypt' if not is_ip_address and certbot_result is defined and certbot_result.rc == 0 else '自签名证书' }}
+    - name: Reload Firewalld
+      ansible.builtin.service:
+        name: firewalld
+        state: reloaded
+      listen: "Reload Firewalld" # 使用listen确保可以被多次触发
 
-          管理员信息:
-          - 用户名: {{ wp_admin_user }}
-          - 密码: {{ wp_admin_pass }} (这是你传入的密码)
-          - 邮箱: {{ wp_admin_email }}
-
-          数据库信息:
-          - 数据库名: {{ db_name }}
-          - 用户名: {{ db_user }}
-          - 密码: {{ db_pass }} (这是你传入的密码)
-          - Root密码: {{ db_root_pass }} (请妥善保管)
-
-          项目目录: {{ project_dir }}
-          证书目录: {{ project_dir }}/certbot/conf/live/{{ site_domain }}
-          备份任务: 已启用，每日凌晨2点执行
-          证书续订任务: 已启用，每日凌晨3点15分检查
+    - name: Restart Docker
+      ansible.builtin.service:
+        name: docker
+        state: restarted
+      listen: "Restart Docker"

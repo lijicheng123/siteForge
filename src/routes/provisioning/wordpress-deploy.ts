@@ -41,11 +41,12 @@ export default async function wordpressDeployRoutes(fastify: FastifyInstance, op
         siteDomain: wordpressConfig.siteDomain || server.ip,
         mysqlRootPassword: wordpressConfig.mysqlRootPassword || `root_${Math.random().toString(36).slice(-12)}`,
         enableHttps: wordpressConfig.enableHttps !== false, // 默认启用HTTPS
-        nginxConfig: {
-          version: 'latest',
+        caddyConfig: {
+          version: '2-alpine',
           httpPort: 80,
           httpsPort: 443,
-          ...wordpressConfig.nginxConfig
+          autoHttps: true,
+          ...wordpressConfig.caddyConfig
         }
       };
 
@@ -53,12 +54,15 @@ export default async function wordpressDeployRoutes(fastify: FastifyInstance, op
       const orchestrator = new DeploymentOrchestrator();
       const playbookResult = await orchestrator.deployWordPressOnly(server, enhancedConfig);
       
+      // 检查部署是否真正成功
+      const isDeploymentSuccessful = playbookResult.status === 'success' && playbookResult.failedTasks === 0;
+      
       // 生成部署状态对象
       const deploymentId = `wp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
       const deploymentResult = {
         deploymentId,
-        stage: playbookResult.status === 'success' ? 'completed' as const : 'failed' as const,
-        progress: playbookResult.status === 'success' ? 100 : 0,
+        stage: isDeploymentSuccessful ? 'completed' as const : 'failed' as const,
+        progress: isDeploymentSuccessful ? 100 : 0,
         server: {
           ...server,
           port: server.port || 22,
@@ -74,8 +78,8 @@ export default async function wordpressDeployRoutes(fastify: FastifyInstance, op
           dockerVersion: '24.0.7',
           dockerComposeInstalled: true,
           dockerComposeVersion: '2.21.0',
-          wordpressRunning: playbookResult.status === 'success',
-          wordpressUrl: playbookResult.status === 'success' ? `http://${server.ip}` : '',
+          wordpressRunning: isDeploymentSuccessful,
+          wordpressUrl: isDeploymentSuccessful ? `http://${server.ip}` : '',
           lastChecked: new Date().toISOString()
         },
         playbookResults: [playbookResult],
@@ -93,12 +97,24 @@ export default async function wordpressDeployRoutes(fastify: FastifyInstance, op
         duration: playbookResult.duration
       };
       
-      return reply.send({
-        success: true,
-        data: deploymentResult,
-        message: 'WordPress部署完成',
-        timestamp: new Date().toISOString()
-      });
+      // 根据实际部署结果返回正确的状态
+      if (isDeploymentSuccessful) {
+        return reply.send({
+          success: true,
+          data: deploymentResult,
+          message: 'WordPress部署成功完成',
+          timestamp: new Date().toISOString()
+        });
+      } else {
+        reply.status(500);
+        return reply.send({
+          success: false,
+          data: deploymentResult,
+          error: 'DEPLOYMENT_FAILED',
+          message: `WordPress部署失败 (失败任务: ${playbookResult.failedTasks}, 总任务: ${playbookResult.totalTasks})`,
+          timestamp: new Date().toISOString()
+        });
+      }
 
     } catch (error) {
       fastify.log.error(`WordPress部署失败: ${error instanceof Error ? error.message : String(error)}`);

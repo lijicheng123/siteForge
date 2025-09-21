@@ -302,11 +302,9 @@ export class AnsibleClient {
   }
 
   /**
-   * 解析Playbook输出
+   * 解析Playbook输出 - 修复版本
    */
   private parsePlaybookOutput(stdout: string, stderr: string): any {
-    // 这里应该解析Ansible的输出格式
-    // 由于Ansible输出格式复杂，这里提供基础实现
     const lines = stdout.split('\n');
     const tasks: AnsibleTaskResult[] = [];
     let totalTasks = 0;
@@ -314,27 +312,84 @@ export class AnsibleClient {
     let failedTasks = 0;
     let skippedTasks = 0;
 
-    // 简单的解析逻辑，实际应该更复杂
-    for (const line of lines) {
+    let currentTask = '';
+    let currentTaskStatus = '';
+    
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      
+      // 识别任务开始
       if (line.includes('TASK [')) {
         totalTasks++;
-        const taskName = line.match(/TASK \[(.*?)\]/)?.[1] || 'Unknown Task';
+        currentTask = line.match(/TASK \[(.*?)\]/)?.[1] || 'Unknown Task';
+      }
+      
+      // 识别任务结果状态
+      else if (line.includes(': [server_0]: FAILED!')) {
+        failedTasks++;
+        currentTaskStatus = 'failed';
         
-        // 模拟任务结果
+        // 尝试提取错误信息
+        let errorMsg = '';
+        const nextLine = lines[i + 1];
+        if (nextLine && nextLine.includes('"msg":')) {
+          const msgMatch = nextLine.match(/"msg":\s*"([^"]+)"/);
+          if (msgMatch) {
+            errorMsg = msgMatch[1];
+          }
+        }
+        
         const taskResult: AnsibleTaskResult = {
-          taskName,
-          status: 'success',
-          message: '任务执行成功',
-          changed: true,
+          taskName: currentTask,
+          status: 'failed',
+          message: errorMsg || '任务执行失败',
+          changed: false,
           stdout: line,
-          stderr: '',
+          stderr: errorMsg,
           startTime: new Date().toISOString(),
           endTime: new Date().toISOString(),
           duration: 1
         };
         
         tasks.push(taskResult);
-        successTasks++;
+      }
+      
+      else if (line.includes(': [server_0]: ok:') || line.includes(': [server_0]')) {
+        if (currentTask && !tasks.find(t => t.taskName === currentTask)) {
+          successTasks++;
+          const taskResult: AnsibleTaskResult = {
+            taskName: currentTask,
+            status: 'success',
+            message: '任务执行成功',
+            changed: line.includes('changed'),
+            stdout: line,
+            stderr: '',
+            startTime: new Date().toISOString(),
+            endTime: new Date().toISOString(),
+            duration: 1
+          };
+          
+          tasks.push(taskResult);
+        }
+      }
+      
+      else if (line.includes('skipped')) {
+        skippedTasks++;
+        if (currentTask && !tasks.find(t => t.taskName === currentTask)) {
+          const taskResult: AnsibleTaskResult = {
+            taskName: currentTask,
+            status: 'skipped',
+            message: '任务被跳过',
+            changed: false,
+            stdout: line,
+            stderr: '',
+            startTime: new Date().toISOString(),
+            endTime: new Date().toISOString(),
+            duration: 1
+          };
+          
+          tasks.push(taskResult);
+        }
       }
     }
 

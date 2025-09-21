@@ -7,12 +7,13 @@ server_role: "wordpress"
 # WordPress特定配置
 wordpress_config:
   # 性能优化
-  wp_memory_limit: "256M"
-  wp_max_memory_limit: "512M"
+  wp_memory_limit: "512M"
+  wp_max_memory_limit: "1024M"
   
-  # 缓存配置
-  object_cache: false
-  page_cache: false
+  # 缓存配置 (强制启用Redis)
+  object_cache: true
+  page_cache: true
+  redis_cache: true
   
   # 插件配置
   auto_updates: true
@@ -28,10 +29,12 @@ wordpress_config:
   
 # Docker Compose服务配置
 services:
-  nginx:
-    image: "nginx:{{ nginx.version }}"
+  caddy:
+    image: "caddy:{{ caddy.version }}"
     ports:
-      - "{{ nginx.port }}:80"
+      - "{{ caddy.port }}:80"
+      - "{{ caddy.ssl_port }}:443"
+      - "{{ caddy.admin_port }}:2019"
     restart_policy: "unless-stopped"
     
   mysql:
@@ -44,6 +47,17 @@ services:
       MYSQL_PASSWORD: "{{ wordpress_db_password }}"
     volumes:
       - "mysql_data:/var/lib/mysql"
+      
+  redis:
+    image: "redis:{{ redis.version }}"
+    restart_policy: "unless-stopped"
+    volumes:
+      - "redis_data:/data"
+    command: >
+      redis-server
+      --appendonly yes
+      --maxmemory {{ redis.max_memory }}
+      --maxmemory-policy allkeys-lru
       
   wordpress:
     image: "wordpress:{{ wordpress.version }}"
@@ -83,6 +97,8 @@ volumes:
     driver: local
   wordpress_data:
     driver: local
+  redis_data:
+    driver: local
     
 # 健康检查配置
 health_checks:
@@ -99,6 +115,13 @@ health_checks:
     timeout: "10s"
     retries: 3
     start_period: "30s"
+    
+  redis:
+    test: ["CMD", "redis-cli", "ping"]
+    interval: "30s"
+    timeout: "5s"
+    retries: 3
+    start_period: "10s"
 
 # 资源限制
 resource_limits:
@@ -108,6 +131,9 @@ resource_limits:
   mysql:
     memory: "512m"
     cpus: "1.0"
-  nginx:
+  caddy:
     memory: "128m"
+    cpus: "0.5"
+  redis:
+    memory: "256m"
     cpus: "0.5"
