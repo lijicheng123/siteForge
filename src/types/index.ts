@@ -34,7 +34,7 @@ import type {
   baseBlueprintSchema,
   contentCompleteBlueprintSchema,
   layoutCompleteBlueprintSchema
-} from '../schemas/index';
+} from '../schemas/workflow-responses';
 import type {
   paletteSchema,
   typographySchema
@@ -46,11 +46,13 @@ import type {
 } from '../schemas/website';
 import type {
   outlineSectionSchema,
-  blockSchema,
+  blockSchema
+} from '../schemas/blocks';
+import type {
   basicPageSchema,
   contentCompletePageSchema,
   layoutCompletePageSchema
-} from '../schemas/blocks';
+} from '../schemas/pages';
 
 // 从Schema推导出TypeScript类型
 export type CompanyInfo = typeof companyInfoSchema;

@@ -7,7 +7,7 @@ import { FastifyInstance, FastifyPluginOptions, FastifySchema } from 'fastify';
 import { 
   contentGenerationRequestSchema, 
   contentGenerationResponseSchema 
-} from '../../schemas';
+} from '../../schemas/workflow-responses';
 import promptFactory from '../../services/prompt-factory';
 import LLMGateway from '../../services/llm-gateway';
 import { MODEL_IDS } from '../../services/model-catalog';

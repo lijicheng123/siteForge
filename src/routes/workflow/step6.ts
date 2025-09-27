@@ -4,8 +4,8 @@
  */
 
 import { FastifyInstance, FastifyPluginOptions, FastifySchema } from 'fastify';
-import { responseSchema } from '../../schemas/index';
-import { step6RequestSchema } from '../../schemas/workflow-request-schema-type';
+import { responseSchema } from '../../schemas/base';
+import { step6RequestSchema } from '../../schemas/workflow-requests';
 import { executeStep6 } from '../../services/workflow-steps.service';
 
 // 响应数据Schema - 直接返回HTML字符串

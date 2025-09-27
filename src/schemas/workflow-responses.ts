@@ -1,7 +1,8 @@
-// 基础类型
-export * from './base';
+/**
+ * 工作流响应Schema定义
+ * 包含各个步骤的响应数据结构和蓝图Schema
+ */
 
-// 蓝图Schema - 渐进式定义
 import { objectSchema, arraySchema, nameSchema, pagePathSchema, responseSchema } from './base';
 import { websiteSeoSchema, seoMetaSchema } from './seo';
 
@@ -14,8 +15,7 @@ import {
 } from './company';
 import { 
   paletteSchema,
-  typographySchema,
-
+  typographySchema
 } from './design';
 import { 
   globalElementsSchema,
@@ -24,7 +24,7 @@ import {
   basicPageSchema, 
   contentCompletePageSchema, 
   layoutCompletePageSchema, 
-} from './blocks';
+} from './pages';
 
 /**
  * 响应约束Schema
@@ -43,7 +43,6 @@ export const structuredDataSchema = objectSchema({
 export const designSystemSchema = objectSchema({
   palette: paletteSchema,
   typography: typographySchema,
-
 }, ['palette', 'typography']);
 
 /**
@@ -85,7 +84,6 @@ export const layoutCompleteBlueprintSchema = objectSchema({
   globalElements: globalElementsSchema,
   pages: arraySchema(layoutCompletePageSchema)
 }, ['structuredData', 'designSystem', 'globalElements', 'pages']);
-
 
 /**
  * Step5b: 文案生成相关Schema
