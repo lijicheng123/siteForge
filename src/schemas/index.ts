@@ -14,7 +14,7 @@ export * from './blocks';
 export * from './seo';
 
 // 工作流Schema
-export * from './workflow';
+export * from './workflow-request-schema-type';
 
 // 部署相关Schema
 export * from './provisioning';
@@ -45,6 +45,7 @@ import {
 } from './blocks';
 
 /**
+ * 响应约束Schema
  * 第一步：获取结构化数据 - 整合所有公司相关信息 - 用于Step1
  */
 export const structuredDataSchema = objectSchema({

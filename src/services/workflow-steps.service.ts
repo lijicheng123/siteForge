@@ -21,7 +21,7 @@ import {
   Step4Request,
   Step5Request,
   Step6Request
-} from '../schemas/workflow';
+} from '../schemas/workflow-request-schema-type';
 import { arraySchema } from '../schemas/base';
 
 /**

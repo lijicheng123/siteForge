@@ -1,6 +1,5 @@
 /**
- * 工作流步骤Schema统一定义
- * 包含所有步骤的请求和响应Schema
+ * 入参Schema和入参类型定义
  */
 import { arraySchema } from './base';
 import { layoutCompletePageSchema } from './blocks';
