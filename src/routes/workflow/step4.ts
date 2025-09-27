@@ -4,7 +4,8 @@
  */
 
 import { FastifyInstance, FastifyPluginOptions, FastifySchema } from 'fastify';
-import { baseBlueprintSchema, contentCompleteBlueprintSchema, responseSchema, step4RequestSchema } from '../../schemas';
+import { baseBlueprintSchema, contentCompleteBlueprintSchema, responseSchema } from '../../schemas/index';
+import { step4RequestSchema } from '../../schemas/workflow-request-schema-type';
 import { executeStep4 } from '../../services/workflow-steps.service';
 
 // 响应Schema - 输出内容完备蓝图Schema

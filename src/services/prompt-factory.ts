@@ -1,12 +1,10 @@
 // src/services/prompt-factory.ts
 // 这是一个完整的模块，包含了所有步骤的 Prompt 生成逻辑
 
-import {
-  structuredDataSchema,
-  designSystemSchema,
-  websiteArchitectureSchema,
-  contentCompleteBlueprintSchema,
-} from '../schemas';
+import { structuredDataSchema } from '../schemas/index';
+import { designSystemSchema } from '../schemas/index';
+import { websiteArchitectureSchema } from '../schemas/index';
+import { contentCompleteBlueprintSchema } from '../schemas/index';
 import { outlineBlockSchema } from '../schemas/blocks';
 
 // 从集中 Schema 源生成可嵌入到 Prompt 的 JSON Schema 文本

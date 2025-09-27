@@ -4,7 +4,8 @@
  */
 
 import { FastifyInstance, FastifyPluginOptions, FastifySchema } from 'fastify';
-import { responseSchema, completeWorkflowRequestSchema } from '../../schemas';
+import { responseSchema } from '../../schemas/index';
+import { completeWorkflowRequestSchema } from '../../schemas/workflow-request-schema-type';
 import { 
   executeStep1, 
   executeStep2, 

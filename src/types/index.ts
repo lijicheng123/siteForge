@@ -11,8 +11,8 @@ export * from '../schemas/website';
 export * from '../schemas/blocks';
 export * from '../schemas/seo';
 
-// 常用组合类型
-export * from '../schemas';
+// 常用组合类型 - 已移除总入口导出，请直接从具体文件导入
+// export * from '../schemas';
 
 // 类型别名 - 为了保持与原有代码的兼容性，提供更友好的类型名称
 import type {
@@ -20,29 +20,37 @@ import type {
   productSchema,
   sellingPointsSchema,
   targetAudienceSchema,
-  assetsSchema,
+  assetsSchema
+} from '../schemas/company';
+import type {
   websiteSeoSchema,
+  seoMetaSchema,
+  seoDetailedSchema
+} from '../schemas/seo';
+import type {
   structuredDataSchema,
-  paletteSchema,
-  typographySchema,
-
   designSystemSchema,
+  websiteArchitectureSchema,
+  baseBlueprintSchema,
+  contentCompleteBlueprintSchema,
+  layoutCompleteBlueprintSchema
+} from '../schemas/index';
+import type {
+  paletteSchema,
+  typographySchema
+} from '../schemas/design';
+import type {
   menuItemSchema,
   footerSectionSchema,
-  globalElementsSchema,
-  websiteArchitectureSchema,
+  globalElementsSchema
+} from '../schemas/website';
+import type {
   outlineSectionSchema,
   blockSchema,
   basicPageSchema,
   contentCompletePageSchema,
-  layoutCompletePageSchema,
-
-  seoMetaSchema,
-  seoDetailedSchema,
-  baseBlueprintSchema,
-  contentCompleteBlueprintSchema,
-  layoutCompleteBlueprintSchema
-} from '../schemas';
+  layoutCompletePageSchema
+} from '../schemas/blocks';
 
 // 从Schema推导出TypeScript类型
 export type CompanyInfo = typeof companyInfoSchema;

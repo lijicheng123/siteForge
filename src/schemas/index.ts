@@ -1,23 +1,5 @@
-/**
- * Schema统一导出文件
- * 提供所有Schema的集中访问点
- */
-
 // 基础类型
 export * from './base';
-
-// 业务实体
-export * from './company';
-export * from './design';
-export * from './website';
-export * from './blocks';
-export * from './seo';
-
-// 工作流Schema
-export * from './workflow-request-schema-type';
-
-// 部署相关Schema
-export * from './provisioning';
 
 // 蓝图Schema - 渐进式定义
 import { objectSchema, arraySchema, nameSchema, pagePathSchema, responseSchema } from './base';

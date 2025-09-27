@@ -5,13 +5,11 @@
 
 import promptFactory from './prompt-factory';
 import LLMGateway from './llm-gateway';
-import {
-  structuredDataSchema,
-  designSystemSchema,
-  websiteArchitectureSchema,
-  contentCompleteBlueprintSchema,
-  blockSchema,
-} from '../schemas';
+import { structuredDataSchema } from '../schemas/index';
+import { designSystemSchema } from '../schemas/index';
+import { websiteArchitectureSchema } from '../schemas/index';
+import { contentCompleteBlueprintSchema } from '../schemas/index';
+import { blockSchema } from '../schemas/blocks';
 import { MODEL_IDS } from './model-catalog';
 import { generateFullGutenbergHtml } from './html-generator';
 import {
