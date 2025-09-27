@@ -124,61 +124,6 @@ export const step4RequestSchema = {
   additionalProperties: false
 };
 
-// Step4响应Schema - 内容完备蓝图
-export const step4ResponseSchema = {
-  type: 'object',
-  properties: {
-    structuredData: {
-      type: 'object',
-      description: '结构化数据'
-    },
-    designSystem: {
-      type: 'object',
-      description: '设计系统'
-    },
-    globalElements: {
-      type: 'object',
-      description: '全局元素'
-    },
-    pages: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          name: { type: 'string' },
-          path: { type: 'string' },
-          purpose: { type: 'string' },
-          seo: {
-            type: 'object',
-            properties: {
-              title: { type: 'string' },
-              description: { type: 'string' },
-              primaryKeywords: { type: 'array', items: { type: 'string' } },
-              longTailKeywords: { type: 'array', items: { type: 'string' } }
-            },
-            required: ['title', 'description', 'primaryKeywords', 'longTailKeywords']
-          },
-          outline: {
-            type: 'array',
-            items: {
-              type: 'object',
-              properties: {
-                sectionName: { type: 'string' },
-                instruction: { type: 'string' },
-                priority: { type: 'number' },
-                estimatedWords: { type: 'number' }
-              },
-              required: ['sectionName', 'instruction']
-            }
-          }
-        },
-        required: ['name', 'path', 'purpose', 'seo', 'outline']
-      }
-    }
-  },
-  required: ['structuredData', 'designSystem', 'globalElements', 'pages'],
-  additionalProperties: false
-};
 
 const blockLibraryBlockSchema = {
   type: 'object',
@@ -314,62 +259,12 @@ export type Step4Request = {
   }>;
 };
 
-export type Step4Response = {
-  structuredData: any;
-  designSystem: any;
-  globalElements: any;
-  pages: Array<{
-    name: string;
-    path: string;
-    purpose: string;
-    seo: {
-      title: string;
-      description: string;
-      primaryKeywords: string[];
-      longTailKeywords: string[];
-    };
-    outline: Array<{
-      sectionName: string;
-      instruction: string;
-      priority?: number;
-      estimatedWords?: number;
-    }>;
-  }>;
-};
-
 export type Step5Request = {
   blueprint: any;
   blockLibrary: {
     core_blocks: string[];
     custom_blocks: Array<{ name: string; description: string; props: any }>;
   };
-};
-
-export type Step5Response = {
-  structuredData: any;
-  designSystem: any;
-  globalElements: any;
-  pages: Array<{
-    name: string;
-    path: string;
-    purpose: string;
-    seo: {
-      title: string;
-      description: string;
-      primaryKeywords: string[];
-      longTailKeywords: string[];
-    };
-    outline: Array<{
-      component: string;
-      level?: number;
-      config?: any;
-      props?: any;
-      children?: any[];
-      content?: any;
-      link?: any;
-      style?: any;
-    }>;
-  }>;
 };
 
 export type Step6Request = {
@@ -399,38 +294,3 @@ export type Step6Request = {
   }>;
 };
 
-export type Step6Response = {
-  structuredData: any;
-  designSystem: any;
-  globalElements: any;
-  pages: Array<{
-    name: string;
-    path: string;
-    purpose: string;
-    seo: {
-      title: string;
-      description: string;
-      primaryKeywords: string[];
-      longTailKeywords: string[];
-    };
-    outline: Array<{
-      component: string;
-      level?: number;
-      config?: any;
-      props?: any;
-      children?: any[];
-      content?: any;
-      link?: any;
-      style?: any;
-    }>;
-  }>;
-};
-
-export type CompleteWorkflowRequest = {
-  rawInput: string;
-  options?: {
-    brandPersonality?: string;
-    targetMarket?: string;
-    customBlocks?: Array<{ name: string; description: string; props: any }>;
-  };
-};
