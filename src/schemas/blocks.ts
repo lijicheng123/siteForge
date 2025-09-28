@@ -74,8 +74,9 @@ export const blockSchema = {
       }
     },
   "required": [
-      "blockName",
-      "attributes"
+    "sectionName",
+    "blockName",
+    "attributes"
     ]
 }
 

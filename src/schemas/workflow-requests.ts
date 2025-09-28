@@ -3,6 +3,8 @@
  */
 import { arraySchema } from './base';
 import { layoutCompletePageSchema, instructionCompletePageSchema } from './pages';
+import { globalElementsSchema } from './website';
+import { designSystemSchema } from './workflow-responses';
 
 // Step1: 需求解析与结构化
 export const step1RequestSchema = {
@@ -140,7 +142,12 @@ export const step5RequestSchema = {
   properties: {
     blueprint: {
       type: 'object',
-      description: '内容完备蓝图'
+      description: '内容完备蓝图',
+      properties: {
+        designSystem: designSystemSchema,
+        globalElements: globalElementsSchema,
+        pages: arraySchema(instructionCompletePageSchema)
+      }
     },
     blockLibrary: {
       type: 'object',
