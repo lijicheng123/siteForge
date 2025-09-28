@@ -18,7 +18,6 @@ export const step1RequestSchema = {
     }
   },
   required: ['rawInput'],
-  additionalProperties: false
 };
 
 // Step2: 品牌视觉设计
@@ -50,7 +49,6 @@ export const step2RequestSchema = {
     }
   },
   required: ['industry', 'preference'],
-  additionalProperties: false
 };
 
 // Step3: 网站信息架构
@@ -89,7 +87,6 @@ export const step3RequestSchema = {
     }
   },
   required: ['companyName', 'products'],
-  additionalProperties: false
 };
 
 // Step4: 页面内容策划 - 输入基础蓝图，输出内容完备蓝图
@@ -122,7 +119,6 @@ export const step4RequestSchema = {
     }
   },
   required: ['structuredData', 'designSystem', 'globalElements', 'pages'],
-  additionalProperties: false
 };
 
 
@@ -134,7 +130,6 @@ const blockLibraryBlockSchema = {
     attributes: { type: 'object' }
   },
   required: ['name', 'description'],
-  additionalProperties: false
 }
 // Step5: 区块布局设计 - 输入内容完备蓝图，输出布局完备蓝图
 export const step5RequestSchema = {
@@ -164,11 +159,9 @@ export const step5RequestSchema = {
         },
       },
       required: ['core_blocks', 'custom_blocks'],
-      additionalProperties: false
     }
   },
   required: ['blueprint', 'blockLibrary'],
-  additionalProperties: false
 };
 
 // Step6: 确定性代码生成 - 输入布局完备蓝图，输出最终蓝图
@@ -190,7 +183,6 @@ export const step6RequestSchema = {
     pages: arraySchema(layoutCompletePageSchema)
   },
   required: ['structuredData', 'designSystem', 'globalElements', 'pages'],
-  additionalProperties: false
 };
 
 // 完整工作流请求Schema
@@ -230,11 +222,9 @@ export const completeWorkflowRequestSchema = {
           description: '自定义区块定义'
         }
       },
-      additionalProperties: false
     }
   },
   required: ['rawInput'],
-  additionalProperties: false
 };
 
 // TypeScript类型定义

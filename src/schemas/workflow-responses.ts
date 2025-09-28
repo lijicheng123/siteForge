@@ -101,7 +101,6 @@ export const contentGenerationRequestSchema = objectSchema({
     patternProperties: {
       '^.+$': { type: 'string' }
     },
-    additionalProperties: false,
     minProperties: 1
   }
 }, ['context', 'tasks']);
@@ -112,6 +111,5 @@ export const contentGenerationResponseSchema = responseSchema({
   description: "Key-Value对象，Key是任务ID，Value是AI生成的文案",
   patternProperties: {
     '^.+$': { type: 'string' }
-  },
-  additionalProperties: false,
+  }
 });

@@ -24,7 +24,6 @@ export const blockSchema = {
       "attributes": {
         "type": "object",
         "description": "区块属性的键值对集合，结构由具体区块决定。",
-        "additionalProperties": true
       },
       "innerBlocks": {
         "type": "array",
@@ -40,7 +39,6 @@ export const blockSchema = {
             },
             "attributes": {
               "type": "object",
-              "additionalProperties": true
             },
             "innerBlocks": {
               "type": "array",
@@ -56,7 +54,6 @@ export const blockSchema = {
                   },
                   "attributes": {
                     "type": "object",
-                    "additionalProperties": true
                   }
                 },
                 "required": [
@@ -91,7 +88,7 @@ export const outlineSectionSchema = objectSchema({
 export const outlineBlockSchema = objectSchema({
   sectionName: nameSchema,
   blockName: { type: 'string', minLength: 1, maxLength: 100 },
-  attributes: { type: 'object', additionalProperties: true },
+  attributes: { type: 'object' },
   innerBlocks: { type: 'array', items: blockSchema },
 }, ['sectionName', 'blockName', 'attributes']);
 

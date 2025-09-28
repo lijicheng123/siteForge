@@ -46,8 +46,7 @@ export const arraySchema = <T>(itemSchema: T) => ({
 export const objectSchema = <T>(properties: T, required?: string[]) => ({
   type: 'object',
   properties,
-  required: required || [],
-  additionalProperties: false
+  required: required || []
 });
 
 // 通用响应Schema
