@@ -54,7 +54,6 @@ export const websiteArchitectureSchema = objectSchema({
     name: nameSchema,
     path: pagePathSchema,
     purpose: { type: 'string', minLength: 10, maxLength: 200 },
-    priority: { type: 'number', minimum: 1, maximum: 10, default: 5 },
     meta: seoMetaSchema
   }, ['name', 'path', 'purpose']))
 }, ['globalElements', 'pages']);
