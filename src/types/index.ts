@@ -31,7 +31,6 @@ import type {
   structuredDataSchema,
   designSystemSchema,
   websiteArchitectureSchema,
-  baseBlueprintSchema,
   contentCompleteBlueprintSchema,
   layoutCompleteBlueprintSchema
 } from '../schemas/workflow-responses';

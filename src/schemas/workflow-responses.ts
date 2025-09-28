@@ -59,16 +59,6 @@ export const websiteArchitectureSchema = objectSchema({
   }, ['name', 'path', 'purpose']))
 }, ['globalElements', 'pages']);
 
-/**
- * 第三步：生成基础蓝图Schema - 包含核心业务数据，用于Step1-3
- */
-export const baseBlueprintSchema = objectSchema({
-  structuredData: structuredDataSchema,
-  designSystem: designSystemSchema,
-  globalElements: globalElementsSchema,
-  pages: arraySchema(basicPageSchema)
-}, ['structuredData', 'designSystem', 'globalElements', 'pages']);
-
 // 内容完备蓝图Schema - 包含页面内容策划，用于Step4
 export const contentCompleteBlueprintSchema = objectSchema({
   globalElements: globalElementsSchema,

@@ -4,7 +4,7 @@
  */
 
 import { FastifyInstance, FastifyPluginOptions, FastifySchema } from 'fastify';
-import { baseBlueprintSchema, contentCompleteBlueprintSchema } from '../../schemas/workflow-responses';
+import { contentCompleteBlueprintSchema } from '../../schemas/workflow-responses';
 import { responseSchema } from '../../schemas/base';
 import { step4RequestSchema } from '../../schemas/workflow-requests';
 import { executeStep4 } from '../../services/workflow-steps.service';
