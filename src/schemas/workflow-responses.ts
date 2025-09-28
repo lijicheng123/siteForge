@@ -71,11 +71,9 @@ export const baseBlueprintSchema = objectSchema({
 
 // 内容完备蓝图Schema - 包含页面内容策划，用于Step4
 export const contentCompleteBlueprintSchema = objectSchema({
-  structuredData: structuredDataSchema,
-  designSystem: designSystemSchema,
   globalElements: globalElementsSchema,
   pages: arraySchema(contentCompletePageSchema)
-}, ['structuredData', 'designSystem', 'globalElements', 'pages']);
+}, ['globalElements', 'pages']);
 
 // 布局完备蓝图Schema - 包含区块布局，用于Step5
 export const layoutCompleteBlueprintSchema = objectSchema({
