@@ -5,7 +5,7 @@ import {
   structuredDataSchema,
   designSystemSchema,
   websiteArchitectureSchema,
-  contentCompleteBlueprintSchema
+  instructionCompleteBlueprintSchema
 } from '../schemas/workflow-responses';
 import { outlineBlockSchema } from '../schemas/blocks';
 
@@ -101,10 +101,10 @@ ${getSchemaString(websiteArchitectureSchema)}`,
 3. 规划内容大纲 (outline)，将页面内容分解为若干个有逻辑顺序的内容区块 (Section)
 4. 为每个区块撰写清晰的 instruction 指令
 
-${getJsonFormatRequirement(contentCompleteBlueprintSchema, useJsonMode)}
+${getJsonFormatRequirement(instructionCompleteBlueprintSchema, useJsonMode)}
 
 输出必须严格符合以下 JSON Schema (整个蓝图结构):
-${getSchemaString(contentCompleteBlueprintSchema)}
+${getSchemaString(instructionCompleteBlueprintSchema)}
 
 注意：输入是基础蓝图，输出是内容完备蓝图。每个页面的 outline 应该包含 outlineSectionSchema 结构，不是 blockSchema。
 

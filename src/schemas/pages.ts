@@ -15,7 +15,7 @@ export const basicPageSchema = objectSchema({
 }, ['name', 'path', 'purpose']);
 
 // 内容完备页面Schema - 包含SEO和内容大纲
-export const contentCompletePageSchema = objectSchema({
+export const instructionCompletePageSchema = objectSchema({
   name: nameSchema,
   path: pagePathSchema,
   purpose: { type: 'string', minLength: 10, maxLength: 200 },

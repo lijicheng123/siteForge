@@ -9,7 +9,7 @@ import {
   structuredDataSchema,
   designSystemSchema,
   websiteArchitectureSchema,
-  contentCompleteBlueprintSchema
+  instructionCompleteBlueprintSchema
 } from '../schemas/workflow-responses';
 import { blockSchema } from '../schemas/blocks';
 import { MODEL_IDS } from './model-catalog';
@@ -107,7 +107,7 @@ export async function executeStep4(params: Step4Request): Promise<any> {
     prompt, 
     temperature: 0.7,
     jsonMode: true, // 启用原生 JSON 模式
-    jsonSchema: contentCompleteBlueprintSchema
+    jsonSchema: instructionCompleteBlueprintSchema
   });
   
   return JSON.parse(response);

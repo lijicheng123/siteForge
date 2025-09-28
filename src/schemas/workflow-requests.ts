@@ -2,7 +2,7 @@
  * 入参Schema和入参类型定义
  */
 import { arraySchema } from './base';
-import { layoutCompletePageSchema } from './pages';
+import { layoutCompletePageSchema, instructionCompletePageSchema } from './pages';
 
 // Step1: 需求解析与结构化
 export const step1RequestSchema = {

@@ -22,13 +22,13 @@ import {
 } from './website';
 import { 
   basicPageSchema, 
-  contentCompletePageSchema, 
+  instructionCompletePageSchema, 
   layoutCompletePageSchema, 
 } from './pages';
 
 /**
  * 响应约束Schema
- * 第一步：获取结构化数据 - 整合所有公司相关信息 - 用于Step1
+ * 【出参】第一步：获取结构化数据 - 整合所有公司相关信息 - 用于Step1
  */
 export const structuredDataSchema = objectSchema({
   companyInfo: companyInfoSchema,
@@ -39,14 +39,14 @@ export const structuredDataSchema = objectSchema({
   seo: websiteSeoSchema
 }, ['companyInfo', 'products', 'sellingPoints', 'targetAudience', 'assets', 'seo']);
 
-// 第二步：获取设计系统主题Schema - 用于Step2
+// 【出参】第二步：获取设计系统主题Schema - 用于Step2
 export const designSystemSchema = objectSchema({
   palette: paletteSchema,
   typography: typographySchema,
 }, ['palette', 'typography']);
 
 /**
- * 第三步：获取网站架构Schema - 用于Step3
+ * 【出参】第三步：获取网站架构Schema - 用于Step3
  */
 export const websiteArchitectureSchema = objectSchema({
   globalElements: globalElementsSchema,
@@ -58,10 +58,10 @@ export const websiteArchitectureSchema = objectSchema({
   }, ['name', 'path', 'purpose']))
 }, ['globalElements', 'pages']);
 
-// 内容完备蓝图Schema - 包含页面内容策划，用于Step4
-export const contentCompleteBlueprintSchema = objectSchema({
+// 【出参】内容完备蓝图Schema - 包含页面内容策划，用于Step4
+export const instructionCompleteBlueprintSchema = objectSchema({
   globalElements: globalElementsSchema,
-  pages: arraySchema(contentCompletePageSchema)
+  pages: arraySchema(instructionCompletePageSchema)
 }, ['globalElements', 'pages']);
 
 // 布局完备蓝图Schema - 包含区块布局，用于Step5

@@ -31,7 +31,7 @@ import type {
   structuredDataSchema,
   designSystemSchema,
   websiteArchitectureSchema,
-  contentCompleteBlueprintSchema,
+  instructionCompleteBlueprintSchema,
   layoutCompleteBlueprintSchema
 } from '../schemas/workflow-responses';
 import type {
@@ -49,7 +49,7 @@ import type {
 } from '../schemas/blocks';
 import type {
   basicPageSchema,
-  contentCompletePageSchema,
+  instructionCompletePageSchema,
   layoutCompletePageSchema
 } from '../schemas/pages';
 
@@ -77,7 +77,7 @@ export type Block = typeof blockSchema;
 
 // 页面类型 - 渐进式定义
 export type BasicPage = typeof basicPageSchema;
-export type ContentCompletePage = typeof contentCompletePageSchema;
+export type ContentCompletePage = typeof instructionCompletePageSchema;
 export type LayoutCompletePage = typeof layoutCompletePageSchema;
 
 
