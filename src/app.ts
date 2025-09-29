@@ -3,6 +3,7 @@ import fastify from 'fastify';
 import dotenv from 'dotenv';
 import cors from '@fastify/cors';
 import routes from './routes';
+import { registerErrorHandler, registerRequestLogger } from './middleware';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -30,6 +31,16 @@ const app = fastify({
 // Register Plugins
 app.register(cors, {
   origin: '*', // For development only. Restrict in production.
+});
+
+// 注册全局中间件
+registerErrorHandler(app);
+registerRequestLogger(app, {
+  logBody: true,
+  logQuery: true,
+  logParams: true,
+  excludePaths: ['/health', '/api/health'],
+  maxBodyLength: 5000
 });
 
 // Register Routes
