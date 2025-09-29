@@ -1,7 +1,7 @@
 import { MODEL_IDS } from "../model-catalog";
 import LLMGateway from "../llm-gateway";
 import siteBuilderPromptFactory from "./page-builder-prompt-factory";
-import { pageBuilderSchema } from "../../schemas/site-builder/schema";
+import { PageBuilderResponseSchema } from "../../schemas/site-builder/schema";
 
 export async function executePageBuilder(params: any) {
     const { blockLibrary, ...userData } = params;
@@ -11,7 +11,7 @@ export async function executePageBuilder(params: any) {
         prompt,
         temperature: 0.7,
         jsonMode: true,
-        jsonSchema: pageBuilderSchema
+        jsonSchema: PageBuilderResponseSchema
     });
     return response;
 }
