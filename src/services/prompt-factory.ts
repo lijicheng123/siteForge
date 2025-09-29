@@ -10,7 +10,7 @@ import {
 import { outlineBlockSchema } from '../schemas/blocks';
 
 // 从集中 Schema 源生成可嵌入到 Prompt 的 JSON Schema 文本
-const getSchemaString = (schema: unknown): string => {
+export const getSchemaString = (schema: unknown): string => {
   try {
     return JSON.stringify(schema, null, 2);
   } catch {
@@ -19,7 +19,7 @@ const getSchemaString = (schema: unknown): string => {
 };
 
 // 通用的JSON格式要求，根据Schema类型自动判断
-const getJsonFormatRequirement = (schema: unknown, _useJsonMode: boolean = false): string => {
+export const getJsonFormatRequirement = (schema: unknown, _useJsonMode: boolean = false): string => {
   // 无论是否启用 JSON 模式，都强制严格的纯 JSON 输出要求
   let outputType = '数据';
   let startChar = '{';

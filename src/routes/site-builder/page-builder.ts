@@ -13,16 +13,28 @@ const PageBuilderSchema: FastifySchema = {
 
   export default async function PageBuilderRoutes(fastify: FastifyInstance, options: FastifyPluginOptions) {
     fastify.post('/page-builder', { schema: PageBuilderSchema }, async (request, reply) => {
-        const startTime = Date.now();
-        const data = await executePageBuilder(request.body as any);
-        const endTime = Date.now();
-        const duration = endTime - startTime;
-        return reply.send({
-            success: true,
-            data,
-            message: '页面构建成功',
-            duration,
-            timestamp: new Date().toISOString()
-          });
+        try {
+            
+            const startTime = Date.now();
+            const data = await executePageBuilder(request.body as any);
+            const endTime = Date.now();
+            const duration = endTime - startTime;
+            return reply.send({
+                success: true,
+                data: data,
+                message: '页面构建成功',
+                duration,
+                timestamp: new Date().toISOString()
+            });
+        } catch (error) {
+            console.error('PageBuilderRoutes error', error);
+            return reply.status(500).send({
+                success: false,
+                error: 'INTERNAL_ERROR',
+                message: '页面构建失败',
+                timestamp: new Date().toISOString()
+            });
+        }
+        
     });
   }

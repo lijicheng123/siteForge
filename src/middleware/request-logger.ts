@@ -19,7 +19,7 @@ const defaultOptions: RequestLogOptions = {
   logHeaders: false,  // 默认不记录headers（可能包含敏感信息）
   logQuery: true,
   logParams: true,
-  excludePaths: ['/health', '/api/health'],
+  excludePaths: ['/health', '/api/health', '/@vite/client'],
   maxBodyLength: 10000  // 限制body日志长度
 };
 
@@ -90,22 +90,22 @@ export function registerRequestLogger(fastify: FastifyInstance, options: Request
     }
 
     // 使用 Fastify 的日志器记录
-    fastify.log.info(logInfo, '收到请求');
+    // fastify.log.info(logInfo, '收到请求');
 
-    // 在控制台也打印一份（便于开发调试）
-    console.log('\n=== 新请求 ===');
-    console.log(`${request.method} ${request.url}`);
-    if (config.logParams && logInfo.params) {
-      console.log('参数:', JSON.stringify(logInfo.params, null, 2));
-    }
-    if (config.logQuery && logInfo.query) {
-      console.log('查询:', JSON.stringify(logInfo.query, null, 2));
-    }
-    if (config.logBody && logInfo.body) {
-      console.log('请求体:', typeof logInfo.body === 'string' ? logInfo.body : JSON.stringify(logInfo.body, null, 2));
-    }
-    console.log('时间:', logInfo.timestamp);
-    console.log('================\n');
+    // // 在控制台也打印一份（便于开发调试）
+    // console.log('\n=== 新请求 ===');
+    // console.log(`${request.method} ${request.url}`);
+    // if (config.logParams && logInfo.params) {
+    //   console.log('参数:', JSON.stringify(logInfo.params, null, 2));
+    // }
+    // if (config.logQuery && logInfo.query) {
+    //   console.log('查询:', JSON.stringify(logInfo.query, null, 2));
+    // }
+    // if (config.logBody && logInfo.body) {
+    //   console.log('请求体:', typeof logInfo.body === 'string' ? logInfo.body : JSON.stringify(logInfo.body, null, 2));
+    // }
+    // console.log('时间:', logInfo.timestamp);
+    // console.log('================\n');
   });
 
   // 记录响应信息

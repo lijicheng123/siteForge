@@ -54,6 +54,8 @@ export function registerErrorHandler(fastify: FastifyInstance) {
     let message = '服务器内部错误';
     let details: ErrorDetail[] = [];
 
+    console.log('error===>', error);
+
     // 处理不同类型的错误
     if (error.validation) {
       // Schema 验证错误
@@ -65,8 +67,8 @@ export function registerErrorHandler(fastify: FastifyInstance) {
       details = error.validation.map(validationError => ({
         field: validationError.instancePath || validationError.schemaPath,
         message: validationError.message || '格式不正确',
-        received: validationError.data,
-        expected: validationError.schema?.type || '未知类型'
+        received: (validationError as any).data,
+        expected: (validationError as any).schema?.type || '未知类型'
       }));
 
       // 在开发环境下，打印详细的验证错误信息

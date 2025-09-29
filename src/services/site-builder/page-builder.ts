@@ -4,8 +4,8 @@ import siteBuilderPromptFactory from "./page-builder-prompt-factory";
 import { PageBuilderResponseSchema } from "../../schemas/site-builder/schema";
 
 export async function executePageBuilder(params: any) {
-    const { blockLibrary, ...userData } = params;
-    const prompt = siteBuilderPromptFactory.getPageBuilderPrompt(userData, blockLibrary);
+    const { blocks, ...userData } = params;
+    const prompt = siteBuilderPromptFactory.getPageBuilderPrompt(userData, blocks);
     const response = await LLMGateway.callText({
         model: MODEL_IDS.GEMINI_2_5_PRO,
         prompt,
@@ -13,5 +13,5 @@ export async function executePageBuilder(params: any) {
         jsonMode: true,
         jsonSchema: PageBuilderResponseSchema
     });
-    return response;
+    return JSON.parse(response);
 }
