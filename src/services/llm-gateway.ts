@@ -557,11 +557,14 @@ export const callLLMText = async (request: LLMRequest): Promise<string> => {
     console.error('没有content，callLLMText thought=>', response.thought)
     throw new Error('没有content，callLLMText thought')
   }
-  try {
-    JSON.parse(response.content)
-  } catch (error) {
-    console.error('callLLMText response.content 不是有效的 JSON,response=>', response)
-    return response.content
+
+  if (request.jsonMode === true) { 
+    try {
+      JSON.parse(response.content)
+    } catch (error) {
+        console.error('callLLMText response.content 不是有效的 JSON,response=>', response)
+        return response.content
+      }
   }
 
   return response.content;
