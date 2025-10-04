@@ -18,7 +18,10 @@
     "test:step5": "node tests/test-workflow-step5.js",
     "test:step6": "node tests/test-workflow-step6.js",
     "test:complete": "node tests/test-complete-workflow.js",
-    "test:gateway": "node tests/test-llm-gateway.js"
+    "test:gateway": "node tests/test-llm-gateway.js",
+    "test:pattern-analyzer": "node tests/test-pattern-analyzer.js",
+    "analyze:quick": "node scripts/quick-test.js",
+    "analyze:batch": "node scripts/batch-analyze-patterns.js"
   },
   "keywords": [
     "ai",

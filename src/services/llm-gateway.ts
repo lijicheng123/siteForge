@@ -7,6 +7,12 @@ export type Channel = 'official' | 'huandu';
 // 模型提供商类型
 export type Provider = 'gemini' | 'claude' | 'openai';
 
+// 图片内容类型
+export interface ImageContent {
+  data: string; // base64 编码的图片数据
+  mimeType: string; // 例如 'image/jpeg', 'image/png'
+}
+
 // LLM 请求参数
 export interface LLMRequest {
   model: string;
@@ -20,6 +26,8 @@ export interface LLMRequest {
   // 对应官方文档的 response_json_schema 字段：
   // https://ai.google.dev/gemini-api/docs/structured-output?hl=zh-cn#javascript
   jsonSchema?: unknown;
+  // 图片内容（仅 Gemini 支持）
+  images?: ImageContent[];
 }
 
 // LLM 响应
@@ -175,11 +183,27 @@ const callGeminiOfficial = async (request: LLMRequest): Promise<LLMResponse> => 
   }
 
   const url = `${baseUrl}/v1beta/models/${request.model}:generateContent`;
+  
+  // 构建 parts 数组
+  const parts: any[] = [{
+    text: request.prompt
+  }];
+  
+  // 如果有图片，添加到 parts
+  if (request.images && request.images.length > 0) {
+    request.images.forEach(image => {
+      parts.push({
+        inline_data: {
+          mime_type: image.mimeType,
+          data: image.data
+        }
+      });
+    });
+  }
+  
   const payload: any = {
     contents: [{
-      parts: [{
-        text: request.prompt
-      }]
+      parts: parts
     }],
     generationConfig: {
       temperature: request.temperature || 0.7,
@@ -236,11 +260,27 @@ const callGeminiHuandu = async (request: LLMRequest): Promise<LLMResponse> => {
   }
 
   const url = `${baseUrl}${endpoints.gemini}`;
+  
+  // 构建 parts 数组
+  const parts: any[] = [{
+    text: request.prompt
+  }];
+  
+  // 如果有图片，添加到 parts
+  if (request.images && request.images.length > 0) {
+    request.images.forEach(image => {
+      parts.push({
+        inline_data: {
+          mime_type: image.mimeType,
+          data: image.data
+        }
+      });
+    });
+  }
+  
   const payload: any = {
     contents: [{
-      parts: [{
-        text: request.prompt
-      }]
+      parts: parts
     }],
     generationConfig: {
       temperature: request.temperature || 0.7,
