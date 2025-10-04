@@ -1,0 +1,6759 @@
+{
+  "ptn-14793": {
+    "id": 14793,
+    "name": "Title / Header 17",
+    "description": "极简居中标题模块，包含一个醒目主标题和一个辅助性副标题。适用于页面顶部或内容章节的开篇，简洁有力地传达核心信息。",
+    "categories": [
+      "header",
+      "content"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "generic",
+      "saas",
+      "tech",
+      "agency"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "no-media": "No Media",
+      "alignment": "Centered",
+      "width": "Wide",
+      "spacing": "Spacious"
+    },
+    "keywords": [
+      "页面标题",
+      "居中对齐",
+      "章节标题",
+      "极简留白",
+      "主副标题"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704755932_Title-Header-17.jpeg"
+  },
+  "ptn-14795": {
+    "id": 14795,
+    "name": "Accordion 12",
+    "description": "居中标题下方的双栏手风琴布局，清晰地组织问答内容。适用于常见问题解答（FAQ）或产品功能介绍页面。",
+    "categories": [
+      "faq",
+      "content"
+    ],
+    "style_tags": [
+      "clean",
+      "minimalist",
+      "modern"
+    ],
+    "industry_tags": [
+      "saas",
+      "agency",
+      "tech",
+      "generic"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "no-media": "No Media",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "手风琴",
+      "FAQ",
+      "问答",
+      "双栏布局",
+      "内容展开"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704761218_Accordion-12.jpeg"
+  },
+  "ptn-15002": {
+    "id": 15002,
+    "name": "Accordion 13",
+    "description": "左侧为手风琴式问答列表，右侧为图片画廊的双栏布局。适用于展示常见问题、产品特性或分步指南，兼具信息与视觉吸引力。",
+    "categories": [
+      "faq",
+      "gallery",
+      "content"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "minimalist",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "generic",
+      "saas",
+      "agency",
+      "tech"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "media-right": "Media Right",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "手风琴",
+      "FAQ",
+      "问答列表",
+      "图片画廊",
+      "双栏布局",
+      "内容展示"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2023/11/1701381267_Accordion-13.jpeg"
+  },
+  "ptn-15020": {
+    "id": 15020,
+    "name": "Testimonial 27",
+    "description": "居中标题和副标题，下方是四张卡片式客户评价，以2x2网格布局呈现。每张卡片包含星级、引言和头像，适合展示社会认同，建立品牌信誉。",
+    "categories": [
+      "testimonials"
+    ],
+    "style_tags": [
+      "clean",
+      "minimalist",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "saas",
+      "agency",
+      "consulting",
+      "generic"
+    ],
+    "layout": {
+      "bento-grid": "Bento & Grid",
+      "no-media": "No Media",
+      "2-columns": "2 Columns",
+      "alignment": "Centered",
+      "width": "Contained"
+    },
+    "keywords": [
+      "客户评价",
+      "用户反馈",
+      "星级评分",
+      "网格布局",
+      "社会认同",
+      "推荐"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2023/12/1701883121_Testimonial-27.jpeg"
+  },
+  "ptn-15414": {
+    "id": 15414,
+    "name": "Media and Text 36",
+    "description": "左侧图片与右侧蓝色背景内容区形成鲜明对比，通过标题、特性列表和CTA按钮清晰传达信息。适合展示产品特性或服务优势。",
+    "categories": [
+      "features",
+      "cta",
+      "content"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "professional",
+      "bold"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "consulting",
+      "agency"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "media-left": "Media Left",
+      "off-grid": "Off-Grid",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "图文组合",
+      "产品特性",
+      "行动号召",
+      "蓝色背景",
+      "功能列表",
+      "双栏布局"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2023/12/1701877645_Media-and-Text-36.jpeg"
+  },
+  "ptn-15418": {
+    "id": 15418,
+    "name": "Video 15",
+    "description": "简洁的居中布局，上方是标题和副标题，下方是宽屏视频播放器。非常适合展示产品演示、教程或品牌故事。",
+    "categories": [
+      "video",
+      "content"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "saas",
+      "education",
+      "tech",
+      "generic"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "media-bottom": "Media Bottom",
+      "alignment": "Centered",
+      "width": "Contained"
+    },
+    "keywords": [
+      "视频播放",
+      "居中布局",
+      "产品演示",
+      "教程模块",
+      "简约设计"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2023/11/1699319909_Video-15-8211-Design-Course.jpeg"
+  },
+  "ptn-15425": {
+    "id": 15425,
+    "name": "Testimonials 22",
+    "description": "居中大标题下方的双栏客户评价模块。每个卡片包含引言、评价内容和用户头像，是展示社会认同的经典设计。",
+    "categories": [
+      "testimonials"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "saas",
+      "agency",
+      "consulting",
+      "generic"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "no-media": "No Media",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "客户评价",
+      "用户推荐",
+      "双栏布局",
+      "社会认同",
+      "推荐信",
+      "用户头像"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2023/12/1701883120_Testimonials-22.jpeg"
+  },
+  "ptn-15427": {
+    "id": 15427,
+    "name": "Media and Text 52",
+    "description": "经典左图右文布局，左侧图片下方附带特性列表，右侧包含详细说明和双行动号召按钮，结构清晰，信息层次分明。",
+    "categories": [
+      "features",
+      "content"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "consulting",
+      "generic"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "media-left": "Media Left",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "图文组合",
+      "功能介绍",
+      "双栏布局",
+      "特性列表",
+      "CTA按钮",
+      "服务展示"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2023/12/1701877644_Media-and-Text-52.jpeg"
+  },
+  "ptn-15430": {
+    "id": 15430,
+    "name": "Title / Header 22",
+    "description": "简洁的居中标题和副标题模块，采用纯色背景，用于清晰地介绍页面或区块内容。适用于各种网站的章节分隔。",
+    "categories": [
+      "content",
+      "header"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern",
+      "flat"
+    ],
+    "industry_tags": [
+      "generic",
+      "saas",
+      "tech",
+      "agency"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "no-media": "No Media",
+      "alignment": "Centered",
+      "width": "Full Width"
+    },
+    "keywords": [
+      "居中标题",
+      "章节标题",
+      "副标题",
+      "简约设计",
+      "纯色背景"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2023/12/1701888149_Title-Header-22.jpeg"
+  },
+  "ptn-15452": {
+    "id": 15452,
+    "name": "Media and Text 37",
+    "description": "左侧图片与悬浮卡片结合，右侧展示标题、特性列表和行动号召按钮。适合清晰地介绍产品功能或服务优势。",
+    "categories": [
+      "features",
+      "cta",
+      "content"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "professional"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "consulting",
+      "agency"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "media-left": "Media Left",
+      "off-grid": "Off-Grid",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "功能列表",
+      "图文介绍",
+      "行动号召",
+      "双栏布局",
+      "悬浮卡片",
+      "特性展示"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/02/1706834357_Media-and-Text-37.jpeg"
+  },
+  "ptn-15460": {
+    "id": 15460,
+    "name": "Hero 41",
+    "description": "全屏背景图英雄区，左侧放置标题和描述文案。整体设计简洁大气，适合传达宁静或宏大的品牌调性。",
+    "categories": [
+      "hero"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "serene",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "travel",
+      "consulting",
+      "non-profit",
+      "generic"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "media-background": "Media Background",
+      "alignment": "Left Aligned",
+      "width": "Full Width"
+    },
+    "keywords": [
+      "首屏",
+      "背景图",
+      "左对齐文案",
+      "山脉风景",
+      "简洁标题",
+      "大气布局"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2023/12/1701711337_Hero-41.jpeg"
+  },
+  "ptn-15466": {
+    "id": 15466,
+    "name": "Media and Text 38",
+    "description": "左侧为标题、描述和行动号召按钮，右侧采用网格布局展示三张图片。适用于展示产品特性、服务或案例。",
+    "categories": [
+      "features",
+      "content",
+      "cta"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "light-mode",
+      "professional"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "startup",
+      "agency"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "bento-grid": "Bento & Grid",
+      "media-right": "Media Right",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "图文组合",
+      "功能介绍",
+      "网格布局",
+      "行动号召",
+      "左文右图",
+      "产品特性"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2023/12/1701877631_Media-and-Text-38.jpeg"
+  },
+  "ptn-15495": {
+    "id": 15495,
+    "name": "Counter / Stats 27",
+    "description": "三栏布局的数据展示模块，左侧为数字计数器，右侧为进度条。适合在报告或仪表盘中直观呈现关键指标和完成度。",
+    "categories": [
+      "stats"
+    ],
+    "style_tags": [
+      "minimalist",
+      "modern",
+      "clean",
+      "professional"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "finance",
+      "generic"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "no-media": "No Media",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "数据统计",
+      "数字计数器",
+      "进度条",
+      "关键指标",
+      "三栏布局",
+      "仪表盘"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2023/12/1701455970_Counter-Stats-27.jpeg"
+  },
+  "ptn-16341": {
+    "id": 16341,
+    "name": "Hero 56",
+    "description": "左侧为圆角大图，右侧为标题和行动号召按钮的非对称双栏布局。设计简洁现代，适合各类网站展示核心价值主张。",
+    "categories": [
+      "hero"
+    ],
+    "style_tags": [
+      "minimalist",
+      "modern",
+      "clean",
+      "serene"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "consulting",
+      "generic"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "media-left": "Media Left",
+      "off-grid": "Off-Grid",
+      "alignment": "Left Aligned",
+      "vertical-alignment": "Middle",
+      "spacing": "Spacious"
+    },
+    "keywords": [
+      "首屏",
+      "左图右文",
+      "非对称布局",
+      "CTA按钮",
+      "价值主张",
+      "圆角图片"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2023/12/1701793646_Hero-56.jpeg"
+  },
+  "ptn-16344": {
+    "id": 16344,
+    "name": "Media and Text 57",
+    "description": "居中标题下方的四栏卡片式布局，每栏包含图片和简短标题。适用于展示团队成员、产品特性或作品集。",
+    "categories": [
+      "gallery",
+      "features",
+      "team"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "generic",
+      "agency",
+      "portfolio",
+      "startup"
+    ],
+    "layout": {
+      "4-columns": "4 Columns",
+      "media-top": "Media Top",
+      "alignment": "Centered",
+      "width": "Contained"
+    },
+    "keywords": [
+      "四栏布局",
+      "图片卡片",
+      "作品集展示",
+      "团队介绍",
+      "功能列表",
+      "居中标题"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2023/12/1701884268_Text-21.jpeg"
+  },
+  "ptn-16358": {
+    "id": 16358,
+    "name": "Media and Text 53",
+    "description": "经典的左文右图双栏布局，采用圆角卡片设计，简洁清晰。适用于产品特性介绍、服务展示或任何需要图文结合的通用内容模块。",
+    "categories": [
+      "content",
+      "features"
+    ],
+    "style_tags": [
+      "clean",
+      "minimalist",
+      "modern",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "generic",
+      "saas",
+      "startup",
+      "tech"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "media-right": "Media Right",
+      "alignment": "Left Aligned",
+      "vertical-alignment": "Middle"
+    },
+    "keywords": [
+      "左文右图",
+      "双栏布局",
+      "图文模块",
+      "圆角卡片",
+      "内容展示",
+      "简洁设计"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2023/12/1701877627_Media-and-Text-53.jpeg"
+  },
+  "ptn-16360": {
+    "id": 16360,
+    "name": "Text 22",
+    "description": "居中对齐的文本模块，包含一个副标题、大段说明文字和行动号召按钮。设计简洁，适合用于介绍、声明或价值主张。",
+    "categories": [
+      "content",
+      "cta"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "generic",
+      "saas",
+      "agency",
+      "tech"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "no-media": "No Media",
+      "alignment": "Centered",
+      "width": "Contained"
+    },
+    "keywords": [
+      "居中文本",
+      "行动号召",
+      "价值主张",
+      "段落介绍",
+      "CTA按钮"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2023/12/1701884269_Text-22.jpeg"
+  },
+  "ptn-16362": {
+    "id": 16362,
+    "name": "Media and Text 58",
+    "description": "左侧为突出标题的文本卡片，右侧并列两个带标题的图片。适合用于介绍服务、产品特性或展示作品集。",
+    "categories": [
+      "content",
+      "features",
+      "gallery"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern"
+    ],
+    "industry_tags": [
+      "agency",
+      "portfolio",
+      "startup",
+      "generic"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "media-right": "Media Right",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "三栏布局",
+      "图文组合",
+      "内容介绍",
+      "特色展示",
+      "卡片设计",
+      "左文右图"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2023/12/1701884264_Text-23.jpeg"
+  },
+  "ptn-16369": {
+    "id": 16369,
+    "name": "Title / Header 21",
+    "description": "极简风格的居中标题模块，由一个彩色副标题和加粗主标题构成，清晰地引导页面内容，适用于各类页面的顶部。",
+    "categories": [
+      "header",
+      "content"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern"
+    ],
+    "industry_tags": [
+      "generic",
+      "saas",
+      "startup"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "no-media": "No Media",
+      "alignment": "Centered",
+      "width": "Contained"
+    },
+    "keywords": [
+      "页面标题",
+      "居中对齐",
+      "主标题",
+      "副标题",
+      "简洁"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/02/1707520466_Title-Header-21.jpeg"
+  },
+  "ptn-16371": {
+    "id": 16371,
+    "name": "Text 23",
+    "description": "居中对齐的段落文本模块，用于介绍组织、产品或服务。设计简洁，适用于任何需要详细文字说明的页面。",
+    "categories": [
+      "content"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "generic"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "no-media": "No Media",
+      "alignment": "Centered",
+      "width": "Contained"
+    },
+    "keywords": [
+      "段落文本",
+      "居中对齐",
+      "内容模块",
+      "关于我们",
+      "文字介绍"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2023/12/1701884266_Text-24.jpeg"
+  },
+  "ptn-16374": {
+    "id": 16374,
+    "name": "Media and Text 54",
+    "description": "交错的图文双栏布局，通过左右切换图片和文字的位置，创造视觉节奏感。适合展示产品特性、服务项目或核心优势。",
+    "categories": [
+      "features",
+      "content"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "minimalist"
+    ],
+    "industry_tags": [
+      "saas",
+      "agency",
+      "tech",
+      "generic"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "bento-grid": "Bento &amp; Grid",
+      "media-left": "Media Left",
+      "media-right": "Media Right",
+      "alignment": "Left Aligned",
+      "width": "Contained",
+      "spacing": "Spacious"
+    },
+    "keywords": [
+      "图文交错",
+      "双栏布局",
+      "产品特性",
+      "服务介绍",
+      "视觉节奏",
+      "圆角图片"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2023/12/1701885846_Media-and-Text-54.jpeg"
+  },
+  "ptn-16376": {
+    "id": 16376,
+    "name": "Text 21",
+    "description": "居中对齐的段落文本模块，采用简洁的无衬线字体，用于强调核心信息或价值主张。适合各类页面的内容补充部分。",
+    "categories": [
+      "content"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "generic",
+      "saas",
+      "startup",
+      "agency"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "no-media": "No Media",
+      "alignment": "Centered",
+      "width": "Contained"
+    },
+    "keywords": [
+      "段落文本",
+      "居中对齐",
+      "内容模块",
+      "价值主张",
+      "简介文本"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2023/12/1701884266_Text-25.jpeg"
+  },
+  "ptn-16378": {
+    "id": 16378,
+    "name": "Image 8",
+    "description": "经典的左图右文双栏布局，右侧为蓝色背景的标题和行动号召按钮。适用于突出显示特定功能或引导用户操作。",
+    "categories": [
+      "cta",
+      "features"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "bold"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "agency",
+      "generic"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "media-left": "Media Left",
+      "vertical-alignment": "Middle"
+    },
+    "keywords": [
+      "双栏布局",
+      "左图右文",
+      "行动号召",
+      "圆角卡片",
+      "彩色背景"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1705346811_Image-8.jpeg"
+  },
+  "ptn-16382": {
+    "id": 16382,
+    "name": "Location/Map/Hours 16",
+    "description": "居中对齐的单栏布局，用于展示公司地址。包含标题、地址信息和地图查看按钮，设计简洁明了，适合联系我们页面或页脚。",
+    "categories": [
+      "location"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "generic",
+      "agency",
+      "startup",
+      "consulting"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "no-media": "No Media",
+      "alignment": "Centered",
+      "spacing": "Spacious"
+    },
+    "keywords": [
+      "地址展示",
+      "联系我们",
+      "地图链接",
+      "居中布局",
+      "简洁设计"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2023/12/1701838379_LocationMapHours-16.jpeg"
+  },
+  "ptn-16384": {
+    "id": 16384,
+    "name": "Form 24",
+    "description": "居中对齐的联系表单，包含标题、姓名、邮箱和消息输入框，以及提交按钮。设计简洁，适用于各类网站的联系页面。",
+    "categories": [
+      "contact-form"
+    ],
+    "style_tags": [
+      "clean",
+      "minimalist",
+      "professional"
+    ],
+    "industry_tags": [
+      "generic",
+      "saas",
+      "agency",
+      "consulting"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "no-media": "No Media",
+      "alignment": "Centered",
+      "width": "Contained"
+    },
+    "keywords": [
+      "联系表单",
+      "信息提交",
+      "用户反馈",
+      "居中布局",
+      "简洁设计"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2023/12/1701463007_Form-24.jpeg"
+  },
+  "ptn-16386": {
+    "id": 16386,
+    "name": "Accordion 18",
+    "description": "居中大标题引导，下方为手风琴式内容列表，用于折叠展示信息。常用于常见问题解答（FAQ）或产品功能介绍。",
+    "categories": [
+      "faq",
+      "content"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "generic",
+      "saas",
+      "tech",
+      "consulting"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "no-media": "No Media",
+      "alignment": "Centered",
+      "width": "Contained"
+    },
+    "keywords": [
+      "手风琴",
+      "折叠面板",
+      "常见问题",
+      "FAQ",
+      "问答列表"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2023/11/1701381263_Accordion-18.jpeg"
+  },
+  "ptn-17666": {
+    "id": 17666,
+    "name": "Hero 57",
+    "description": "双栏布局的首屏设计，以宁静的山脉作为全宽背景。左侧为醒目大标题，右侧为描述和行动号召按钮，视觉层次分明。",
+    "categories": [
+      "hero"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "serene",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "tech",
+      "consulting",
+      "travel",
+      "generic"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "media-background": "Media Background",
+      "width": "Contained",
+      "vertical-alignment": "Middle"
+    },
+    "keywords": [
+      "首屏",
+      "背景图",
+      "双栏布局",
+      "行动号召",
+      "价值主张",
+      "山脉背景"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/03/1741725270_Hero-57.jpeg"
+  },
+  "ptn-17699": {
+    "id": 17699,
+    "name": "Media and Text 61",
+    "description": "左侧采用非对称图片拼贴布局，右侧为标题、描述和行动号召按钮。适合展示品牌故事、服务特色或旅行博客内容。",
+    "categories": [
+      "content",
+      "cta",
+      "gallery"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "travel",
+      "portfolio",
+      "agency",
+      "generic"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "media-left": "Media Left",
+      "off-grid": "Off-Grid",
+      "alignment": "Left Aligned",
+      "vertical-alignment": "Middle"
+    },
+    "keywords": [
+      "图片拼贴",
+      "左图右文",
+      "非对称布局",
+      "行动号召",
+      "特色介绍",
+      "品牌故事"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/03/1742588445_Media-and-Text-61.jpeg"
+  },
+  "ptn-17715": {
+    "id": 17715,
+    "name": "Location/Map/Hours 17",
+    "description": "顶部采用双栏布局展示联系信息和多个地址，下方嵌入全宽交互式地图，清晰指引用户。适合拥用多个分支机构的企业网站。",
+    "categories": [
+      "location"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "generic",
+      "agency",
+      "consulting",
+      "real-estate"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "bento-grid": "Bento & Grid",
+      "media-bottom": "Media Bottom",
+      "alignment": "Left Aligned",
+      "width": "Full Width"
+    },
+    "keywords": [
+      "联系我们",
+      "地址",
+      "地图",
+      "多地点",
+      "分支机构",
+      "Google地图"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/03/1742585814_LocationMapHours-17.jpeg"
+  },
+  "ptn-17811": {
+    "id": 17811,
+    "name": "Cards 40",
+    "description": "三栏式布局，左侧为两个图文卡片，右侧为独立的标题和行动号召按钮。适合展示核心服务或产品特性。",
+    "categories": [
+      "content",
+      "services",
+      "features"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "consulting",
+      "agency"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "media-left": "Media Left",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "三栏布局",
+      "图文卡片",
+      "服务介绍",
+      "功能展示",
+      "行动号召",
+      "不对称布局"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704137407_Cards-40.jpeg"
+  },
+  "ptn-17825": {
+    "id": 17825,
+    "name": "Counter / Stats 36",
+    "description": "左侧文案和三栏数据统计，右侧配图的经典布局。用于直观展示公司的关键成就或业务数据，增强可信度。",
+    "categories": [
+      "stats",
+      "content"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "professional",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "consulting",
+      "agency"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "media-right": "Media Right",
+      "alignment": "Left Aligned",
+      "off-grid": "Off-Grid"
+    },
+    "keywords": [
+      "数据展示",
+      "关键指标",
+      "公司成就",
+      "左文右图",
+      "统计数据",
+      "数字看板"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704137364_Counter-Stats-36.jpeg"
+  },
+  "ptn-17834": {
+    "id": 17834,
+    "name": "Columns 34",
+    "description": "优雅的三栏式布局，每栏通过淡化的大号数字背景突出步骤顺序，配以标题和说明文字，适合展示流程、步骤或核心功能。",
+    "categories": [
+      "how-it-works",
+      "features"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "startup",
+      "generic"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "no-media": "No Media",
+      "alignment": "Left Aligned",
+      "spacing": "Spacious"
+    },
+    "keywords": [
+      "步骤说明",
+      "三栏布局",
+      "流程展示",
+      "数字序号",
+      "功能介绍",
+      "简约设计"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704137411_Columns-34.jpeg"
+  },
+  "ptn-17842": {
+    "id": 17842,
+    "name": "Media and Text 62",
+    "description": "经典的左图右文分栏布局，右侧包含标题、描述和行动号召按钮。适用于展示产品特性、公司使命或核心价值。",
+    "categories": [
+      "content",
+      "cta",
+      "features"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "professional",
+      "serene"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "consulting",
+      "agency"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "2-columns": "2 Columns",
+      "media-background": "Media Background",
+      "media-left": "Media Left",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "分栏布局",
+      "左图右文",
+      "行动号召",
+      "产品特性",
+      "价值主张",
+      "CTA按钮"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704138067_Media-and-Text-62.jpeg"
+  },
+  "ptn-17854": {
+    "id": 17854,
+    "name": "Title / Header 23",
+    "description": "居中对齐的大标题和副标题模块，采用粗体字吸引用户注意。适用于任何页面的顶部，用以介绍章节内容。",
+    "categories": [
+      "header",
+      "content"
+    ],
+    "style_tags": [
+      "minimalist",
+      "modern",
+      "clean",
+      "bold"
+    ],
+    "industry_tags": [
+      "generic",
+      "saas",
+      "tech",
+      "agency"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "no-media": "No Media",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "页面标题",
+      "章节标题",
+      "居中标题",
+      "粗体文字",
+      "简洁设计"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704143512_Title-Header-23.jpeg"
+  },
+  "ptn-17863": {
+    "id": 17863,
+    "name": "Media and Text 63",
+    "description": "左侧采用创意图片拼贴，右侧为文字说明的非对称布局。适合展示品牌故事、核心价值或服务介绍，设计感强。",
+    "categories": [
+      "content",
+      "features"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "minimalist"
+    ],
+    "industry_tags": [
+      "agency",
+      "consulting",
+      "travel",
+      "generic"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "media-left": "Media Left",
+      "off-grid": "Off-Grid",
+      "alignment": "Left Aligned",
+      "vertical-alignment": "Middle"
+    },
+    "keywords": [
+      "图片拼贴",
+      "左图右文",
+      "非对称布局",
+      "创意展示",
+      "品牌故事",
+      "服务介绍"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704139404_Media-and-Text-63.jpeg"
+  },
+  "ptn-17874": {
+    "id": 17874,
+    "name": "Testimonials 34",
+    "description": "居中大标题下方的非对称网格布局，融合了客户评价、描述性文本和两张配图，有效展示社会认同并提供视觉背景。",
+    "categories": [
+      "testimonials"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "travel",
+      "agency",
+      "consulting"
+    ],
+    "layout": {
+      "bento-grid": "Bento & Grid",
+      "media-bottom": "Media Bottom",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "客户评价",
+      "用户见证",
+      "非对称布局",
+      "网格设计",
+      "图文组合",
+      "社会认同"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704143512_Testimonials-34.jpeg"
+  },
+  "ptn-17889": {
+    "id": 17889,
+    "name": "Gallery 14",
+    "description": "居中标题下的图片轮播廊，通过简洁的导航点切换展示内容。适合作品集、活动照片或产品视觉展示。",
+    "categories": [
+      "gallery"
+    ],
+    "style_tags": [
+      "minimalist",
+      "modern",
+      "clean",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "portfolio",
+      "agency",
+      "travel",
+      "generic"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "media-bottom": "Media Bottom",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "图片轮播",
+      "作品集",
+      "图库",
+      "居中标题",
+      "滑块"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704143797_Gallery-14.jpeg"
+  },
+  "ptn-17902": {
+    "id": 17902,
+    "name": "Team 23",
+    "description": "居中标题和三列网格布局，用于展示团队成员。每个卡片包含成员照片、姓名和职位，设计简洁专业，适合企业或机构网站。",
+    "categories": [
+      "team"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "agency",
+      "startup",
+      "consulting",
+      "tech"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "media-top": "Media Top",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "团队介绍",
+      "成员展示",
+      "三栏布局",
+      "人物卡片",
+      "公司团队",
+      "员工简介"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704144719_Team-23.jpeg"
+  },
+  "ptn-17916": {
+    "id": 17916,
+    "name": "Location/Map/Hour 18",
+    "description": "顶部为居中标题和三栏联系信息，底部配有三栏图片画廊。适用于展示公司联系方式、地理位置或相关项目。",
+    "categories": [
+      "location",
+      "gallery",
+      "contact-form"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "agency",
+      "consulting",
+      "portfolio",
+      "generic"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "media-bottom": "Media Bottom",
+      "alignment": "Centered",
+      "width": "Contained"
+    },
+    "keywords": [
+      "联系信息",
+      "地址电话",
+      "三栏布局",
+      "图片画廊",
+      "公司位置",
+      "联系方式"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704147196_LocationMapHour-18.jpeg"
+  },
+  "ptn-17925": {
+    "id": 17925,
+    "name": "Accordion 19",
+    "description": "双栏布局，左侧为手风琴式常见问题解答（FAQ），右侧为联系表单。适用于帮助中心或产品支持页面，方便用户自助查询并联系客服。",
+    "categories": [
+      "faq",
+      "contact-form"
+    ],
+    "style_tags": [
+      "clean",
+      "professional",
+      "modern",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "consulting",
+      "generic"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "no-media": "No Media",
+      "alignment": "Centered",
+      "width": "Contained"
+    },
+    "keywords": [
+      "常见问题",
+      "联系表单",
+      "手风琴",
+      "双栏布局",
+      "客户支持",
+      "信息提交"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704152460_Accordion-19.jpeg"
+  },
+  "ptn-17969": {
+    "id": 17969,
+    "name": "Title / Header 24",
+    "description": "全宽背景图搭配居中标题和副标题，营造宁静大气的视觉氛围。适用于页面顶部或章节标题，吸引用户注意力。",
+    "categories": [
+      "header"
+    ],
+    "style_tags": [
+      "clean",
+      "serene",
+      "modern",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "travel",
+      "health",
+      "non-profit",
+      "generic"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "media-background": "Media Background",
+      "alignment": "Centered",
+      "width": "Full Width"
+    },
+    "keywords": [
+      "页面标题",
+      "背景图片",
+      "居中对齐",
+      "章节标题",
+      "全宽横幅",
+      "宁静"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704259050_Title-Header-24.jpeg"
+  },
+  "ptn-17980": {
+    "id": 17980,
+    "name": "Testimonials 35",
+    "description": "非对称双栏布局，左侧为标题和介绍，右侧展示带配图的客户评价。适合建立品牌信任和展示社会认同。",
+    "categories": [
+      "testimonials",
+      "content"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "saas",
+      "agency",
+      "consulting",
+      "generic"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "media-right": "Media Right",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "客户评价",
+      "推荐信",
+      "双栏布局",
+      "用户证言",
+      "社会认同",
+      "左文右图"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704303262_Testimonials-35.jpeg"
+  },
+  "ptn-17988": {
+    "id": 17988,
+    "name": "Video 18",
+    "description": "简洁的单栏布局，顶部为标题和说明文字，下方是醒目的视频播放器。适合产品介绍、教程展示或品牌故事讲述。",
+    "categories": [
+      "video",
+      "content"
+    ],
+    "style_tags": [
+      "minimalist",
+      "modern",
+      "clean",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "generic",
+      "saas",
+      "tech",
+      "education"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "media-bottom": "Media Bottom",
+      "alignment": "Left Aligned",
+      "width": "Contained"
+    },
+    "keywords": [
+      "视频播放",
+      "产品介绍",
+      "顶部文案",
+      "单栏布局",
+      "教程视频",
+      "品牌故事"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704257582_Video-18.jpeg"
+  },
+  "ptn-17994": {
+    "id": 17994,
+    "name": "Team 24",
+    "description": "居中标题和描述下方，是四栏网格布局的团队成员卡片。每张卡片包含照片、姓名、职位和社交链接，适合展示公司核心团队。",
+    "categories": [
+      "team"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "agency",
+      "startup",
+      "consulting",
+      "tech"
+    ],
+    "layout": {
+      "4-columns": "4 Columns",
+      "media-background": "Media Background",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "团队介绍",
+      "成员展示",
+      "四栏布局",
+      "员工简介",
+      "社交链接"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704258769_Team-24.jpeg"
+  },
+  "ptn-18016": {
+    "id": 18016,
+    "name": "Form 25",
+    "description": "经典的两栏联系表单布局，左侧为标题、描述和社交链接，右侧为输入字段和提交按钮。适用于企业网站或服务页面。",
+    "categories": [
+      "contact-form"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "generic",
+      "agency",
+      "consulting",
+      "saas"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "no-media": "No Media",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "联系表单",
+      "双栏布局",
+      "客户咨询",
+      "信息提交",
+      "社交链接"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704259776_Form-25.jpeg"
+  },
+  "ptn-18026": {
+    "id": 18026,
+    "name": "Location/Map/Hour 19",
+    "description": "在全宽地图背景之上，悬浮一张包含三列联系信息（邮箱、地址、电话）的卡片。设计清晰直观，适用于企业联系页面或页脚。",
+    "categories": [
+      "location"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "generic",
+      "corporate",
+      "agency"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "media-bottom": "Media Bottom",
+      "full-width": "Full Width",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "联系方式",
+      "地址地图",
+      "三栏布局",
+      "悬浮卡片",
+      "谷歌地图",
+      "营业地点"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704260838_LocationMapHour-19.jpeg"
+  },
+  "ptn-18038": {
+    "id": 18038,
+    "name": "Logo Farm 27",
+    "description": "左侧为引导标题，右侧水平排列多个合作伙伴或客户徽标，用于展示品牌信誉和社会认同。",
+    "categories": [
+      "logos"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "professional",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "saas",
+      "agency",
+      "startup",
+      "generic"
+    ],
+    "layout": {
+      "5-columns": "5+ Columns",
+      "media-right": "Media Right",
+      "vertical-alignment": "Middle"
+    },
+    "keywords": [
+      "合作伙伴",
+      "客户徽标",
+      "品牌展示",
+      "社会认同",
+      "媒体报道",
+      "Logo墙"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704293347_Logo-Farm-27.jpeg"
+  },
+  "ptn-18047": {
+    "id": 18047,
+    "name": "Title / Header 25",
+    "description": "简约的全宽页面标题模块，将居中标题和副标题叠加在柔和的背景图之上。适合用作网站首页或内页的视觉引导。",
+    "categories": [
+      "hero",
+      "header"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern",
+      "serene"
+    ],
+    "industry_tags": [
+      "generic",
+      "consulting",
+      "startup"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "media-background": "Media Background",
+      "alignment": "Centered",
+      "width": "Full Width"
+    },
+    "keywords": [
+      "页面标题",
+      "首屏",
+      "背景图片",
+      "居中对齐",
+      "简约设计",
+      "横幅"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704303252_Title-Header-25.jpeg"
+  },
+  "ptn-18197": {
+    "id": 18197,
+    "name": "Accordion 20",
+    "description": "居中标题和手风琴列表布局，背景带有柔和的图片。非常适合用于展示常见问题解答（FAQ）或产品功能细节。",
+    "categories": [
+      "faq",
+      "content"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "light-mode",
+      "serene"
+    ],
+    "industry_tags": [
+      "generic",
+      "saas",
+      "consulting",
+      "agency"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "media-background": "Media Background",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "手风琴",
+      "常见问题",
+      "FAQ",
+      "问答列表",
+      "内容展开",
+      "背景图"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/01/1738013609_Accordion-20.jpeg"
+  },
+  "ptn-18201": {
+    "id": 18201,
+    "name": "Video 19",
+    "description": "顶部采用双栏文本布局，左侧为标题描述，右侧为卡片式要点列表，下方嵌入一个醒目的视频播放器。适合产品功能演示或教程说明。",
+    "categories": [
+      "video",
+      "features"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "education",
+      "consulting"
+    ],
+    "layout": {
+      "bento-grid": "Bento & Grid",
+      "media-bottom": "Media Bottom",
+      "2-columns": "2 Columns",
+      "contained": "Contained",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "视频播放",
+      "产品演示",
+      "功能介绍",
+      "双栏文本",
+      "清单列表",
+      "教程视频"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704742262_Video-19.jpeg"
+  },
+  "ptn-18223": {
+    "id": 18223,
+    "name": "Media and Text 66",
+    "description": "左侧为特色图片，右侧为大标题和双栏描述文本的布局。结构清晰，适合展示产品特性、服务优势或公司简介。",
+    "categories": [
+      "features",
+      "content"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "consulting",
+      "agency"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "media-left": "Media Left",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "图文组合",
+      "三栏布局",
+      "功能介绍",
+      "产品特性",
+      "左图右文",
+      "企业服务"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704742276_Media-and-Text-66.jpeg"
+  },
+  "ptn-18234": {
+    "id": 18234,
+    "name": "Media and Text 67",
+    "description": "三栏式布局，中心突出展示图片和行动号召按钮，两侧分点阐述核心特性。适用于产品介绍、服务展示或价值主张页面。",
+    "categories": [
+      "features",
+      "content",
+      "cta"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "consulting",
+      "agency"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "bento-grid": "Bento &amp; Grid",
+      "media-center": "Media Center",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "三栏布局",
+      "功能特性",
+      "图文组合",
+      "居中图片",
+      "行动号召",
+      "产品介绍"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704743306_Media-and-Text-67.jpeg"
+  },
+  "ptn-18236": {
+    "id": 18236,
+    "name": "Testimonials 36",
+    "description": "简洁的双栏布局，左侧为区域标题和介绍，右侧展示单个客户评价及头像。适合建立品牌信任和社会认同。",
+    "categories": [
+      "testimonials"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "professional",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "generic",
+      "saas",
+      "agency",
+      "consulting"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "no-media": "No Media",
+      "alignment": "Left Aligned",
+      "width": "Contained"
+    },
+    "keywords": [
+      "客户评价",
+      "推荐语",
+      "双栏布局",
+      "用户证言",
+      "社会认同"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704743313_Testimonials-36.jpeg"
+  },
+  "ptn-18249": {
+    "id": 18249,
+    "name": "Media and Text 68",
+    "description": "左侧为标题、描述和特性列表，右侧为2x2图片网格布局。适合展示产品特性、服务亮点或作品集。",
+    "categories": [
+      "features",
+      "gallery",
+      "services"
+    ],
+    "style_tags": [
+      "clean",
+      "minimalist",
+      "modern"
+    ],
+    "industry_tags": [
+      "saas",
+      "agency",
+      "portfolio",
+      "tech"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "bento-grid": "Bento & Grid",
+      "media-right": "Media Right",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "功能列表",
+      "图片网格",
+      "左文右图",
+      "产品特性",
+      "特色展示",
+      "多图布局"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704751721_Media-and-Text-68.jpeg"
+  },
+  "ptn-18251": {
+    "id": 18251,
+    "name": "Media and Text 69",
+    "description": "左侧内容卡片悬浮于右侧背景图之上，形成富有层次感的布局。适合展示品牌故事、核心价值或服务介绍。",
+    "categories": [
+      "content",
+      "services"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "serene",
+      "professional"
+    ],
+    "industry_tags": [
+      "travel",
+      "consulting",
+      "non-profit",
+      "generic"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "2-columns": "2 Columns",
+      "media-background": "Media Background",
+      "media-left": "Media Left",
+      "off-grid": "Off-Grid",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "内容卡片",
+      "重叠布局",
+      "背景图片",
+      "左文右图",
+      "品牌故事",
+      "服务介绍"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704746815_Media-and-Text-69.jpeg"
+  },
+  "ptn-18252": {
+    "id": 18252,
+    "name": "Video 20",
+    "description": "居中标题和双栏文本，下方是醒目的视频播放器和行动号召按钮。适合产品演示、教程或品牌故事展示。",
+    "categories": [
+      "video",
+      "cta"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "consulting",
+      "agency"
+    ],
+    "layout": {
+      "bento-grid": "Bento & Grid",
+      "media-bottom": "Media Bottom",
+      "1-column": "1 Column",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "视频播放",
+      "产品演示",
+      "行动号召",
+      "居中布局",
+      "双栏文本"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704745478_Video-20.jpeg"
+  },
+  "ptn-18289": {
+    "id": 18289,
+    "name": "Location/Map/Hour 21",
+    "description": "全宽嵌入式地图模块，用于直观展示地理位置。左上角包含地址信息和导航链接，设计简洁实用。",
+    "categories": [
+      "location"
+    ],
+    "style_tags": [
+      "clean",
+      "minimalist",
+      "flat"
+    ],
+    "industry_tags": [
+      "generic",
+      "restaurant",
+      "real-estate",
+      "agency"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "media-center": "Media Center",
+      "width": "Full Width"
+    },
+    "keywords": [
+      "地图",
+      "位置展示",
+      "联系我们",
+      "地理位置",
+      "导航",
+      "Google地图"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704751645_LocationMapHour-21.jpeg"
+  },
+  "ptn-18301": {
+    "id": 18301,
+    "name": "Media and Text 70",
+    "description": "经典左图右文布局，包含标题、副标题和行动号召按钮。简洁明了，适合展示产品特性或引导用户操作。",
+    "categories": [
+      "content",
+      "cta"
+    ],
+    "style_tags": [
+      "clean",
+      "minimalist",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "agency",
+      "generic"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "media-left": "Media Left",
+      "alignment": "Left Aligned",
+      "vertical-alignment": "Middle"
+    },
+    "keywords": [
+      "左图右文",
+      "行动号召",
+      "产品特性",
+      "双栏布局",
+      "CTA按钮",
+      "图文模块"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704751937_Media-and-Text-70.jpeg"
+  },
+  "ptn-18315": {
+    "id": 18315,
+    "name": "Featured Product 15",
+    "description": "全幅背景图布局，左侧内容区展示产品标题、星级评价、价格和行动号召按钮。适合突出展示单个核心产品或服务。",
+    "categories": [
+      "cta",
+      "hero",
+      "content"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "serene",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "saas",
+      "ecommerce",
+      "tech",
+      "generic"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "media-background": "Media Background",
+      "alignment": "Left Aligned",
+      "width": "Full Width"
+    },
+    "keywords": [
+      "产品展示",
+      "背景图片",
+      "行动号召",
+      "价格显示",
+      "用户评价",
+      "左对齐布局"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704755160_Featured-Product-15.jpeg"
+  },
+  "ptn-18324": {
+    "id": 18324,
+    "name": "Form 28",
+    "description": "双栏布局，左侧为手风琴式FAQ区域，右侧为深色背景的联系表单。适合在提供支持信息的同时收集用户反馈。",
+    "categories": [
+      "contact-form",
+      "faq"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "professional",
+      "dark-mode"
+    ],
+    "industry_tags": [
+      "saas",
+      "agency",
+      "consulting",
+      "generic"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "no-media": "No Media",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "联系表单",
+      "手风琴",
+      "FAQ",
+      "双栏布局",
+      "深色模式",
+      "用户反馈"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704753330_Form-27.jpeg"
+  },
+  "ptn-18331": {
+    "id": 18331,
+    "name": "Accordion 21",
+    "description": "双栏布局的常见问题解答（FAQ）模块，左侧为标准列表，右侧采用卡片式设计以突出显示。适合展示产品特性或解答用户疑问。",
+    "categories": [
+      "faq",
+      "content"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "consulting",
+      "generic"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "media-background": "Media Background",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "手风琴",
+      "FAQ",
+      "问答模块",
+      "双栏布局",
+      "卡片设计"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704753853_Accordion-21.jpeg"
+  },
+  "ptn-18334": {
+    "id": 18334,
+    "name": "Accordion 22",
+    "description": "经典的左文右图布局，左侧采用手风琴组件来展示可折叠内容，右侧配图。非常适合用于FAQ、产品功能介绍等场景。",
+    "categories": [
+      "faq",
+      "content"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "minimalist",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "generic",
+      "saas",
+      "travel",
+      "education"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "media-right": "Media Right",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "手风琴",
+      "FAQ",
+      "问答列表",
+      "左文右图",
+      "内容展开",
+      "折叠面板"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1711122257_Accordion-22.jpeg"
+  },
+  "ptn-18341": {
+    "id": 18341,
+    "name": "Counter / Stats 37",
+    "description": "左侧为背景图，右侧为内容卡片，通过关键数据展示组织成就。适合企业网站或SaaS产品用以建立信任感。",
+    "categories": [
+      "stats"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional",
+      "serene"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "consulting",
+      "agency"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "2-columns": "2 Columns",
+      "bento-grid": "Bento & Grid",
+      "media-background": "Media Background",
+      "media-left": "Media Left",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "数据展示",
+      "关键指标",
+      "背景图",
+      "信息卡片",
+      "企业成就",
+      "统计数据"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704755880_Counter-Stats-37.jpeg"
+  },
+  "ptn-18452": {
+    "id": 18452,
+    "name": "Hero 59",
+    "description": "全宽背景图搭配居中标题和描述，营造宁静专业氛围。适合用作网站首页、关于页面或章节标题。",
+    "categories": [
+      "hero",
+      "content"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "serene",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "consulting",
+      "health",
+      "non-profit",
+      "generic"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "media-background": "Media Background",
+      "alignment": "Centered",
+      "width": "Full Width"
+    },
+    "keywords": [
+      "页面标题",
+      "背景图",
+      "居中布局",
+      "简约设计",
+      "首屏",
+      "横幅"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704778814_Hero-59.jpeg"
+  },
+  "ptn-18457": {
+    "id": 18457,
+    "name": "Media and Text 71",
+    "description": "经典的左图右文布局，图片下方带有装饰性色块，增强视觉层次感。右侧包含标题、描述和行动号召按钮，适合展示产品特性或服务介绍。",
+    "categories": [
+      "content",
+      "features",
+      "cta"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "minimalist"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "agency",
+      "consulting"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "media-left": "Media Left",
+      "off-grid": "Off-Grid",
+      "alignment": "Left Aligned",
+      "vertical-alignment": "Middle"
+    },
+    "keywords": [
+      "左图右文",
+      "双栏布局",
+      "产品特性",
+      "服务介绍",
+      "行动号召",
+      "图文组合",
+      "装饰背景"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1710624933_Media-and-Text-71.jpeg"
+  },
+  "ptn-18473": {
+    "id": 18473,
+    "name": "Form 29",
+    "description": "双栏布局的邮件订阅表单，左侧为标题和描述，右侧为输入框和提交按钮。设计简洁，适用于页脚或内容区。",
+    "categories": [
+      "newsletter"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "minimalist",
+      "professional"
+    ],
+    "industry_tags": [
+      "generic",
+      "saas",
+      "tech",
+      "startup"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "no-media": "No Media",
+      "vertical-alignment": "Middle"
+    },
+    "keywords": [
+      "邮件订阅",
+      "电子报",
+      "订阅表单",
+      "通讯注册",
+      "CTA",
+      "双栏布局"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704826670_Form-29.jpeg"
+  },
+  "ptn-18478": {
+    "id": 18478,
+    "name": "Cards 43",
+    "description": "三栏卡片式布局，每张卡片顶部配有图标，下方是标题和描述。适合简洁明了地展示产品特性、服务或核心价值。",
+    "categories": [
+      "features",
+      "services",
+      "content"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "agency",
+      "generic"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "no-media": "No Media",
+      "alignment": "Centered",
+      "spacing": "Spacious"
+    },
+    "keywords": [
+      "卡片布局",
+      "三栏",
+      "图标",
+      "功能介绍",
+      "服务展示",
+      "简洁设计"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/01/1704826622_Cards-43.jpeg"
+  },
+  "ptn-18665": {
+    "id": 18665,
+    "name": "Hero 60",
+    "description": "全幅自然风光背景图英雄区，左侧叠加标题、描述和双行动号召按钮。整体设计宁静开阔，适合传达宏大愿景或自然主题。",
+    "categories": [
+      "hero"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "serene",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "travel",
+      "tech",
+      "consulting",
+      "non-profit"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "media-background": "Media Background",
+      "alignment": "Left Aligned",
+      "width": "Full Width"
+    },
+    "keywords": [
+      "首屏",
+      "背景图",
+      "左对齐",
+      "行动号召",
+      "自然风光",
+      "双按钮"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1711122245_Hero-60.jpeg"
+  },
+  "ptn-18668": {
+    "id": 18668,
+    "name": "Product Loop 20",
+    "description": "居中标题下的三栏式产品卡片网格，每张卡片顶部为图片，下方为品名和价格，底部配有行动号召按钮。适合电商网站展示特色商品系列。",
+    "categories": [
+      "content",
+      "cta",
+      "gallery"
+    ],
+    "style_tags": [
+      "clean",
+      "minimalist",
+      "modern",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "ecommerce",
+      "startup",
+      "generic"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "media-top": "Media Top",
+      "alignment": "Centered",
+      "width": "Contained"
+    },
+    "keywords": [
+      "产品网格",
+      "商品卡片",
+      "三栏布局",
+      "电商展示",
+      "行动号召",
+      "特色商品"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/02/1708040370_Product-Loop-20.jpeg"
+  },
+  "ptn-18672": {
+    "id": 18672,
+    "name": "Media and Text 72",
+    "description": "非对称双栏布局，左侧展示地址、营业时间等关键信息，右侧配以大图。适合展示实体店面、旅游目的地或服务地点详情。",
+    "categories": [
+      "location",
+      "content"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "light-mode",
+      "professional"
+    ],
+    "industry_tags": [
+      "travel",
+      "real-estate",
+      "generic"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "bento-grid": "Bento & Grid",
+      "media-bottom": "Media Bottom",
+      "media-top": "Media Top",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "联系信息",
+      "营业时间",
+      "地址展示",
+      "双栏布局",
+      "非对称网格",
+      "地点介绍"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/02/1707934716_Media-and-Text-72.jpeg"
+  },
+  "ptn-18675": {
+    "id": 18675,
+    "name": "Gallery 15",
+    "description": "非对称的便当网格布局，左侧为一张大图，右侧为四张小图。适合展示摄影作品或项目案例，营造视觉冲击力。",
+    "categories": [
+      "gallery"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "minimalist",
+      "serene"
+    ],
+    "industry_tags": [
+      "portfolio",
+      "agency",
+      "travel",
+      "media"
+    ],
+    "layout": {
+      "bento-grid": "Bento & Grid",
+      "media-center": "Media Center",
+      "2-columns": "2 Columns",
+      "full-width": "Full Width"
+    },
+    "keywords": [
+      "图片画廊",
+      "便当网格",
+      "非对称布局",
+      "摄影作品集",
+      "视觉展示"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/03/1742585171_Gallery-15.jpeg"
+  },
+  "ptn-18678": {
+    "id": 18678,
+    "name": "Featured Product 16",
+    "description": "经典的左图右文布局，用于展示单个产品。右侧包含标题、星级、价格、描述和行动号召按钮，结构清晰，适合电商或服务介绍页面。",
+    "categories": [
+      "features",
+      "services"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "ecommerce",
+      "travel",
+      "generic"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "media-left": "Media Left",
+      "alignment": "Left Aligned",
+      "vertical-alignment": "Middle"
+    },
+    "keywords": [
+      "产品展示",
+      "左图右文",
+      "星级评价",
+      "价格显示",
+      "CTA按钮",
+      "电商"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/02/1708024240_Media-and-Text-73.jpeg"
+  },
+  "ptn-18684": {
+    "id": 18684,
+    "name": "Title / Header 26",
+    "description": "全宽背景图的页面标题模块，文字居中叠加于图片之上，简洁有力。适用于各类网站的页面顶部或章节标题。",
+    "categories": [
+      "header",
+      "hero"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "minimalist"
+    ],
+    "industry_tags": [
+      "generic",
+      "tech",
+      "agency",
+      "consulting"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "media-background": "Media Background",
+      "alignment": "Centered",
+      "width": "Full Width"
+    },
+    "keywords": [
+      "页面标题",
+      "背景图片",
+      "居中对齐",
+      "全宽横幅",
+      "章节标题"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1711121055_Title-Header-26.jpeg"
+  },
+  "ptn-18690": {
+    "id": 18690,
+    "name": "Team 26",
+    "description": "居中标题和简介，下方是四栏团队成员展示。每个成员包含圆形头像、姓名和职位，设计简洁专业。",
+    "categories": [
+      "team"
+    ],
+    "style_tags": [
+      "clean",
+      "minimalist",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "agency",
+      "startup",
+      "tech",
+      "consulting"
+    ],
+    "layout": {
+      "4-columns": "4 Columns",
+      "media-top": "Media Top",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "团队介绍",
+      "成员展示",
+      "圆形头像",
+      "四栏布局",
+      "公司团队",
+      "关于我们"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/02/1707938428_Team-26.jpeg"
+  },
+  "ptn-18692": {
+    "id": 18692,
+    "name": "List 32",
+    "description": "水平排列的四栏图标列表，背景为风景图。每个项目包含一个图标和标题，适合展示核心功能、服务优势或步骤流程。",
+    "categories": [
+      "features",
+      "how-it-works",
+      "services"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "light-mode",
+      "flat"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "consulting",
+      "generic"
+    ],
+    "layout": {
+      "4-columns": "4 Columns",
+      "media-background": "Media Background",
+      "alignment": "Centered",
+      "width": "Full Width"
+    },
+    "keywords": [
+      "图标列表",
+      "功能特性",
+      "四栏布局",
+      "背景图",
+      "步骤说明",
+      "服务优势"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1711121049_List-32.jpeg"
+  },
+  "ptn-18697": {
+    "id": 18697,
+    "name": "Testimonials 37",
+    "description": "经典左文右图布局，左侧展示客户评价和头像，右侧配图。通过引用式设计增强可信度，适合展示客户成功案例。",
+    "categories": [
+      "testimonials"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "consulting",
+      "agency"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "media-right": "Media Right",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "客户评价",
+      "推荐信",
+      "左文右图",
+      "用户见证",
+      "社会化证明",
+      "引言"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/02/1707938856_Testimonials-37.jpeg"
+  },
+  "ptn-18702": {
+    "id": 18702,
+    "name": "Form 30",
+    "description": "居中布局的邮件订阅表单，以柔和的风景图为背景。深色卡片设计突出了输入框和行动号召按钮，适合各类网站的页脚或独立区块。",
+    "categories": [
+      "newsletter"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "professional",
+      "serene"
+    ],
+    "industry_tags": [
+      "generic",
+      "saas",
+      "agency",
+      "tech"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "media-background": "Media Background",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "邮件订阅",
+      "通讯注册",
+      "背景图表单",
+      "居中布局",
+      "CTA按钮",
+      "潜在客户捕获"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/02/1707940228_Form-30.jpeg"
+  },
+  "ptn-18724": {
+    "id": 18724,
+    "name": "Accordion 23",
+    "description": "左侧为手风琴式问答列表，右侧为联系表单的双栏布局。适用于常见问题解答（FAQ）或客户支持页面，方便用户查询信息后直接联系。",
+    "categories": [
+      "faq",
+      "contact-form"
+    ],
+    "style_tags": [
+      "clean",
+      "minimalist",
+      "professional",
+      "modern"
+    ],
+    "industry_tags": [
+      "saas",
+      "agency",
+      "consulting",
+      "generic"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "no-media": "No Media",
+      "alignment": "Left Aligned",
+      "width": "Contained"
+    },
+    "keywords": [
+      "常见问题",
+      "手风琴",
+      "联系表单",
+      "双栏布局",
+      "客户支持",
+      "信息提交"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/02/1707942143_Accordion-23.jpeg"
+  },
+  "ptn-18727": {
+    "id": 18727,
+    "name": "Video 21",
+    "description": "简洁的单栏布局，顶部为左对齐的标题和副标题，下方是醒目的视频播放器。适合产品介绍、教程展示或品牌故事讲述。",
+    "categories": [
+      "video",
+      "content"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "generic",
+      "tech",
+      "saas",
+      "consulting"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "media-bottom": "Media Bottom",
+      "alignment": "Left Aligned",
+      "width": "Contained"
+    },
+    "keywords": [
+      "视频播放",
+      "产品介绍",
+      "顶部标题",
+      "单栏布局",
+      "视频展示",
+      "内容模块"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/02/1708024019_Video-21.jpeg"
+  },
+  "ptn-18744": {
+    "id": 18744,
+    "name": "Hero 61",
+    "description": "全屏背景图的Hero模块，文案和行动号召按钮居中布局。适合用作网站首页，快速传达核心信息。",
+    "categories": [
+      "hero"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "serene",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "generic",
+      "tech",
+      "consulting",
+      "travel"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "media-background": "Media Background",
+      "alignment": "Centered",
+      "width": "Full Width"
+    },
+    "keywords": [
+      "首屏",
+      "背景图",
+      "居中布局",
+      "CTA按钮",
+      "价值主张"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/02/1708555360_Hero-61.jpeg"
+  },
+  "ptn-18746": {
+    "id": 18746,
+    "name": "Counter / Stats 38",
+    "description": "非对称三栏布局，左侧为标题、描述和行动号召按钮，中间是圆形主图，右侧卡片展示关键数据。适合展示公司成就或项目影响力。",
+    "categories": [
+      "stats",
+      "cta"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "professional",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "saas",
+      "consulting",
+      "non-profit",
+      "tech"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "media-center": "Media Center",
+      "off-grid": "Off-Grid",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "数据统计",
+      "关键指标",
+      "非对称布局",
+      "圆形图片",
+      "公司成就",
+      "行动号召"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/02/1708547572_Counter-Stats-38.jpeg"
+  },
+  "ptn-18750": {
+    "id": 18750,
+    "name": "Testimonials 40",
+    "description": "采用Bento网格布局展示客户评价，通过明暗对比的卡片设计增强视觉吸引力。适合企业或SaaS网站展示用户反馈，建立信任感。",
+    "categories": [
+      "testimonials"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "professional"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "agency",
+      "consulting"
+    ],
+    "layout": {
+      "bento-grid": "Bento & Grid",
+      "media-background": "Media Background",
+      "2-columns": "2 Columns",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "客户评价",
+      "用户推荐",
+      "Bento网格",
+      "社交证明",
+      "卡片式布局",
+      "推荐信"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/07/1720448408_Testimonials-40.jpeg"
+  },
+  "ptn-18757": {
+    "id": 18757,
+    "name": "List 34",
+    "description": "经典双栏布局，左侧通过卡片和图标展示特征列表，右侧是标题、描述和行动号召按钮，结构清晰，引导性强。",
+    "categories": [
+      "features",
+      "cta",
+      "content"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "startup",
+      "consulting"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "bento-grid": "Bento & Grid",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "特征列表",
+      "图标列表",
+      "双栏布局",
+      "行动号召",
+      "功能展示",
+      "产品介绍"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/02/1708553785_List-34.jpeg"
+  },
+  "ptn-18759": {
+    "id": 18759,
+    "name": "Testimonials 38",
+    "description": "顶部为标题和简介，下方是三栏并排的客户评价卡片。每张卡片包含用户照片和引言，布局清晰，适合展示客户信任。",
+    "categories": [
+      "testimonials"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "generic",
+      "travel",
+      "ecommerce",
+      "consulting"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "media-center": "Media Center",
+      "alignment": "Left Aligned",
+      "contained": "Contained"
+    },
+    "keywords": [
+      "客户评价",
+      "用户见证",
+      "三栏布局",
+      "图片卡片",
+      "社会认同"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/07/1720447231_Testimonials-38.jpeg"
+  },
+  "ptn-18761": {
+    "id": 18761,
+    "name": "Logo Farm 30",
+    "description": "经典双栏布局，左侧展示合作伙伴或客户徽标以建立信任，右侧为大尺寸背景图和突出的联系方式卡片。",
+    "categories": [
+      "logos",
+      "content"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "professional",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "agency",
+      "consulting",
+      "startup",
+      "tech"
+    ],
+    "layout": {
+      "media-left": "Media Left",
+      "media-right": "Media Right",
+      "2-columns": "2 Columns",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "合作伙伴",
+      "客户徽标",
+      "双栏布局",
+      "联系方式",
+      "社会证明",
+      "品牌信誉"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/02/1708554648_Logo-Farm-30.jpeg"
+  },
+  "ptn-18770": {
+    "id": 18770,
+    "name": "Team 27",
+    "description": "居中标题下的四栏团队成员展示模块。每个成员卡片包含圆形头像、姓名、职位和社交链接，设计简洁专业。",
+    "categories": [
+      "team"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "agency",
+      "startup",
+      "consulting",
+      "corporate"
+    ],
+    "layout": {
+      "4-columns": "4 Columns",
+      "media-top": "Media Top",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "团队成员",
+      "圆形头像",
+      "公司团队",
+      "关于我们",
+      "四栏布局",
+      "社交链接"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/02/1708556166_Team-27.jpeg"
+  },
+  "ptn-18773": {
+    "id": 18773,
+    "name": "Counter / Stats 39",
+    "description": "居中标题下方的四栏数据统计模块，以淡雅山脉为背景，用于直观展示关键成就或业务数据，建立信任感。",
+    "categories": [
+      "stats"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional",
+      "serene"
+    ],
+    "industry_tags": [
+      "corporate",
+      "saas",
+      "tech",
+      "consulting"
+    ],
+    "layout": {
+      "4-columns": "4 Columns",
+      "media-background": "Media Background",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "数据统计",
+      "关键指标",
+      "四栏布局",
+      "背景图",
+      "成就展示",
+      "公司数据"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1711121480_Counter-Stats-39.jpeg"
+  },
+  "ptn-18781": {
+    "id": 18781,
+    "name": "Testimonial 39",
+    "description": "优雅的三栏式布局，中间是圆形特色图片，左侧为标题、描述和行动号召按钮，右侧是客户评价卡片。适合展示社会认同，增强信任感。",
+    "categories": [
+      "testimonials",
+      "cta"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "saas",
+      "agency",
+      "consulting",
+      "tech"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "media-center": "Media Center",
+      "alignment": "Left Aligned",
+      "vertical-alignment": "Middle"
+    },
+    "keywords": [
+      "客户评价",
+      "三栏布局",
+      "社会认同",
+      "圆形图片",
+      "行动号召",
+      "用户反馈"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/02/1708645019_Testimonial-39.jpeg"
+  },
+  "ptn-18785": {
+    "id": 18785,
+    "name": "List 35",
+    "description": "居中标题和简介，下方是四栏图标列表，用于清晰展示产品核心特性或服务项目。布局简洁，适用于各类企业网站。",
+    "categories": [
+      "features",
+      "services"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "minimalist"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "consulting",
+      "agency"
+    ],
+    "layout": {
+      "4-columns": "4 Columns",
+      "no-media": "No Media",
+      "alignment": "Centered",
+      "width": "Contained"
+    },
+    "keywords": [
+      "功能列表",
+      "图标列表",
+      "四栏布局",
+      "产品特性",
+      "服务介绍"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/02/1708647953_List-35.jpeg"
+  },
+  "ptn-18791": {
+    "id": 18791,
+    "name": "Counter / Stats 40",
+    "description": "上半部分为图片画廊与文字卡片叠加，下半部分为四栏数据统计。适合展示项目成就或公司里程碑，视觉冲击力强。",
+    "categories": [
+      "stats",
+      "gallery"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "agency",
+      "portfolio",
+      "travel",
+      "generic"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "4-columns": "4 Columns",
+      "bento-grid": "Bento & Grid",
+      "media-left": "Media Left",
+      "media-right": "Media Right",
+      "spacing": "Spacious"
+    },
+    "keywords": [
+      "数据统计",
+      "图片画廊",
+      "成就展示",
+      "里程碑",
+      "四栏布局",
+      "卡片叠加"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1709311914_Counter-Stats-40.jpeg"
+  },
+  "ptn-18793": {
+    "id": 18793,
+    "name": "Media and Text 76",
+    "description": "经典的左文右图布局，右侧采用圆形图片，设计简洁现代。适用于产品特性介绍、关于我们或服务展示等内容模块。",
+    "categories": [
+      "content",
+      "features"
+    ],
+    "style_tags": [
+      "clean",
+      "minimalist",
+      "modern",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "generic",
+      "saas",
+      "agency",
+      "startup"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "media-right": "Media Right",
+      "alignment": "Left Aligned",
+      "vertical-alignment": "Middle"
+    },
+    "keywords": [
+      "左文右图",
+      "圆形图片",
+      "双栏布局",
+      "内容介绍",
+      "简洁设计",
+      "特色展示"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/02/1708718062_Media-and-Text-76.jpeg"
+  },
+  "ptn-18798": {
+    "id": 18798,
+    "name": "Accordion 24",
+    "description": "双栏布局，左侧为手风琴式问答列表，右侧为联系表单。适用于常见问题解答（FAQ）或客户支持页面，方便用户查询和联系。",
+    "categories": [
+      "faq",
+      "contact-form"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "saas",
+      "agency",
+      "consulting",
+      "generic"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "no-media": "No Media",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "FAQ",
+      "手风琴",
+      "联系表单",
+      "客户支持",
+      "双栏布局",
+      "问答列表"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1709311911_Accordion-24.jpeg"
+  },
+  "ptn-18808": {
+    "id": 18808,
+    "name": "Hero 62",
+    "description": "经典的左文右图布局，包含标题、描述和双行动号召按钮。设计简洁，适用于展示产品、服务或核心价值主张。",
+    "categories": [
+      "hero"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "saas",
+      "agency",
+      "tech",
+      "consulting"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "media-right": "Media Right",
+      "alignment": "Left Aligned",
+      "vertical-alignment": "Middle"
+    },
+    "keywords": [
+      "左文右图",
+      "双栏布局",
+      "行动号召",
+      "产品介绍",
+      "简洁设计",
+      "价值主张"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1709590951_Hero-62.jpeg"
+  },
+  "ptn-18821": {
+    "id": 18821,
+    "name": "Cards 45",
+    "description": "居中标题引导，下方均分三列展示深色信息卡片。每张卡片配有图标，适合清晰地罗列产品特性或服务项目。",
+    "categories": [
+      "features",
+      "services"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "professional",
+      "bold"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "consulting",
+      "agency"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "media-background": "Media Background",
+      "alignment": "Centered",
+      "width": "Contained"
+    },
+    "keywords": [
+      "功能卡片",
+      "三栏布局",
+      "图标列表",
+      "服务展示",
+      "深色卡片"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1709311758_Cards-45.jpeg"
+  },
+  "ptn-18825": {
+    "id": 18825,
+    "name": "Logo Farm 31",
+    "description": "居中对齐的标题和描述下方，是一个合作伙伴或客户的Logo轮播墙。用于展示社会认同，建立品牌信誉。",
+    "categories": [
+      "logos"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "generic",
+      "saas",
+      "agency",
+      "startup"
+    ],
+    "layout": {
+      "5-columns": "5+ Columns",
+      "media-bottom": "Media Bottom",
+      "alignment": "Centered",
+      "width": "Contained"
+    },
+    "keywords": [
+      "合作伙伴",
+      "客户Logo",
+      "Logo墙",
+      "品牌展示",
+      "轮播",
+      "社会认同"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1709311903_Logo-Farm-31.jpeg"
+  },
+  "ptn-18830": {
+    "id": 18830,
+    "name": "Logo Farm 32",
+    "description": "居中标题和简介，下方是三栏网格布局的合作伙伴徽标墙。用于展示客户或合作伙伴，建立社会认同感。",
+    "categories": [
+      "logos"
+    ],
+    "style_tags": [
+      "clean",
+      "minimalist",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "saas",
+      "agency",
+      "tech",
+      "consulting"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "bento-grid": "Bento & Grid",
+      "alignment": "Centered",
+      "width": "Contained"
+    },
+    "keywords": [
+      "合作伙伴",
+      "客户徽标",
+      "Logo墙",
+      "社会认同",
+      "品牌展示",
+      "三栏网格"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1709311907_Logo-Farm-32.jpeg"
+  },
+  "ptn-18889": {
+    "id": 18889,
+    "name": "Product Loop 21",
+    "description": "简洁的三栏式产品卡片网格布局，每张卡片顶部为产品图，下方为名称和价格。适用于电商网站的产品列表或作品集展示。",
+    "categories": [
+      "services",
+      "gallery"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "ecommerce",
+      "portfolio",
+      "agency",
+      "generic"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "media-top": "Media Top",
+      "grid": "Grid",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "产品网格",
+      "商品卡片",
+      "三栏布局",
+      "电商列表",
+      "作品展示"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1709843462_Product-Loop-21.jpeg"
+  },
+  "ptn-18891": {
+    "id": 18891,
+    "name": "Hero 63",
+    "description": "极简主义的居中布局，包含一个醒目的主标题、副标题和两个垂直排列的行动号召按钮，设计简洁有力，聚焦核心信息。",
+    "categories": [
+      "hero",
+      "cta"
+    ],
+    "style_tags": [
+      "minimalist",
+      "modern",
+      "bold",
+      "clean"
+    ],
+    "industry_tags": [
+      "generic",
+      "saas",
+      "startup",
+      "tech"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "no-media": "No Media",
+      "alignment": "Centered",
+      "spacing": "Spacious"
+    },
+    "keywords": [
+      "居中布局",
+      "行动号召",
+      "双按钮",
+      "极简首屏",
+      "价值主张",
+      "标题"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1710796676_Hero-63.jpeg"
+  },
+  "ptn-18895": {
+    "id": 18895,
+    "name": "Video 23",
+    "description": "居中标题下方的三栏视频布局，设计简洁明了。适用于展示产品演示、教程系列或客户案例。",
+    "categories": [
+      "video",
+      "gallery"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern"
+    ],
+    "industry_tags": [
+      "generic",
+      "tech",
+      "education",
+      "media"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "media-bottom": "Media Bottom",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "视频画廊",
+      "三栏布局",
+      "视频展示",
+      "教程列表",
+      "居中标题",
+      "产品演示"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1709655610_Video-23.jpeg"
+  },
+  "ptn-18901": {
+    "id": 18901,
+    "name": "Form 48",
+    "description": "居中对齐的邮件订阅表单，包含标题、输入框、行动号召按钮和辅助说明。设计简洁，适用于各类网站页脚或内容区。",
+    "categories": [
+      "newsletter",
+      "contact-form"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "generic",
+      "saas",
+      "agency",
+      "tech"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "no-media": "No Media",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "邮件订阅",
+      "订阅表单",
+      "居中布局",
+      "CTA按钮",
+      "线框按钮"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1709655598_Form-31.jpeg"
+  },
+  "ptn-18912": {
+    "id": 18912,
+    "name": "Counter or Stats 41",
+    "description": "非对称图片网格与四栏数据统计相结合，用于直观展示关键成就或项目影响力。适合企业官网、作品集或非营利组织页面。",
+    "categories": [
+      "stats",
+      "gallery"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "bold",
+      "professional"
+    ],
+    "industry_tags": [
+      "agency",
+      "consulting",
+      "portfolio",
+      "non-profit"
+    ],
+    "layout": {
+      "4-columns": "4 Columns",
+      "media-left": "Media Left",
+      "media-right": "Media Right",
+      "grid": "Grid",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "数据统计",
+      "图片组合",
+      "成就展示",
+      "关键指标",
+      "里程碑",
+      "影响力"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1709688106_Counter-or-Stats-41.jpeg"
+  },
+  "ptn-18914": {
+    "id": 18914,
+    "name": "Title / Header 28",
+    "description": "居中对齐的章节标题，两侧配有装饰性水平线条，用于清晰地分隔页面内容。风格极简，用途广泛。",
+    "categories": [
+      "content",
+      "header"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "bold"
+    ],
+    "industry_tags": [
+      "generic",
+      "portfolio",
+      "agency"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "no-media": "No Media",
+      "alignment": "Centered",
+      "width": "Contained"
+    },
+    "keywords": [
+      "章节标题",
+      "内容分隔线",
+      "居中标题",
+      "装饰线条",
+      "极简设计"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1711403259_Title-Header-28.jpeg"
+  },
+  "ptn-18919": {
+    "id": 18919,
+    "name": "Media and Text 80",
+    "description": "经典的左文右图两栏布局，左侧为大号加粗说明文字，右侧为特色图片。适用于公司介绍、产品特性或服务说明等场景。",
+    "categories": [
+      "content",
+      "features",
+      "services"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern",
+      "bold"
+    ],
+    "industry_tags": [
+      "generic",
+      "agency",
+      "consulting",
+      "portfolio"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "media-right": "Media Right",
+      "alignment": "Left Aligned",
+      "vertical-alignment": "Middle"
+    },
+    "keywords": [
+      "左文右图",
+      "图文介绍",
+      "两栏布局",
+      "公司简介",
+      "产品说明",
+      "特色展示"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1709688781_Media-and-Text-53.jpeg"
+  },
+  "ptn-18925": {
+    "id": 18925,
+    "name": "Gallery 17",
+    "description": "左侧为标题和描述，右侧为三张图片组成的网格画廊。这种不对称布局适合作品集、案例展示或旅行博客，能有效吸引视觉焦点。",
+    "categories": [
+      "gallery"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern"
+    ],
+    "industry_tags": [
+      "portfolio",
+      "agency",
+      "travel",
+      "media"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "bento-grid": "Bento & Grid",
+      "media-right": "Media Right",
+      "alignment": "Left Aligned",
+      "vertical-alignment": "Middle"
+    },
+    "keywords": [
+      "图片画廊",
+      "作品集",
+      "网格布局",
+      "左文右图",
+      "不对称设计",
+      "摄影展示"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1709689426_Gallery-16.jpeg"
+  },
+  "ptn-18930": {
+    "id": 18930,
+    "name": "Accordion 25",
+    "description": "居中对齐的手风琴式常见问题解答模块。设计简洁，通过点击标题展开或折叠答案，有效节省页面空间，适合展示问答内容。",
+    "categories": [
+      "faq",
+      "content"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "corporate",
+      "consulting"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "no-media": "No Media",
+      "alignment": "Centered",
+      "width": "Contained"
+    },
+    "keywords": [
+      "常见问题",
+      "手风琴",
+      "问答列表",
+      "内容折叠",
+      "FAQ"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1709690008_Accordion-25.jpeg"
+  },
+  "ptn-18996": {
+    "id": 18996,
+    "name": "Title / Header 29",
+    "description": "包含标题、CTA按钮和倒计时器的页面标题模块。居中对齐的布局，非常适合用于活动预告、产品发布或限时优惠页面。",
+    "categories": [
+      "header",
+      "cta",
+      "content"
+    ],
+    "style_tags": [
+      "minimalist",
+      "modern",
+      "clean"
+    ],
+    "industry_tags": [
+      "saas",
+      "ecommerce",
+      "startup",
+      "generic"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "no-media": "No Media",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "倒计时",
+      "活动预告",
+      "产品发布",
+      "行动号召",
+      "页面标题"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1711403263_Title-Header-29.jpeg"
+  },
+  "ptn-19028": {
+    "id": 19028,
+    "name": "Media and Text 81",
+    "description": "经典左文右图布局，左侧包含标题、描述和活动列表，右侧为特色图片。适用于展示即将举行的活动或社区公告。",
+    "categories": [
+      "content",
+      "blog"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "non-profit",
+      "education",
+      "media",
+      "generic"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "media-right": "Media Right",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "活动列表",
+      "图文组合",
+      "社区公告",
+      "双栏布局",
+      "左文右图"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1710771734_Media-and-Text-81.jpeg"
+  },
+  "ptn-19057": {
+    "id": 19057,
+    "name": "Hero 64",
+    "description": "全屏背景图英雄区，左侧为主要文案和CTA按钮。底部悬浮卡片可展示次要信息或链接，设计现代专业。",
+    "categories": [
+      "hero"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "professional",
+      "serene"
+    ],
+    "industry_tags": [
+      "tech",
+      "consulting",
+      "agency",
+      "travel"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "media-background": "Media Background",
+      "media-left": "Media Left",
+      "off-grid": "Off-Grid",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "首屏",
+      "背景图",
+      "左对齐",
+      "悬浮卡片",
+      "行动号召",
+      "专业设计"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1710771790_Hero-64.jpeg"
+  },
+  "ptn-19114": {
+    "id": 19114,
+    "name": "Hero 65",
+    "description": "经典左文右图布局，包含醒目标题、描述和行动号召按钮。适用于各类网站首页，快速传达核心价值。",
+    "categories": [
+      "hero"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "professional",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "startup",
+      "agency"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "media-right": "Media Right",
+      "alignment": "Left Aligned",
+      "width": "Contained"
+    },
+    "keywords": [
+      "首屏",
+      "左文右图",
+      "价值主张",
+      "CTA按钮",
+      "产品介绍"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1710876506_Hero-65.jpeg"
+  },
+  "ptn-19116": {
+    "id": 19116,
+    "name": "Media and Text 82",
+    "description": "非对称双栏布局，左侧为三张图片的网格画廊，右侧为描述性文本和一张大图。适合展示项目案例或产品特性。",
+    "categories": [
+      "gallery",
+      "content"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "minimalist"
+    ],
+    "industry_tags": [
+      "agency",
+      "portfolio",
+      "startup",
+      "generic"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "bento-grid": "Bento & Grid",
+      "media-bottom": "Media Bottom",
+      "media-left": "Media Left",
+      "alignment": "Left Aligned",
+      "width": "Contained",
+      "spacing": "Spacious"
+    },
+    "keywords": [
+      "图片画廊",
+      "网格布局",
+      "非对称设计",
+      "作品集展示",
+      "图文组合",
+      "Bento网格"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/05/1715178110_Media-and-Text-82.jpeg"
+  },
+  "ptn-19127": {
+    "id": 19127,
+    "name": "Title / Header 30",
+    "description": "简洁的双栏页面标题布局，左侧为标题和描述，右侧放置一个独立的行动号召按钮。适用于需要引导用户操作的页面顶部。",
+    "categories": [
+      "header",
+      "content"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "generic",
+      "saas",
+      "tech",
+      "consulting"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "no-media": "No Media",
+      "width": "Contained",
+      "vertical-alignment": "Middle"
+    },
+    "keywords": [
+      "页面标题",
+      "章节标题",
+      "行动号召",
+      "双栏布局",
+      "CTA按钮",
+      "简洁页头"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1710878980_Title-Header-30.jpeg"
+  },
+  "ptn-19131": {
+    "id": 19131,
+    "name": "Text 26",
+    "description": "简洁的三栏文本布局，每栏包含标题和描述，用于清晰地并列展示核心要点或服务项目。",
+    "categories": [
+      "content",
+      "features",
+      "services"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "professional",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "generic",
+      "saas",
+      "consulting",
+      "agency"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "no-media": "No Media",
+      "alignment": "Left Aligned",
+      "width": "Contained"
+    },
+    "keywords": [
+      "三栏布局",
+      "文本模块",
+      "核心特点",
+      "服务项目",
+      "要点罗列"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1710889102_Text-26.jpeg"
+  },
+  "ptn-19133": {
+    "id": 19133,
+    "name": "Testimonials 41",
+    "description": "居中大标题下方的两栏网格布局，用于展示四个客户评价。每个评价包含引文、头像和姓名，设计简洁专业。",
+    "categories": [
+      "testimonials"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "saas",
+      "agency",
+      "consulting",
+      "tech"
+    ],
+    "layout": {
+      "bento-grid": "Bento &amp; Grid",
+      "no-media": "No Media",
+      "2-columns": "2 Columns",
+      "grid": "Grid",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "客户评价",
+      "推荐信",
+      "网格布局",
+      "用户反馈",
+      "社交证明",
+      "双栏"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1711553993_Testimonials-41.jpeg"
+  },
+  "ptn-19148": {
+    "id": 19148,
+    "name": "Post Loop 15",
+    "description": "三栏布局的博文列表模块，顶部设有标题和行动号召按钮。适合在首页或博客页面展示精选文章，引导用户阅读更多内容。",
+    "categories": [
+      "blog",
+      "content"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "generic",
+      "media",
+      "agency",
+      "consulting"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "no-media": "No Media",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "博文列表",
+      "精选文章",
+      "三栏布局",
+      "文章卡片",
+      "内容模块",
+      "CTA按钮"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1710888805_Post-Loop-15.jpeg"
+  },
+  "ptn-19152": {
+    "id": 19152,
+    "name": "Title / Header 31",
+    "description": "居中对齐的章节标题模块，包含引导文案、主标题和行动号召按钮。设计简洁，适用于各类页面的内容分隔或简单的CTA场景。",
+    "categories": [
+      "header",
+      "cta",
+      "content"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "generic",
+      "saas",
+      "startup",
+      "agency"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "no-media": "No Media",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "章节标题",
+      "居中布局",
+      "行动号召",
+      "CTA按钮",
+      "简约页头"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1711553971_Title-Header-31.jpeg"
+  },
+  "ptn-19164": {
+    "id": 19164,
+    "name": "Form 32",
+    "description": "简洁的双栏通讯订阅模块，左侧为标题、描述和邮件输入框，右侧为社交媒体链接。适合网站页脚或内容区，用于用户增长。",
+    "categories": [
+      "newsletter"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "generic",
+      "saas",
+      "agency",
+      "media"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "no-media": "No Media",
+      "vertical-alignment": "Middle",
+      "width": "Contained"
+    },
+    "keywords": [
+      "邮件订阅",
+      "通讯注册",
+      "社交链接",
+      "表单",
+      "用户增长",
+      "页脚订阅"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1710941176_Form-32.jpeg"
+  },
+  "ptn-19168": {
+    "id": 19168,
+    "name": "Video 24",
+    "description": "全宽视频展示模块，居中的播放按钮引导用户互动。适用于展示产品演示、品牌故事或背景视频。",
+    "categories": [
+      "video"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "serene"
+    ],
+    "industry_tags": [
+      "generic",
+      "portfolio",
+      "agency",
+      "travel"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "media-center": "Media Center",
+      "width": "Full Width",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "视频播放",
+      "全宽视频",
+      "视频背景",
+      "产品演示",
+      "品牌故事",
+      "居中布局"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1711121237_Video-24.jpeg"
+  },
+  "ptn-19173": {
+    "id": 19173,
+    "name": "Title / Header 33",
+    "description": "极简风格的页面标题模块，采用居中对齐布局，配有装饰性线条和向下的视觉引导箭头。适用于各类页面的顶部，以简洁方式引出内容。",
+    "categories": [
+      "header",
+      "content"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "generic",
+      "startup",
+      "agency",
+      "tech"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "no-media": "No Media",
+      "alignment": "Centered",
+      "width": "Full Width"
+    },
+    "keywords": [
+      "页面标题",
+      "居中标题",
+      "章节标题",
+      "简约设计",
+      "视觉引导",
+      "内容分隔"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1710980154_Title-Header-33.jpeg"
+  },
+  "ptn-19194": {
+    "id": 19194,
+    "name": "Form 33",
+    "description": "经典双栏联系表单布局，左侧为标题、描述和社交链接，右侧为独立的表单区域。适合企业网站的联系我们页面。",
+    "categories": [
+      "contact-form"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "generic",
+      "saas",
+      "agency",
+      "consulting"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "no-media": "No Media",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "联系表单",
+      "双栏布局",
+      "客户支持",
+      "信息提交",
+      "社交链接"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1711124012_Form-33.jpeg"
+  },
+  "ptn-19198": {
+    "id": 19198,
+    "name": "Location/Map/Hour 22",
+    "description": "顶部三栏罗列地址、邮箱和电话等联系信息，下方嵌入全宽地图，清晰展示地理位置。适用于企业“联系我们”页面。",
+    "categories": [
+      "location"
+    ],
+    "style_tags": [
+      "clean",
+      "professional",
+      "modern"
+    ],
+    "industry_tags": [
+      "generic",
+      "agency",
+      "consulting"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "bento-grid": "Bento &amp; Grid",
+      "media-bottom": "Media Bottom",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "联系信息",
+      "地图位置",
+      "谷歌地图",
+      "地址",
+      "三栏布局"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1711124759_LocationMapHour-22.jpeg"
+  },
+  "ptn-19200": {
+    "id": 19200,
+    "name": "Text 27",
+    "description": "居中标题和副标题引出下方的三栏式内容布局，清晰地展示核心特性、服务或价值主张。适合各类网站的功能介绍或优势说明部分。",
+    "categories": [
+      "features",
+      "services",
+      "content"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "consulting",
+      "generic"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "no-media": "No Media",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "三栏布局",
+      "功能介绍",
+      "服务列表",
+      "居中标题",
+      "简洁设计",
+      "价值主张"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1711125161_Text-27.jpeg"
+  },
+  "ptn-19213": {
+    "id": 19213,
+    "name": "Text 28",
+    "description": "简洁的三栏文本布局，每栏包含标题和简短描述，下方有分割线。适合并列展示核心特性、服务项目或关键信息点。",
+    "categories": [
+      "features",
+      "content"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "professional",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "generic",
+      "saas",
+      "tech",
+      "consulting"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "no-media": "No Media",
+      "alignment": "Left Aligned",
+      "width": "Wide"
+    },
+    "keywords": [
+      "三栏布局",
+      "特性列表",
+      "文本模块",
+      "信息点",
+      "服务介绍",
+      "简洁设计"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1711135300_Text-28.jpeg"
+  },
+  "ptn-19216": {
+    "id": 19216,
+    "name": "Columns 36",
+    "description": "居中标题和副标题，下方是四栏圆形图片布局，每个图片配有说明文字。适合展示服务、产品特性或团队成员。",
+    "categories": [
+      "features",
+      "services",
+      "team"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "saas",
+      "agency",
+      "consulting",
+      "generic"
+    ],
+    "layout": {
+      "4-columns": "4 Columns",
+      "media-center": "Media Center",
+      "media-left": "Media Left",
+      "media-right": "Media Right",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "四栏布局",
+      "圆形图片",
+      "服务展示",
+      "功能介绍",
+      "团队成员",
+      "居中对齐"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1711136284_Columns-36.jpeg"
+  },
+  "ptn-19220": {
+    "id": 19220,
+    "name": "Testimonials 42",
+    "description": "两栏式标题区引出下方网格布局的客户评价。每条评价包含引言、头像和姓名，设计简洁，适合展示社会认同。",
+    "categories": [
+      "testimonials"
+    ],
+    "style_tags": [
+      "clean",
+      "minimalist",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "saas",
+      "agency",
+      "consulting",
+      "generic"
+    ],
+    "layout": {
+      "bento-grid": "Bento & Grid",
+      "no-media": "No Media",
+      "2-columns": "2 Columns",
+      "grid": "Grid",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "客户评价",
+      "推荐信",
+      "用户反馈",
+      "网格布局",
+      "社会认同",
+      "头像"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/07/1720220326_Testimonials-42.jpeg"
+  },
+  "ptn-19235": {
+    "id": 19235,
+    "name": "Gallery 18",
+    "description": "左侧为活动列表，右侧为四张图片的网格画廊。适合展示即将举行的活动或项目，并配以视觉元素。",
+    "categories": [
+      "gallery",
+      "content"
+    ],
+    "style_tags": [
+      "minimalist",
+      "modern",
+      "clean",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "agency",
+      "portfolio",
+      "non-profit",
+      "media"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "media-right": "Media Right",
+      "grid": "Grid",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "活动列表",
+      "图片画廊",
+      "双栏布局",
+      "事件日历",
+      "社区活动",
+      "网格布局"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1711402694_Gallery-18.jpeg"
+  },
+  "ptn-19275": {
+    "id": 19275,
+    "name": "Columns 37",
+    "description": "简洁的三栏文本布局，每栏包含标题和描述性文字。适用于并列展示产品特性、服务项目或核心价值点。",
+    "categories": [
+      "features",
+      "services",
+      "content"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "generic",
+      "saas",
+      "consulting",
+      "agency"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "no-media": "No Media",
+      "alignment": "Left Aligned",
+      "width": "Contained"
+    },
+    "keywords": [
+      "三栏布局",
+      "文本模块",
+      "功能列表",
+      "服务介绍",
+      "简洁设计"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1711553915_Columns-37.jpeg"
+  },
+  "ptn-19300": {
+    "id": 19300,
+    "name": "Hero 66",
+    "description": "全宽背景图英雄区，左侧放置醒目标题和说明文案。整体设计宁静、专业，适合企业或咨询服务网站首页。",
+    "categories": [
+      "hero"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "serene",
+      "elegant"
+    ],
+    "industry_tags": [
+      "consulting",
+      "tech",
+      "saas",
+      "generic"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "media-background": "Media Background",
+      "alignment": "Left Aligned",
+      "width": "Full Width"
+    },
+    "keywords": [
+      "首屏",
+      "背景图",
+      "左对齐标题",
+      "企业官网",
+      "价值主张",
+      "宁静风格"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1711642725_Hero-66.jpeg"
+  },
+  "ptn-19302": {
+    "id": 19302,
+    "name": "Media and Text 83",
+    "description": "经典的左图右文布局，右侧包含标题、描述性段落和行动号召按钮。适用于产品介绍、服务展示或关于页面。",
+    "categories": [
+      "content",
+      "cta"
+    ],
+    "style_tags": [
+      "clean",
+      "minimalist",
+      "modern"
+    ],
+    "industry_tags": [
+      "generic",
+      "travel",
+      "portfolio"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "media-left": "Media Left",
+      "alignment": "Left Aligned",
+      "vertical-alignment": "Middle"
+    },
+    "keywords": [
+      "左图右文",
+      "双栏布局",
+      "行动号召",
+      "内容介绍",
+      "图文模块"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1711643148_Media-and-Text-83.jpeg"
+  },
+  "ptn-19306": {
+    "id": 19306,
+    "name": "Media and Text 84",
+    "description": "顶部为居中标题和双栏文本，下方是宽幅视频播放器。适合用视频来生动介绍产品、服务或品牌故事。",
+    "categories": [
+      "video",
+      "content"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "minimalist"
+    ],
+    "industry_tags": [
+      "generic",
+      "saas",
+      "agency",
+      "consulting"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "bento-grid": "Bento & Grid",
+      "media-bottom": "Media Bottom",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "视频介绍",
+      "上文下图",
+      "双栏文本",
+      "居中标题",
+      "品牌故事"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/03/1711645670_Media-and-Text-84.jpeg"
+  },
+  "ptn-19310": {
+    "id": 19310,
+    "name": "Text 29",
+    "description": "居中对齐的文本模块，包含一个醒目的标题和一段说明性文字。适用于介绍章节、阐述核心价值或产品简介。",
+    "categories": [
+      "content"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "generic",
+      "saas",
+      "startup",
+      "agency"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "no-media": "No Media",
+      "alignment": "Centered",
+      "width": "Contained"
+    },
+    "keywords": [
+      "居中文本",
+      "标题段落",
+      "内容介绍",
+      "价值主张",
+      "简介模块"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/04/1712076427_Text-29.jpeg"
+  },
+  "ptn-19314": {
+    "id": 19314,
+    "name": "Accordion 26",
+    "description": "双栏手风琴布局，顶部有居中标题和描述。淡雅的背景图增添了宁静感，非常适合用于常见问题解答（FAQ）页面。",
+    "categories": [
+      "faq",
+      "content"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "serene"
+    ],
+    "industry_tags": [
+      "generic",
+      "saas",
+      "consulting",
+      "tech"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "media-background": "Media Background",
+      "alignment": "Centered",
+      "width": "Full Width"
+    },
+    "keywords": [
+      "手风琴",
+      "FAQ",
+      "双栏布局",
+      "问答模块",
+      "背景图",
+      "居中对齐"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/04/1712176907_Accordion-26.jpeg"
+  },
+  "ptn-19322": {
+    "id": 19322,
+    "name": "Text 30",
+    "description": "双栏文本布局，左侧标题与右侧段落由竖线分隔，结构清晰。适用于需要简明扼要介绍概念或功能的场景。",
+    "categories": [
+      "content"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern"
+    ],
+    "industry_tags": [
+      "generic",
+      "saas",
+      "tech",
+      "consulting"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "no-media": "No Media",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "双栏文本",
+      "标题介绍",
+      "内容区块",
+      "竖线分隔",
+      "要点说明"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/04/1712078018_Text-30.jpeg"
+  },
+  "ptn-19326": {
+    "id": 19326,
+    "name": "Pricing Table 11",
+    "description": "三栏式定价方案，中间方案通过背景色突出显示，引导用户选择。适合SaaS、订阅服务等网站展示不同套餐。",
+    "categories": [
+      "pricing-table"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "startup",
+      "consulting"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "no-media": "No Media",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "定价表",
+      "套餐对比",
+      "价格方案",
+      "功能列表",
+      "SaaS定价",
+      "高亮推荐"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/04/1712078209_Pricing-Table-11.jpeg"
+  },
+  "ptn-19335": {
+    "id": 19335,
+    "name": "Cards 46",
+    "description": "居中标题引导，下方为三列卡片网格布局，每张卡片包含图片和文字。适用于展示产品特性、服务项目或作品集。",
+    "categories": [
+      "gallery",
+      "features",
+      "services"
+    ],
+    "style_tags": [
+      "clean",
+      "minimalist",
+      "modern"
+    ],
+    "industry_tags": [
+      "agency",
+      "portfolio",
+      "saas",
+      "generic"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "bento-grid": "Bento &amp; Grid",
+      "media-left": "Media Left",
+      "media-right": "Media Right",
+      "alignment": "Centered",
+      "grid": "Grid",
+      "width": "Contained"
+    },
+    "keywords": [
+      "卡片网格",
+      "三列布局",
+      "图文卡片",
+      "作品集展示",
+      "图片画廊"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/04/1712885828_Cards-46.jpeg"
+  },
+  "ptn-19338": {
+    "id": 19338,
+    "name": "Logo Farm 33",
+    "description": "简约的合作伙伴徽标展示区，采用居中大标题和底部徽标轮播设计，是增强网站社会公信力和展示客户案例的理想选择。",
+    "categories": [
+      "logos"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern"
+    ],
+    "industry_tags": [
+      "generic",
+      "saas",
+      "agency",
+      "consulting"
+    ],
+    "layout": {
+      "5-columns": "5+ Columns",
+      "media-bottom": "Media Bottom",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "合作伙伴",
+      "客户徽标",
+      "品牌标志",
+      "社会认同",
+      "Logo墙",
+      "轮播"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/04/1712885786_Logo-Farm-33.jpeg"
+  },
+  "ptn-19346": {
+    "id": 19346,
+    "name": "Media and Text 85",
+    "description": "经典左文右图两栏布局，上方为醒目标题与配图，下方为详细说明文字，结构清晰。适合用于介绍产品特性、服务或公司信息。",
+    "categories": [
+      "content",
+      "features",
+      "services"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional",
+      "minimalist"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "consulting",
+      "agency"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "media-right": "Media Right",
+      "alignment": "Left Aligned",
+      "width": "Contained"
+    },
+    "keywords": [
+      "图文组合",
+      "两栏布局",
+      "产品介绍",
+      "公司简介",
+      "内容模块",
+      "左文右图"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/04/1712886959_Media-and-Text-85.jpeg"
+  },
+  "ptn-19350": {
+    "id": 19350,
+    "name": "Cards 47",
+    "description": "由六个信息卡片组成的网格布局，采用交错的背景色增强视觉层次。适用于展示产品特性、服务项目或核心优势。",
+    "categories": [
+      "features",
+      "services",
+      "content"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "agency",
+      "consulting"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "bento-grid": "Bento & Grid",
+      "no-media": "No Media",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "卡片网格",
+      "功能特性",
+      "服务列表",
+      "三栏布局",
+      "信息块",
+      "专业设计"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/04/1712887559_Cards-47.jpeg"
+  },
+  "ptn-19357": {
+    "id": 19357,
+    "name": "Counter or Stats 42",
+    "description": "简洁的四栏布局，用于展示关键数据和指标，下方配有居中标题。适合企业网站或SaaS平台展示成就，建立信任感。",
+    "categories": [
+      "stats"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "corporate",
+      "consulting"
+    ],
+    "layout": {
+      "4-columns": "4 Columns",
+      "no-media": "No Media",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "数据统计",
+      "关键指标",
+      "四栏布局",
+      "里程碑",
+      "公司成就",
+      "数字展示"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/04/1712957453_Counter-or-Stats-42.jpeg"
+  },
+  "ptn-19361": {
+    "id": 19361,
+    "name": "List 36",
+    "description": "垂直排列的卡片式列表，每个项目包含标题、简介和详情按钮。适用于展示活动日程、文章摘要或新闻列表。",
+    "categories": [
+      "content",
+      "blog"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "generic",
+      "corporate",
+      "education",
+      "media"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "no-media": "No Media",
+      "alignment": "Left Aligned",
+      "width": "Contained"
+    },
+    "keywords": [
+      "卡片列表",
+      "文章列表",
+      "活动日程",
+      "新闻摘要",
+      "垂直布局",
+      "CTA按钮"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/04/1712957360_List-36.jpeg"
+  },
+  "ptn-19405": {
+    "id": 19405,
+    "name": "Media and Text 86",
+    "description": "左侧三张图片并列展示，右侧为标题和带图标的列表。适合用于介绍产品特性、服务项目或步骤说明。",
+    "categories": [
+      "features",
+      "content",
+      "services"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "agency",
+      "startup"
+    ],
+    "layout": {
+      "4-columns": "4 Columns",
+      "media-left": "Media Left",
+      "alignment": "Left Aligned",
+      "width": "Contained"
+    },
+    "keywords": [
+      "图文组合",
+      "功能列表",
+      "多栏布局",
+      "图标列表",
+      "产品特性",
+      "服务介绍"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/04/1713912280_Media-and-Text-86.jpeg"
+  },
+  "ptn-19407": {
+    "id": 19407,
+    "name": "Cards 48",
+    "description": "居中标题和三栏卡片布局，每张卡片包含图片、标题和行动号召按钮。适用于展示产品特性、服务项目或团队成员。",
+    "categories": [
+      "features",
+      "services",
+      "content"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "saas",
+      "agency",
+      "consulting",
+      "generic"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "media-left": "Media Left",
+      "media-right": "Media Right",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "卡片布局",
+      "三栏网格",
+      "产品特性",
+      "服务介绍",
+      "行动号召",
+      "居中对齐"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/04/1713913407_Cards-48.jpeg"
+  },
+  "ptn-19409": {
+    "id": 19409,
+    "name": "Pricing Table 12",
+    "description": "经典的三栏式价格表布局，清晰展示不同套餐的价格、特性和行动号召按钮。适合各类SaaS产品或订阅服务。",
+    "categories": [
+      "pricing-table"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "professional",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "saas",
+      "startup",
+      "tech",
+      "consulting"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "no-media": "No Media",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "价格表",
+      "套餐对比",
+      "订阅计划",
+      "功能列表",
+      "三栏布局",
+      "CTA按钮"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/04/1713913872_Pricing-12.jpeg"
+  },
+  "ptn-19412": {
+    "id": 19412,
+    "name": "Pricing Table 13",
+    "description": "三栏式价格表，通过明暗对比和卡片高亮突出推荐方案。每个方案包含价格、特性列表和行动号召按钮，适合SaaS或服务型网站。",
+    "categories": [
+      "pricing-table"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "professional"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "startup",
+      "consulting"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "media-background": "Media Background",
+      "alignment": "Centered",
+      "off-grid": "Off-Grid"
+    },
+    "keywords": [
+      "价格表",
+      "套餐对比",
+      "推荐方案",
+      "SaaS定价",
+      "功能列表",
+      "行动号召"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/04/1713914356_Pricing-Table-13.jpeg"
+  },
+  "ptn-19414": {
+    "id": 19414,
+    "name": "List 37",
+    "description": "三栏网格布局，每项包含图标、标题、描述和行动按钮。适合清晰地展示产品特性、服务列表或核心优势。",
+    "categories": [
+      "features",
+      "services",
+      "content"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "agency",
+      "consulting"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "bento-grid": "Bento & Grid",
+      "no-media": "No Media",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "功能列表",
+      "图标卡片",
+      "三栏布局",
+      "网格设计",
+      "服务展示",
+      "行动号召"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/04/1713915647_List-37.jpeg"
+  },
+  "ptn-19417": {
+    "id": 19417,
+    "name": "Counter or Stats 43",
+    "description": "全幅背景图数据统计模块，居中标题下方展示四列核心数据，用于直观呈现企业成就或产品亮点。",
+    "categories": [
+      "stats"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "professional",
+      "elegant"
+    ],
+    "industry_tags": [
+      "corporate",
+      "tech",
+      "consulting",
+      "agency"
+    ],
+    "layout": {
+      "4-columns": "4 Columns",
+      "no-media": "No Media",
+      "media-background": "Media Background",
+      "alignment": "Centered",
+      "width": "Full Width"
+    },
+    "keywords": [
+      "数据统计",
+      "关键指标",
+      "背景图",
+      "四栏布局",
+      "企业成就",
+      "居中对齐"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/04/1713915645_Counter-or-Stats-43.jpeg"
+  },
+  "ptn-19419": {
+    "id": 19419,
+    "name": "Team 28",
+    "description": "居中标题和四栏卡片布局，用于展示团队成员。背景图增强了视觉吸引力，适合公司或组织介绍核心团队。",
+    "categories": [
+      "team"
+    ],
+    "style_tags": [
+      "clean",
+      "professional",
+      "modern",
+      "serene"
+    ],
+    "industry_tags": [
+      "agency",
+      "consulting",
+      "startup",
+      "generic"
+    ],
+    "layout": {
+      "4-columns": "4 Columns",
+      "media-background": "Media Background",
+      "media-top": "Media Top",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "团队介绍",
+      "成员卡片",
+      "四栏布局",
+      "背景图片",
+      "公司团队",
+      "员工简介"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/04/1713918389_Team-28.jpeg"
+  },
+  "ptn-19421": {
+    "id": 19421,
+    "name": "Team 29",
+    "description": "居中标题和三列卡片式布局，用于展示团队成员。每张卡片包含照片、姓名、职位和社交链接，设计简洁专业。",
+    "categories": [
+      "team"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "agency",
+      "corporate",
+      "startup",
+      "generic"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "media-top": "Media Top",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "团队成员",
+      "员工介绍",
+      "三栏布局",
+      "人物卡片",
+      "公司团队",
+      "社交链接"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/04/1713918978_Team-29.jpeg"
+  },
+  "ptn-19423": {
+    "id": 19423,
+    "name": "Hero 67",
+    "description": "全屏背景图英雄区，文案和行动号召按钮居中布局，营造宁静专业氛围。适合企业、科技或咨询服务网站首页。",
+    "categories": [
+      "hero"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "professional",
+      "serene"
+    ],
+    "industry_tags": [
+      "tech",
+      "consulting",
+      "saas",
+      "generic"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "media-background": "Media Background",
+      "alignment": "Centered",
+      "width": "Full Width"
+    },
+    "keywords": [
+      "首屏",
+      "背景图",
+      "居中布局",
+      "CTA按钮",
+      "价值主张",
+      "企业官网"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/04/1713921021_Hero-67.jpeg"
+  },
+  "ptn-19425": {
+    "id": 19425,
+    "name": "List 38",
+    "description": "居中标题下方的2x2网格布局，每个卡片采用左图右文结构，包含标题、描述和CTA按钮。适合展示服务、产品特性或博客文章列表。",
+    "categories": [
+      "services",
+      "features",
+      "blog"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "saas",
+      "agency",
+      "consulting",
+      "generic"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "bento-grid": "Bento & Grid",
+      "media-left": "Media Left",
+      "alignment": "Centered",
+      "width": "Contained"
+    },
+    "keywords": [
+      "网格布局",
+      "卡片列表",
+      "左图右文",
+      "服务展示",
+      "功能介绍",
+      "CTA按钮"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/04/1713921573_List-38.jpeg"
+  },
+  "ptn-19427": {
+    "id": 19427,
+    "name": "Testimonials 43",
+    "description": "居中标题下方的三栏式客户评价布局，每栏包含引言、头像和客户信息。设计简洁，适合展示社会认同，建立品牌信任。",
+    "categories": [
+      "testimonials"
+    ],
+    "style_tags": [
+      "clean",
+      "minimalist",
+      "modern"
+    ],
+    "industry_tags": [
+      "saas",
+      "agency",
+      "consulting",
+      "generic"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "no-media": "No Media",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "客户评价",
+      "推荐",
+      "三栏布局",
+      "用户反馈",
+      "社会认同",
+      "头像"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/04/1713922034_Testimonials-43.jpeg"
+  },
+  "ptn-19429": {
+    "id": 19429,
+    "name": "Testimonials 44",
+    "description": "深色标题区域引出三栏式客户评价卡片。每张卡片都包含星级评分和用户头像，非常适合建立社会认同感。",
+    "categories": [
+      "testimonials"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "dark-mode",
+      "professional"
+    ],
+    "industry_tags": [
+      "saas",
+      "agency",
+      "consulting",
+      "generic"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "no-media": "No Media",
+      "alignment": "Centered",
+      "width": "Contained"
+    },
+    "keywords": [
+      "客户评价",
+      "推荐信",
+      "三栏布局",
+      "星级评分",
+      "用户反馈",
+      "社会认同"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/04/1713922613_Testimonials-44.jpeg"
+  },
+  "ptn-19431": {
+    "id": 19431,
+    "name": "List 39",
+    "description": "三栏卡片式布局，交替展示图文内容。适用于博客文章摘要、产品特性或团队成员介绍，结构清晰，视觉丰富。",
+    "categories": [
+      "content",
+      "features",
+      "blog"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern"
+    ],
+    "industry_tags": [
+      "agency",
+      "portfolio",
+      "media",
+      "generic"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "media-bottom": "Media Bottom",
+      "media-top": "Media Top",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "三栏布局",
+      "图文交错",
+      "卡片设计",
+      "内容列表",
+      "特色展示",
+      "博客摘要"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/04/1713923146_List-39.jpeg"
+  },
+  "ptn-19433": {
+    "id": 19433,
+    "name": "Testimonials 45",
+    "description": "左侧为引言和客户评价，右侧搭配圆形配图的经典两栏布局。适合展示客户证言，建立品牌信任感。",
+    "categories": [
+      "testimonials"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "saas",
+      "agency",
+      "consulting",
+      "tech"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "media-right": "Media Right",
+      "alignment": "Left Aligned",
+      "vertical-alignment": "Middle"
+    },
+    "keywords": [
+      "客户评价",
+      "用户证言",
+      "推荐信",
+      "左文右图",
+      "圆形图片",
+      "社会认同"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/07/1720220318_Testimonials-45.jpeg"
+  },
+  "ptn-19435": {
+    "id": 19435,
+    "name": "Pricing Table 14",
+    "description": "双栏价格表布局，通过不同背景色区分方案。右侧方案被突出显示，适合引导用户选择推荐套餐。",
+    "categories": [
+      "pricing-table"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional",
+      "flat"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "consulting",
+      "agency"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "no-media": "No Media",
+      "alignment": "Centered",
+      "width": "Contained"
+    },
+    "keywords": [
+      "价格表",
+      "套餐对比",
+      "双栏布局",
+      "功能列表",
+      "行动号召",
+      "推荐方案"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/04/1713923663_Pricing-Table-14.jpeg"
+  },
+  "ptn-19579": {
+    "id": 19579,
+    "name": "Post Loop 16",
+    "description": "三栏网格布局的博客文章列表，每篇文章包含特色图片、标题、摘要和阅读更多链接。适合展示精选文章或最新动态。",
+    "categories": [
+      "blog"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "minimalist",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "media",
+      "portfolio",
+      "agency",
+      "generic"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "media-top": "Media Top",
+      "alignment": "Left Aligned",
+      "grid": "Grid"
+    },
+    "keywords": [
+      "博客列表",
+      "文章网格",
+      "三栏布局",
+      "精选文章",
+      "内容展示",
+      "卡片式设计"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/06/1718300298_Post-Loop-16.jpeg"
+  },
+  "ptn-19587": {
+    "id": 19587,
+    "name": "Hero 68",
+    "description": "Bento网格布局，左侧为大尺寸主图，右侧组合了标题、描述和行动号召按钮。适合在首屏区域展示多维度的产品信息或核心价值。",
+    "categories": [
+      "hero"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "agency",
+      "startup"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "bento-grid": "Bento & Grid",
+      "media-background": "Media Background",
+      "media-left": "Media Left",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "Bento网格",
+      "首屏设计",
+      "不对称布局",
+      "多模块组合",
+      "CTA"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/07/1719868764_Hero-68.jpeg"
+  },
+  "ptn-19606": {
+    "id": 19606,
+    "name": "Hero 69",
+    "description": "非对称网格布局，左侧为标题、描述和CTA按钮，右侧为大尺寸主图。适合展示核心价值主张或产品特性。",
+    "categories": [
+      "hero"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "light-mode",
+      "professional"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "startup",
+      "agency"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "bento-grid": "Bento & Grid",
+      "media-background": "Media Background",
+      "media-right": "Media Right",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "bento网格",
+      "首屏设计",
+      "价值主张",
+      "左文右图",
+      "CTA按钮",
+      "非对称布局"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/07/1719868731_Hero-69.jpeg"
+  },
+  "ptn-19608": {
+    "id": 19608,
+    "name": "Hero 70",
+    "description": "左侧为醒目标题和行动号召按钮，右侧采用便当网格（Bento Grid）展示多个入口或特性。适合需要清晰传达核心价值并提供多个导航路径的首页。",
+    "categories": [
+      "hero"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "minimalist"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "startup",
+      "agency"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "bento-grid": "Bento & Grid",
+      "media-background": "Media Background",
+      "2-columns": "2 Columns",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "首屏",
+      "Bento网格",
+      "价值主张",
+      "CTA按钮",
+      "多入口导航",
+      "卡片布局"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/07/1719869197_Hero-70.jpeg"
+  },
+  "ptn-19784": {
+    "id": 19784,
+    "name": "Hero 71",
+    "description": "极简主义的页面标题模块，采用单栏居中布局，背景简洁。适用于各类页面的顶部，用于清晰地展示页面主题。",
+    "categories": [
+      "hero",
+      "header"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "generic"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "no-media": "No Media",
+      "alignment": "Centered",
+      "width": "Contained",
+      "vertical-alignment": "Middle"
+    },
+    "keywords": [
+      "页面标题",
+      "居中标题",
+      "简约设计",
+      "单栏布局",
+      "内容区块"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/03/1741725431_Hero-71.jpeg"
+  },
+  "ptn-19786": {
+    "id": 19786,
+    "name": "Video 25",
+    "description": "上方为分栏标题和描述，下方是带文字叠加效果的大尺寸视频播放器。适合产品演示、教程或品牌故事展示。",
+    "categories": [
+      "video",
+      "content"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "minimalist",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "agency",
+      "generic"
+    ],
+    "layout": {
+      "bento-grid": "Bento & Grid",
+      "media-center": "Media Center",
+      "1-column": "1 Column",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "视频播放器",
+      "产品演示",
+      "文本叠加",
+      "教程展示",
+      "品牌故事",
+      "居中布局"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/08/1722897266_Video-25.jpeg"
+  },
+  "ptn-19788": {
+    "id": 19788,
+    "name": "Media and Text 87",
+    "description": "非对称的多图布局，左侧大图吸引眼球，右侧文案与下方小图组合。适合展示品牌故事、旅行或户外活动。",
+    "categories": [
+      "content",
+      "gallery",
+      "features"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "minimalist",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "travel",
+      "portfolio",
+      "agency",
+      "media"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "media-bottom": "Media Bottom",
+      "media-left": "Media Left",
+      "off-grid": "Off-Grid",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "多图展示",
+      "非对称布局",
+      "图文组合",
+      "品牌故事",
+      "户外探险",
+      "创意布局"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/08/1722897267_Media-and-Text-87.jpeg"
+  },
+  "ptn-19791": {
+    "id": 19791,
+    "name": "Team 30",
+    "description": "居中标题和描述，下方是四列团队成员卡片网格，底部配有行动号召按钮。适合展示公司核心团队或成员。",
+    "categories": [
+      "team"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "agency",
+      "startup",
+      "tech",
+      "consulting"
+    ],
+    "layout": {
+      "4-columns": "4 Columns",
+      "media-top": "Media Top",
+      "alignment": "Centered",
+      "width": "Contained"
+    },
+    "keywords": [
+      "团队介绍",
+      "成员展示",
+      "四栏布局",
+      "人物卡片",
+      "公司团队",
+      "CTA按钮"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2024/08/1722897266_Team-30.jpeg"
+  },
+  "ptn-20585": {
+    "id": 20585,
+    "name": "Hero 79",
+    "description": "居中对齐的英雄区，包含醒目标题、描述和邮件订阅表单。底部展示合作伙伴徽标，适合快速传达价值并收集潜在客户。",
+    "categories": [
+      "hero",
+      "newsletter",
+      "logos"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "professional",
+      "bold"
+    ],
+    "industry_tags": [
+      "saas",
+      "startup",
+      "tech",
+      "consulting"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "no-media": "No Media",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "邮件订阅",
+      "潜在客户",
+      "居中布局",
+      "合作伙伴徽标",
+      "价值主张",
+      "行动号召"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/01/1738006412_Hero-79.jpeg"
+  },
+  "ptn-20595": {
+    "id": 20595,
+    "name": "Media and Text 95",
+    "description": "双栏布局，左侧为醒目标题，右侧为说明文字和邮件订阅表单，背景图营造氛围。适合用作行动号召或信息订阅模块。",
+    "categories": [
+      "newsletter",
+      "cta",
+      "content"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "professional",
+      "serene"
+    ],
+    "industry_tags": [
+      "saas",
+      "consulting",
+      "travel",
+      "generic"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "media-background": "Media Background",
+      "alignment": "Left Aligned",
+      "vertical-alignment": "Middle",
+      "width": "Wide"
+    },
+    "keywords": [
+      "邮件订阅",
+      "背景图",
+      "双栏布局",
+      "行动号召",
+      "信息收集",
+      "电子报注册"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/01/1738014658_Media-and-Text-95.jpeg"
+  },
+  "ptn-20598": {
+    "id": 20598,
+    "name": "Cards 57",
+    "description": "两段式布局，顶部为双栏标题和行动号召，下方是四栏卡片网格。适合清晰地展示多项服务或产品特性。",
+    "categories": [
+      "features",
+      "services"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "consulting",
+      "agency"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "4-columns": "4 Columns",
+      "no-media": "No Media",
+      "alignment": "Left Aligned",
+      "width": "Contained"
+    },
+    "keywords": [
+      "功能卡片",
+      "服务展示",
+      "四栏网格",
+      "双栏标题",
+      "行动号召"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/01/1738186415_Cards-57.jpeg"
+  },
+  "ptn-20600": {
+    "id": 20600,
+    "name": "Columns 39",
+    "description": "三栏式布局，中间为突出图片，两侧对称排列功能特性列表。适合展示产品核心优势或服务项目。",
+    "categories": [
+      "features",
+      "services"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "minimalist",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "consulting",
+      "agency"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "media-center": "Media Center",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "三栏布局",
+      "功能列表",
+      "特性展示",
+      "居中图片",
+      "服务项目",
+      "优势对比"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/01/1738250980_Columns-39.jpeg"
+  },
+  "ptn-20605": {
+    "id": 20605,
+    "name": "Featured Product 18",
+    "description": "非对称布局的产品展示模块，通过大图、垂直文本和信息卡片突出产品。适合电商促销或特色商品介绍。",
+    "categories": [
+      "features",
+      "services"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "minimalist"
+    ],
+    "industry_tags": [
+      "ecommerce",
+      "startup",
+      "generic",
+      "travel"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "media-center": "Media Center",
+      "off-grid": "Off-Grid",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "产品展示",
+      "促销活动",
+      "非对称布局",
+      "星级评价",
+      "垂直文本",
+      "商品卡片"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/02/1738506703_Featured-Product-18.jpeg"
+  },
+  "ptn-20611": {
+    "id": 20611,
+    "name": "Gallery 24",
+    "description": "独特的两栏布局，左侧为醒目的垂直标题，右侧包含两个可滑动的图片画廊。适合展示作品集或项目案例。",
+    "categories": [
+      "gallery"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern"
+    ],
+    "industry_tags": [
+      "portfolio",
+      "agency",
+      "media"
+    ],
+    "layout": {
+      "5-columns": "5+ Columns",
+      "media-bottom": "Media Bottom",
+      "media-top": "Media Top",
+      "2-columns": "2 Columns",
+      "media-right": "Media Right",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "图片画廊",
+      "作品集",
+      "垂直标题",
+      "图片轮播",
+      "双栏布局",
+      "简约设计"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/02/1738506694_Gallery-24.jpeg"
+  },
+  "ptn-20619": {
+    "id": 20619,
+    "name": "Cards 58",
+    "description": "优雅的四栏卡片布局，每张卡片采用独特的拱形裁切图片，下方配有左对齐标题。适合展示团队成员、服务项目或作品集。",
+    "categories": [
+      "gallery",
+      "team",
+      "services"
+    ],
+    "style_tags": [
+      "minimalist",
+      "modern",
+      "clean",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "portfolio",
+      "agency",
+      "travel",
+      "startup"
+    ],
+    "layout": {
+      "4-columns": "4 Columns",
+      "media-center": "Media Center",
+      "media-left": "Media Left",
+      "media-right": "Media Right",
+      "media-top": "Media Top",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "四栏布局",
+      "卡片设计",
+      "拱形图片",
+      "图片画廊",
+      "团队展示",
+      "作品集"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/02/1738545432_Cards-58.jpeg"
+  },
+  "ptn-20714": {
+    "id": 20714,
+    "name": "Gallery 26",
+    "description": "非对称的Bento网格布局，左侧大卡片包含标题、描述和CTA按钮，右侧和下方环绕着不同尺寸的图片。适合展示作品集或特色内容。",
+    "categories": [
+      "gallery"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "professional"
+    ],
+    "industry_tags": [
+      "portfolio",
+      "agency",
+      "travel",
+      "generic"
+    ],
+    "layout": {
+      "4-columns": "4 Columns",
+      "bento-grid": "Bento & Grid",
+      "media-background": "Media Background",
+      "media-top": "Media Top",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "Bento网格",
+      "作品集",
+      "图片画廊",
+      "不对称布局",
+      "图文卡片",
+      "CTA按钮"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/02/1740435896_Gallery-26.jpeg"
+  },
+  "ptn-20716": {
+    "id": 20716,
+    "name": "Hero 82",
+    "description": "采用全宽背景图的Hero组件，左侧叠加醒目标题、描述文案和双行动号召按钮。适合旅游、探险或科技产品首页，营造沉浸式视觉体验。",
+    "categories": [
+      "hero"
+    ],
+    "style_tags": [
+      "modern",
+      "bold",
+      "clean",
+      "serene"
+    ],
+    "industry_tags": [
+      "travel",
+      "startup",
+      "tech",
+      "non-profit"
+    ],
+    "layout": {
+      "1-column": "1 Column",
+      "media-background": "Media Background",
+      "alignment": "Left Aligned",
+      "width": "Full Width"
+    },
+    "keywords": [
+      "首屏",
+      "背景图",
+      "左对齐",
+      "双按钮CTA",
+      "全宽布局",
+      "自然风光"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/02/1740003572_Hero-82.jpeg"
+  },
+  "ptn-20725": {
+    "id": 20725,
+    "name": "Location/Map/Hour 24",
+    "description": "左侧标题与右侧地图结合的双栏布局，标题卡片悬浮于地图之上。下方三栏清晰展示地址、邮箱和电话等联系方式，适合企业联系页面。",
+    "categories": [
+      "location"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "generic",
+      "agency",
+      "consulting",
+      "startup"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "media-right": "Media Right",
+      "off-grid": "Off-Grid",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "联系我们",
+      "地理位置",
+      "地图展示",
+      "联系信息",
+      "地址电话",
+      "双栏布局"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/02/1740434067_LocationMapHour-24.jpeg"
+  },
+  "ptn-20728": {
+    "id": 20728,
+    "name": "Cards 59",
+    "description": "居中大标题下的三栏卡片布局，每张卡片包含图片、描述和独特的垂直侧边标题。适合展示服务、作品集或团队成员。",
+    "categories": [
+      "features",
+      "services",
+      "gallery"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "professional",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "agency",
+      "portfolio",
+      "startup",
+      "tech"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "media-center": "Media Center",
+      "media-left": "Media Left",
+      "media-right": "Media Right",
+      "alignment": "Centered",
+      "media-top": "Media Top"
+    },
+    "keywords": [
+      "三栏卡片",
+      "垂直标题",
+      "作品集展示",
+      "服务介绍",
+      "图文卡片",
+      "特色功能"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/02/1740090439_Cards-59.jpeg"
+  },
+  "ptn-20730": {
+    "id": 20730,
+    "name": "Columns 40",
+    "description": "居中大标题下设三列内容，每列均配有图标、标题和描述文本。适合展示产品核心功能、服务项目或价值主张。",
+    "categories": [
+      "features",
+      "services"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "startup",
+      "consulting"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "no-media": "No Media",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "三栏布局",
+      "功能特性",
+      "图标列表",
+      "服务介绍",
+      "价值主张",
+      "居中对齐"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/02/1740768315_Columns-40.jpeg"
+  },
+  "ptn-20745": {
+    "id": 20745,
+    "name": "Cards 60",
+    "description": "非对称的便当网格布局，通过大小不一的圆角卡片展示内容。每张卡片均以图片为背景，适合用于作品集、服务或博客文章的视觉化呈现。",
+    "categories": [
+      "gallery",
+      "content",
+      "services"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "serene"
+    ],
+    "industry_tags": [
+      "travel",
+      "portfolio",
+      "agency",
+      "media"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "bento-grid": "Bento & Grid",
+      "media-background": "Media Background"
+    },
+    "keywords": [
+      "便当网格",
+      "图片卡片",
+      "非对称布局",
+      "圆角设计",
+      "作品集展示",
+      "视觉内容"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/02/1740673308_Cards-60.jpeg"
+  },
+  "ptn-20749": {
+    "id": 20749,
+    "name": "Cards 61",
+    "description": "双栏卡片式布局，左侧为客户评价轮播，右侧展示核心标题和关键数据统计，有效结合社会认同与公司实力。",
+    "categories": [
+      "testimonials",
+      "stats",
+      "content"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "professional",
+      "bold"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "consulting",
+      "agency"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "no-media": "No Media",
+      "2-columns": "2 Columns",
+      "contained": "Contained"
+    },
+    "keywords": [
+      "客户评价",
+      "数据统计",
+      "信任背书",
+      "卡片布局",
+      "轮播滑块",
+      "社会认同"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/02/1740774964_Cards-61.jpeg"
+  },
+  "ptn-20760": {
+    "id": 20760,
+    "name": "Gallery 27",
+    "description": "交错式双栏图库布局，每栏包含标题描述和四张圆角图片网格。适合展示作品集、项目案例或活动照片。",
+    "categories": [
+      "gallery"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern"
+    ],
+    "industry_tags": [
+      "portfolio",
+      "agency",
+      "travel",
+      "media"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "4-columns": "4 Columns",
+      "media-bottom": "Media Bottom",
+      "media-top": "Media Top",
+      "alignment": "Left Aligned",
+      "spacing": "Spacious"
+    },
+    "keywords": [
+      "图库",
+      "作品集",
+      "图片网格",
+      "交错布局",
+      "圆角卡片",
+      "简约设计"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/02/1740511456_Gallery-27.jpeg"
+  },
+  "ptn-20762": {
+    "id": 20762,
+    "name": "Hero 83",
+    "description": "非对称网格布局，顶部为左文右图，底部为四栏卡片。适合展示核心价值主张和多个入口点，设计现代简洁。",
+    "categories": [
+      "hero",
+      "features"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "light-mode",
+      "professional"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "agency",
+      "startup"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "4-columns": "4 Columns",
+      "bento-grid": "Bento & Grid",
+      "media-right": "Media Right",
+      "alignment": "Left Aligned",
+      "spacing": "Spacious"
+    },
+    "keywords": [
+      "Bento网格",
+      "价值主张",
+      "多入口",
+      "卡片布局",
+      "社交链接",
+      "首屏设计"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/02/1740518395_Hero-83.jpeg"
+  },
+  "ptn-20764": {
+    "id": 20764,
+    "name": "Hero 84",
+    "description": "非对称双栏布局，顶部大标题，左侧展示主视觉图，右侧通过卡片罗列核心特性。适合展示产品或服务的关键卖点。",
+    "categories": [
+      "hero",
+      "features"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "minimalist",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "startup",
+      "consulting"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "bento-grid": "Bento & Grid",
+      "media-left": "Media Left",
+      "alignment": "Left Aligned",
+      "spacing": "Spacious"
+    },
+    "keywords": [
+      "非对称布局",
+      "产品特性",
+      "左图右文",
+      "卡片设计",
+      "图标列表",
+      "首屏介绍"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/02/1740519504_Hero-84.jpeg"
+  },
+  "ptn-20783": {
+    "id": 20783,
+    "name": "Hero 85",
+    "description": "全幅背景图之上，左侧为醒目标题，右侧以网格卡片形式展示核心特性。适合科技或旅游类网站，直观传达价值主张。",
+    "categories": [
+      "hero"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "professional",
+      "flat"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "travel",
+      "generic"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "bento-grid": "Bento & Grid",
+      "media-background": "Media Background"
+    },
+    "keywords": [
+      "首屏",
+      "背景图",
+      "网格布局",
+      "卡片设计",
+      "价值主张",
+      "功能介绍"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/02/1740674732_Hero-85.jpeg"
+  },
+  "ptn-20786": {
+    "id": 20786,
+    "name": "Hero 86",
+    "description": "经典左文右图布局，左侧为醒目标题和双行动号召按钮，右侧为圆角配图。适合展示核心价值主张或产品介绍。",
+    "categories": [
+      "hero"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "minimalist",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "startup",
+      "travel"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "media-right": "Media Right",
+      "alignment": "Left Aligned",
+      "vertical-alignment": "Middle"
+    },
+    "keywords": [
+      "首屏",
+      "价值主张",
+      "左文右图",
+      "CTA按钮",
+      "产品介绍",
+      "现代简约"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/02/1740675838_Hero-86.jpeg"
+  },
+  "ptn-20798": {
+    "id": 20798,
+    "name": "Columns 41",
+    "description": "非对称网格布局，包含一个主卡片和两个次级卡片，用于展示不同层级的产品特性或服务。适合科技或咨询类网站。",
+    "categories": [
+      "features",
+      "content",
+      "services"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "professional",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "startup",
+      "consulting"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "bento-grid": "Bento &amp; Grid",
+      "media-background": "Media Background",
+      "media-right": "Media Right",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "Bento网格",
+      "特色展示",
+      "卡片设计",
+      "非对称布局",
+      "产品服务",
+      "内容模块"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/02/1740772877_Columns-41.jpeg"
+  },
+  "ptn-20814": {
+    "id": 20814,
+    "name": "Call to Action 1",
+    "description": "五栏式布局，中心区域突出显示标题和行动号召按钮，两侧由四张图片环绕，视觉冲击力强，适合引导用户操作。",
+    "categories": [
+      "cta",
+      "gallery"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "travel",
+      "agency",
+      "consulting",
+      "generic"
+    ],
+    "layout": {
+      "5-columns": "5+ Columns",
+      "media-left": "Media Left",
+      "media-right": "Media Right",
+      "alignment": "Centered",
+      "vertical-alignment": "Middle"
+    },
+    "keywords": [
+      "行动号召",
+      "多栏布局",
+      "图片网格",
+      "居中CTA",
+      "视觉引导"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/03/1741108080_Call-to-Action-1.jpeg"
+  },
+  "ptn-20815": {
+    "id": 20815,
+    "name": "Hero 87",
+    "description": "多部分组合式英雄区，包含居中标题、四栏关键数据统计和带背景图的介绍模块。适合企业官网首页，用于建立信任和展示成就。",
+    "categories": [
+      "hero",
+      "stats"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "professional",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "consulting",
+      "finance"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "4-columns": "4 Columns",
+      "bento-grid": "Bento & Grid",
+      "media-background": "Media Background",
+      "alignment": "Centered"
+    },
+    "keywords": [
+      "英雄区",
+      "数据统计",
+      "关键指标",
+      "企业实力",
+      "多模块布局",
+      "背景图"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/03/1741031248_Hero-87.jpeg"
+  },
+  "ptn-20819": {
+    "id": 20819,
+    "name": "Cards 62",
+    "description": "Bento网格布局，通过不同尺寸的卡片展示核心功能、数据统计和行动号召。适合科技、旅游或服务类网站。",
+    "categories": [
+      "features",
+      "stats",
+      "services"
+    ],
+    "style_tags": [
+      "modern",
+      "clean",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "tech",
+      "travel",
+      "saas",
+      "generic"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "bento-grid": "Bento &amp; Grid",
+      "media-left": "Media Left"
+    },
+    "keywords": [
+      "Bento网格",
+      "卡片布局",
+      "数据展示",
+      "功能特性",
+      "圆角设计",
+      "CTA模块"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/03/1741037503_Cards-62.jpeg"
+  },
+  "ptn-20836": {
+    "id": 20836,
+    "name": "Call to Action 2",
+    "description": "经典的左文右图行动号召模块，结构清晰，通过简洁的文案和突出的按钮引导用户操作，适用于各类网站的转化区域。",
+    "categories": [
+      "cta"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "saas",
+      "tech",
+      "agency",
+      "generic"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "media-right": "Media Right",
+      "alignment": "Left Aligned",
+      "width": "Contained"
+    },
+    "keywords": [
+      "行动号召",
+      "左文右图",
+      "CTA按钮",
+      "转化模块",
+      "图文组合"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/03/1741106997_Call-to-Action-2.jpeg"
+  },
+  "ptn-20839": {
+    "id": 20839,
+    "name": "Call to Action 3",
+    "description": "左侧为简洁文案和行动号召按钮，右侧为四张图片组成的网格画廊。适合引导用户采取行动或展示作品集。",
+    "categories": [
+      "cta",
+      "gallery"
+    ],
+    "style_tags": [
+      "clean",
+      "minimalist",
+      "modern"
+    ],
+    "industry_tags": [
+      "portfolio",
+      "agency",
+      "travel",
+      "generic"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "media-right": "Media Right",
+      "grid": "Grid",
+      "alignment": "Left Aligned",
+      "vertical-alignment": "Middle"
+    },
+    "keywords": [
+      "行动号召",
+      "双栏布局",
+      "图片网格",
+      "作品集展示",
+      "左文右图",
+      "简约设计"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/03/1741107812_Call-to-Action-3.jpeg"
+  },
+  "ptn-20850": {
+    "id": 20850,
+    "name": "Gallery 28",
+    "description": "左侧标题文案，右侧搭配多列不规则图片网格。适合展示摄影作品、项目案例或视觉故事。",
+    "categories": [
+      "gallery"
+    ],
+    "style_tags": [
+      "minimalist",
+      "modern",
+      "clean",
+      "serene"
+    ],
+    "industry_tags": [
+      "portfolio",
+      "agency",
+      "travel",
+      "media"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "bento-grid": "Bento & Grid",
+      "off-grid": "Off-Grid",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "图片画廊",
+      "作品集",
+      "Bento网格",
+      "不对称布局",
+      "摄影展示",
+      "视觉叙事"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/03/1741117121_Gallery-28.jpeg"
+  },
+  "ptn-20852": {
+    "id": 20852,
+    "name": "Gallery 29",
+    "description": "居中标题和描述下方是一个三栏图片轮播组件，用于展示作品集或活动照片。设计简洁，适合旅行、摄影或作品展示网站。",
+    "categories": [
+      "gallery"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "minimalist"
+    ],
+    "industry_tags": [
+      "portfolio",
+      "travel",
+      "agency",
+      "generic"
+    ],
+    "layout": {
+      "3-columns": "3 Columns",
+      "media-bottom": "Media Bottom",
+      "alignment": "Centered",
+      "width": "Contained"
+    },
+    "keywords": [
+      "图片轮播",
+      "作品集",
+      "相册",
+      "滑块",
+      "居中布局",
+      "摄影展示"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/03/1741117559_Gallery-29.jpeg"
+  },
+  "ptn-20856": {
+    "id": 20856,
+    "name": "Columns 42",
+    "description": "动态的四栏网格布局，图文交错排列，视觉上富有变化。适合展示产品特性、团队成员或服务项目。",
+    "categories": [
+      "features",
+      "gallery",
+      "services"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "agency",
+      "portfolio",
+      "startup",
+      "generic"
+    ],
+    "layout": {
+      "4-columns": "4 Columns",
+      "bento-grid": "Bento & Grid",
+      "media-bottom": "Media Bottom",
+      "media-top": "Media Top",
+      "alignment": "Centered",
+      "spacing": "Spacious"
+    },
+    "keywords": [
+      "四栏布局",
+      "Bento网格",
+      "图文交错",
+      "产品特性",
+      "服务展示",
+      "动态布局"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/03/1741118561_Columns-42.jpeg"
+  },
+  "ptn-20858": {
+    "id": 20858,
+    "name": "Featured Product 19",
+    "description": "顶部双栏展示产品标题、价格和星级评价，下方配有大幅特色图片。适合电商或服务网站突出展示核心产品。",
+    "categories": [
+      "features",
+      "services"
+    ],
+    "style_tags": [
+      "clean",
+      "modern",
+      "light-mode"
+    ],
+    "industry_tags": [
+      "ecommerce",
+      "travel",
+      "tech"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "bento-grid": "Bento & Grid",
+      "media-bottom": "Media Bottom",
+      "alignment": "Left Aligned",
+      "width": "Contained"
+    },
+    "keywords": [
+      "产品展示",
+      "价格",
+      "用户评价",
+      "特色图片",
+      "CTA按钮",
+      "双栏布局"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/03/1741120629_Featured-Product-19.jpeg"
+  },
+  "ptn-22813": {
+    "id": 22813,
+    "name": "Form 50",
+    "description": "经典双栏联系模块，左侧为信息提交表单，右侧并列展示地址、电话和营业时间等详细联系方式，结构清晰。",
+    "categories": [
+      "contact-form"
+    ],
+    "style_tags": [
+      "minimalist",
+      "clean",
+      "modern",
+      "professional"
+    ],
+    "industry_tags": [
+      "generic",
+      "agency",
+      "consulting",
+      "startup"
+    ],
+    "layout": {
+      "2-columns": "2 Columns",
+      "no-media": "No Media",
+      "alignment": "Left Aligned"
+    },
+    "keywords": [
+      "联系表单",
+      "信息提交",
+      "双栏布局",
+      "联系方式",
+      "客户支持"
+    ],
+    "image_url": "https://patterns.startertemplatecloud.com/wp-content/uploads/kadence-cloud-screenshots/2025/05/1747061125_Form-50.jpeg"
+  }
+}

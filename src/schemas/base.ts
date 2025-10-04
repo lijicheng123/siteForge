@@ -57,6 +57,7 @@ export const responseSchema = <T>(dataSchema: T) => ({
       success: { type: 'boolean' },
       data: dataSchema,
       message: { type: 'string' },
+      duration: { type: 'number' },
       timestamp: { type: 'string', format: 'date-time' }
     },
     required: ['success', 'data', 'timestamp']

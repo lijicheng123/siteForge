@@ -7,6 +7,7 @@
 - **🤖 AI驱动**: 集成OpenAI GPT、Anthropic Claude、Google Gemini，智能分析用户需求
 - **🔄 6步工作流**: 从需求分析到HTML生成的完整自动化流程
 - **🎨 WordPress兼容**: 输出Gutenberg兼容的HTML代码
+- **🖼️ Pattern Enrichment**: AI 视觉分析自动丰富化 Pattern 数据
 - **⚡ 高性能**: 基于Fastify框架，响应迅速
 - **🔧 模块化设计**: 清晰的代码结构，易于维护和扩展
 - **🌐 多LLM支持**: 支持多种AI模型，灵活切换
@@ -25,6 +26,30 @@
 - 有效的OpenAI和/或Anthropic API密钥
 
 ## 🚀 快速开始
+
+### Pattern Enrichment（推荐）
+
+使用 AI 视觉分析丰富化 Pattern 数据：
+
+```bash
+# 1. 启动服务
+npm run dev
+
+# 2. 运行批量处理
+screen -S enrich
+npm run enrich -- --delay 1500
+# Ctrl+A, D 断开
+```
+
+📖 **详细文档**：[PATTERN-ENRICHMENT.md](./PATTERN-ENRICHMENT.md)
+- 完整使用指南
+- 参数说明和最佳实践
+- 成本估算（~54元）
+- 常见问题解决
+
+---
+
+### 网站生成工作流
 
 ### 1. 克隆项目
 

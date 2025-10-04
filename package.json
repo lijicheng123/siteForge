@@ -20,8 +20,7 @@
     "test:complete": "node tests/test-complete-workflow.js",
     "test:gateway": "node tests/test-llm-gateway.js",
     "test:pattern-analyzer": "node tests/test-pattern-analyzer.js",
-    "analyze:quick": "node scripts/quick-test.js",
-    "analyze:batch": "node scripts/batch-analyze-patterns.js"
+    "enrich": "node scripts/enrich-patterns.js"
   },
   "keywords": [
     "ai",

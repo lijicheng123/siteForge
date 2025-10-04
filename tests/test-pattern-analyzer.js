@@ -14,10 +14,21 @@ async function testAnalyzePattern(patternId) {
     
     console.log('✅ 请求成功');
     console.log('状态码:', response.status);
-    console.log('响应数据:', JSON.stringify(response.data, null, 2));
-    console.log('\n布局描述:');
-    console.log(response.data.data.layoutDescription);
-    console.log(`\n耗时: ${response.data.duration}ms`);
+    console.log(`耗时: ${response.data.duration}ms\n`);
+    
+    const data = response.data.data;
+    console.log('📊 丰富化的 Pattern 数据:');
+    console.log('─'.repeat(60));
+    console.log(`ID: ${data.id}`);
+    console.log(`名称: ${data.name}`);
+    console.log(`描述: ${data.description}`);
+    console.log(`分类: ${data.categories.join(', ')}`);
+    console.log(`风格标签: ${data.style_tags.join(', ')}`);
+    console.log(`行业标签: ${data.industry_tags.join(', ')}`);
+    console.log(`布局: ${JSON.stringify(data.layout)}`);
+    console.log(`关键词: ${data.keywords.join(', ')}`);
+    console.log(`图片URL: ${data.image_url}`);
+    console.log('─'.repeat(60));
     
     return response.data;
   } catch (error) {
