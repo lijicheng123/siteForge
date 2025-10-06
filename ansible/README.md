@@ -22,10 +22,9 @@ ansible/
 
 ## 支持的操作系统
 
-- CentOS 7/8
-- Rocky Linux 8/9
-- Ubuntu 18.04/20.04/22.04
-- Debian 10/11
+- **Rocky Linux 8/9** (专用优化)
+
+本项目专为 Rocky Linux 优化，不支持其他操作系统。
 
 ## 前置要求
 
@@ -65,7 +64,7 @@ all:
           ansible_user: root
           ansible_password: "your_password"
           ansible_port: 22
-          server_os: centos
+          server_os: rocky
 ```
 
 ### 2. 配置变量

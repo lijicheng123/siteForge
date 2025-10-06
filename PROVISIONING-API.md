@@ -8,10 +8,9 @@ WordPress自动化部署功能允许用户通过API接口，在远程服务器�
 
 ## 支持的操作系统
 
-- CentOS 7/8
-- Rocky Linux 8/9
-- Ubuntu 18.04/20.04/22.04
-- Debian 10/11
+- **Rocky Linux 8/9** (专用优化)
+
+本系统专为 Rocky Linux 优化，不支持其他操作系统。
 
 ## API端点
 
@@ -30,7 +29,7 @@ Content-Type: application/json
     "username": "root",
     "password": "your_password",
     "port": 22,
-    "os": "centos"
+    "os": "rocky"
   }
 }
 ```
@@ -41,8 +40,8 @@ Content-Type: application/json
   "success": true,
   "data": {
     "isOnline": true,
-    "os": "centos",
-    "osVersion": "CentOS 8.4",
+    "os": "rocky",
+    "osVersion": "Rocky Linux 9.0",
     "memory": {
       "total": 2.0,
       "available": 1.2,
@@ -81,7 +80,7 @@ Content-Type: application/json
     "username": "root",
     "password": "your_password",
     "port": 22,
-    "os": "centos"
+    "os": "rocky"
   }
 }
 ```
@@ -129,7 +128,7 @@ Content-Type: application/json
     "username": "root",
     "password": "your_password",
     "port": 22,
-    "os": "centos"
+    "os": "rocky"
   },
   "wordpressConfig": {
     "siteName": "My WordPress Site",
@@ -156,7 +155,7 @@ Content-Type: application/json
       "ip": "192.168.1.100",
       "username": "root",
       "port": 22,
-      "os": "centos"
+      "os": "rocky"
     },
     "wordpressConfig": {
       "siteUrl": "http://192.168.1.100",
@@ -189,7 +188,7 @@ Content-Type: application/json
     "username": "root",
     "password": "your_password",
     "port": 22,
-    "os": "centos"
+    "os": "rocky"
   },
   "wordpressConfig": {
     "siteName": "My WordPress Site",
