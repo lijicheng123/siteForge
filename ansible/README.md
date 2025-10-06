@@ -7,22 +7,17 @@
 ```
 ansible/
 ├── ansible.cfg              # Ansible配置文件
+├── requirements.yml         # Collections依赖声明
 ├── inventory/               # 主机清单目录
 │   └── hosts.yml           # 主机配置文件
 ├── group_vars/             # 组变量目录
 │   ├── all.yml             # 全局变量
 │   └── wordpress_servers.yml # WordPress服务器组变量
-├── host_vars/              # 主机变量目录
-├── playbooks/              # Playbook目录
-│   ├── server-check.yml    # 服务器检查
-│   ├── docker-install.yml  # Docker安装
-│   ├── wordpress-deploy.yml # WordPress部署
-│   └── wordpress-manage.yml # WordPress管理
-└── roles/                  # 角色目录
-    ├── docker-setup/       # Docker安装角色
-    ├── wordpress-deploy/   # WordPress部署角色
-    ├── server-check/       # 服务器检查角色
-    └── wordpress-manage/   # WordPress管理角色
+└── playbooks/              # Playbook目录
+    ├── server-check.yml    # 服务器检查
+    ├── docker-install.yml  # Docker安装
+    ├── wordpress-deploy.yml # WordPress部署
+    └── wordpress-manage.yml # WordPress管理
 ```
 
 ## 支持的操作系统
@@ -46,6 +41,15 @@ ansible/
 - 最低配置：2核CPU，2GB内存，40GB磁盘
 
 ## 快速开始
+
+### 0. 安装依赖
+
+首先安装所需的 Ansible Collections：
+
+```bash
+cd ansible
+ansible-galaxy collection install -r requirements.yml
+```
 
 ### 1. 配置主机清单
 
@@ -165,7 +169,7 @@ ansible-playbook -i inventory/hosts.yml playbooks/wordpress-manage.yml \
 - `backup_dir`: 备份目录，默认 `/opt/backups`
 - `wordpress.version`: WordPress版本，默认 `latest`
 - `mysql.version`: MySQL版本，默认 `10.6`
-- `nginx.version`: Nginx版本，默认 `latest`
+- `caddy.version`: Caddy版本，默认 `2-alpine`
 
 ### WordPress配置变量
 
@@ -223,14 +227,17 @@ wordpress_config:
 
 ```bash
 # 检查容器状态
-docker-compose ps
+docker compose ps
 
 # 查看容器日志
-docker-compose logs
+docker compose logs
 
 # 进入容器调试
-docker-compose exec wordpress bash
-docker-compose exec mysql bash
+docker compose exec wordpress bash
+docker compose exec mysql bash
+
+# 使用 WP-CLI
+docker compose exec wordpress wp --allow-root --info
 
 # 检查网络连接
 docker network ls

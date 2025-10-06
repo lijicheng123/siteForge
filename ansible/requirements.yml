@@ -1,0 +1,13 @@
+---
+# Ansible Collections 依赖声明
+# 安装命令: ansible-galaxy collection install -r requirements.yml
+
+collections:
+  # Docker 管理所需
+  - name: community.docker
+    version: ">=3.4.0"
+  
+  # 防火墙管理所需
+  - name: ansible.posix
+    version: ">=1.5.0"
+

@@ -34,7 +34,7 @@
     - name: 启动WordPress服务
       shell: |
         cd {{ project_dir }}
-        docker-compose up -d
+        docker compose up -d
       register: start_result
       when: action == 'start'
       
@@ -42,7 +42,7 @@
     - name: 停止WordPress服务
       shell: |
         cd {{ project_dir }}
-        docker-compose down
+        docker compose down
       register: stop_result
       when: action == 'stop'
       
@@ -50,7 +50,7 @@
     - name: 重启WordPress服务
       shell: |
         cd {{ project_dir }}
-        docker-compose restart
+        docker compose restart
       register: restart_result
       when: action == 'restart'
       
@@ -58,8 +58,8 @@
     - name: 强制重新创建WordPress服务
       shell: |
         cd {{ project_dir }}
-        docker-compose down --remove-orphans
-        docker-compose up -d --force-recreate
+        docker compose down --remove-orphans
+        docker compose up -d --force-recreate
       register: recreate_result
       when: action == 'recreate'
       
@@ -67,7 +67,7 @@
     - name: 查看WordPress服务状态
       shell: |
         cd {{ project_dir }}
-        docker-compose ps
+        docker compose ps
       register: status_result
       changed_when: false
       when: action == 'status' or action in ['start', 'restart', 'recreate']
@@ -76,7 +76,7 @@
     - name: 查看WordPress服务日志
       shell: |
         cd {{ project_dir }}
-        docker-compose logs --tail=50
+        docker compose logs --tail=50
       register: logs_result
       changed_when: false
       when: action == 'logs'
@@ -85,22 +85,22 @@
     - name: 更新WordPress核心
       shell: |
         cd {{ project_dir }}
-        docker-compose exec -T wp_cli wp core update --allow-root
-        docker-compose exec -T wp_cli wp core update-db --allow-root
+        docker compose exec -T wordpress wp core update --allow-root
+        docker compose exec -T wordpress wp core update-db --allow-root
       register: update_core_result
       when: action == 'update'
       
     - name: 更新WordPress插件
       shell: |
         cd {{ project_dir }}
-        docker-compose exec -T wp_cli wp plugin update --all --allow-root
+        docker compose exec -T wordpress wp plugin update --all --allow-root
       register: update_plugins_result
       when: action == 'update'
       
     - name: 更新WordPress主题
       shell: |
         cd {{ project_dir }}
-        docker-compose exec -T wp_cli wp theme update --all --allow-root
+        docker compose exec -T wordpress wp theme update --all --allow-root
       register: update_themes_result
       when: action == 'update'
       
@@ -124,11 +124,12 @@
     - name: 检查容器资源使用情况
       shell: |
         cd {{ project_dir }}
-        docker-compose exec -T nginx sh -c 'ps aux && free -m && df -h'
+        echo "=== Caddy ==="
+        docker compose exec -T caddy sh -c 'ps aux && free -m && df -h'
         echo "=== MySQL ==="
-        docker-compose exec -T mysql sh -c 'ps aux && free -m'
+        docker compose exec -T mysql sh -c 'ps aux && free -m'
         echo "=== WordPress ==="
-        docker-compose exec -T wordpress sh -c 'ps aux && free -m'
+        docker compose exec -T wordpress sh -c 'ps aux && free -m'
       register: resource_usage
       changed_when: false
       when: action == 'monitor'
@@ -147,7 +148,7 @@
     - name: 数据库连接检查
       shell: |
         cd {{ project_dir }}
-        docker-compose exec -T mysql mysql -u root -p{{ mysql_root_password | default('changeme123') }} -e "SELECT 1" > /dev/null 2>&1
+        docker compose exec -T mysql mysql -u root -p{{ mysql_root_password | default('changeme123') }} -e "SELECT 1" > /dev/null 2>&1
       register: db_check
       ignore_errors: yes
       when: action in ['status', 'health', 'start', 'restart']
@@ -156,15 +157,15 @@
     - name: 优化WordPress数据库
       shell: |
         cd {{ project_dir }}
-        docker-compose exec -T wp_cli wp db optimize --allow-root
+        docker compose exec -T wordpress wp db optimize --allow-root
       register: db_optimize
       when: action == 'optimize'
       
     - name: 清理WordPress缓存
       shell: |
         cd {{ project_dir }}
-        docker-compose exec -T wp_cli wp cache flush --allow-root
-        docker-compose exec -T wp_cli wp transient delete --all --allow-root
+        docker compose exec -T wordpress wp cache flush --allow-root
+        docker compose exec -T wordpress wp transient delete --all --allow-root
       register: cache_clean
       when: action == 'optimize'
       
@@ -173,9 +174,9 @@
       shell: |
         cd {{ project_dir }}
         # 检查文件权限
-        docker-compose exec -T wordpress find /var/www/html -type f -perm 777 2>/dev/null | wc -l
+        docker compose exec -T wordpress find /var/www/html -type f -perm 777 2>/dev/null | wc -l
         # 检查可疑文件
-        docker-compose exec -T wordpress find /var/www/html -name "*.php" -exec grep -l "eval\|base64_decode\|gzinflate" {} \; 2>/dev/null | wc -l
+        docker compose exec -T wordpress find /var/www/html -name "*.php" -exec grep -l "eval\|base64_decode\|gzinflate" {} \; 2>/dev/null | wc -l
       register: security_check
       changed_when: false
       when: action == 'security'

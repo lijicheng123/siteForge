@@ -85,10 +85,10 @@
       
     - name: 检查Docker Compose安装状态
       shell: |
-        if command -v docker-compose >/dev/null 2>&1; then
-          docker-compose --version | awk '{print $3}' | sed 's/,//'
-        elif docker compose version >/dev/null 2>&1; then
+        if docker compose version >/dev/null 2>&1; then
           docker compose version --short
+        elif command -v docker-compose >/dev/null 2>&1; then
+          docker-compose --version | awk '{print $3}' | sed 's/,//'
         else
           echo "not_installed"
         fi

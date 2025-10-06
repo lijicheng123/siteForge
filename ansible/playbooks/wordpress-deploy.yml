@@ -367,11 +367,8 @@
                       image: wordpress:{{ wordpress.version }}
                       container_name: {{ project_name }}_wordpress
                       restart: unless-stopped
-                      # PHP-FPM端口不需要对外部暴露
-                      # ports:
-                      #   - "9000:9000"
+                      user: "33:33"
                       environment:
-                        # MODIFIED: 使用服务名进行内部通信
                         WORDPRESS_DB_HOST: "mysql:3306"
                         WORDPRESS_DB_NAME: "{{ wordpress.db_name }}"
                         WORDPRESS_DB_USER: "{{ wordpress.db_user }}"
@@ -381,7 +378,6 @@
                         - wordpress_data:/var/www/html
                       networks:
                         - wordpress_net
-                      # MODIFIED: 移除不再需要的 extra_hosts
                       depends_on:
                         mysql:
                           condition: service_healthy
@@ -393,6 +389,14 @@
                         timeout: 10s
                         retries: 3
                         start_period: 90s
+                      # 安装 wp-cli 到容器中
+                      command: >
+                        sh -c "
+                        curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar &&
+                        chmod +x wp-cli.phar &&
+                        mv wp-cli.phar /usr/local/bin/wp &&
+                        docker-entrypoint.sh php-fpm
+                        "
                   
                     caddy:
                       image: caddy:{{ caddy.version }}
@@ -420,29 +424,6 @@
                         timeout: 5s
                         retries: 3
                   
-                    wp-cli:
-                      image: wordpress:cli-php8.2
-                      container_name: {{ project_name }}_wp_cli
-                      user: "0:0"
-                      environment:
-                        # MODIFIED: 使用服务名进行内部通信
-                        WORDPRESS_DB_HOST: "mysql:3306"
-                        WORDPRESS_DB_NAME: "{{ wordpress.db_name }}"
-                        WORDPRESS_DB_USER: "{{ wordpress.db_user }}"
-                        WORDPRESS_DB_PASSWORD: "{{ wordpress.db_password }}"
-                      volumes:
-                        - wordpress_data:/var/www/html
-                      networks:
-                        - wordpress_net
-                      # MODIFIED: 移除不再需要的 extra_hosts
-                      depends_on:
-                        mysql:
-                          condition: service_healthy
-                      deploy:
-                        resources:
-                          limits:
-                            memory: 1G
-                      entrypoint: /bin/sh -c "while true; do sleep 30; done"
 
             - name: "MODIFIED: 生成修正版的Caddy配置文件"
               ansible.builtin.copy:
@@ -829,7 +810,7 @@
       block:
         - name: 5.1 检查WordPress安装状态
           ansible.builtin.command:
-            cmd: docker compose exec -T wp-cli wp --allow-root core is-installed
+            cmd: docker compose exec -T wordpress wp --allow-root core is-installed
             chdir: "{{ project_dir }}"
           register: wp_installed_check
           ignore_errors: yes
@@ -837,11 +818,10 @@
 
         - name: 5.2 安装WordPress核心 (仅在未安装时)
           block:
-            # MODIFIED: 在wp-config.php创建命令中修正DB_HOST和REDIS_HOST
             - name: 创建WordPress配置文件
               ansible.builtin.command:
                 cmd: >
-                  docker compose exec -T wp-cli wp --allow-root config create
+                  docker compose exec -T wordpress wp --allow-root config create
                   --dbname="{{ wordpress.db_name }}"
                   --dbuser="{{ wordpress.db_user }}"
                   --dbpass="{{ wordpress.db_password }}"
@@ -863,7 +843,7 @@
             - name: 执行WordPress安装
               ansible.builtin.command:
                 cmd: >
-                  docker compose exec -T wp-cli wp --allow-root core install
+                  docker compose exec -T wordpress wp --allow-root core install
                   --url="{{ 'https' if ssl.enabled else 'http' }}://{{ site_domain }}"
                   --title="{{ wordpress.site_name }}"
                   --admin_user="{{ wordpress.admin_username }}"
@@ -879,21 +859,21 @@
           block:
             - name: 安装Redis Object Cache插件 (强制启用)
               ansible.builtin.command:
-                cmd: docker compose exec -T wp-cli wp --allow-root plugin install redis-cache --activate
+                cmd: docker compose exec -T wordpress wp --allow-root plugin install redis-cache --activate
                 chdir: "{{ project_dir }}"
               register: redis_plugin_install
               ignore_errors: yes
 
             - name: 启用Redis缓存 (强制启用)
               ansible.builtin.command:
-                cmd: docker compose exec -T wp-cli wp --allow-root redis enable
+                cmd: docker compose exec -T wordpress wp --allow-root redis enable
                 chdir: "{{ project_dir }}"
               register: redis_enable
               ignore_errors: yes
 
             - name: 验证Redis缓存状态
               ansible.builtin.command:
-                cmd: docker compose exec -T wp-cli wp --allow-root redis status
+                cmd: docker compose exec -T wordpress wp --allow-root redis status
                 chdir: "{{ project_dir }}"
               register: redis_status
               ignore_errors: yes
@@ -908,13 +888,13 @@
 
             - name: 设置WordPress永久链接结构
               ansible.builtin.command:
-                cmd: docker compose exec -T wp-cli wp --allow-root rewrite structure '/%postname%/' --hard
+                cmd: docker compose exec -T wordpress wp --allow-root rewrite structure '/%postname%/' --hard
                 chdir: "{{ project_dir }}"
               ignore_errors: yes
 
             - name: 更新WordPress选项
               ansible.builtin.command:
-                cmd: docker compose exec -T wp-cli wp --allow-root option update {{ item.key }} '{{ item.value }}'
+                cmd: docker compose exec -T wordpress wp --allow-root option update {{ item.key }} '{{ item.value }}'
                 chdir: "{{ project_dir }}"
               loop:
                 - { key: 'timezone_string', value: 'Asia/Shanghai' }
@@ -928,7 +908,7 @@
 
             - name: 清理默认内容
               ansible.builtin.command:
-                cmd: docker compose exec -T wp-cli wp --allow-root {{ item }}
+                cmd: docker compose exec -T wordpress wp --allow-root {{ item }}
                 chdir: "{{ project_dir }}"
               loop:
                 - "plugin delete hello akismet"
@@ -939,7 +919,7 @@
 
             - name: 安装推荐的性能优化插件
               ansible.builtin.command:
-                cmd: docker compose exec -T wp-cli wp --allow-root plugin install {{ item }} --activate
+                cmd: docker compose exec -T wordpress wp --allow-root plugin install {{ item }} --activate
                 chdir: "{{ project_dir }}"
               loop:
                 - "autoptimize"      # 代码优化
@@ -972,14 +952,14 @@
           block:
             - name: 检查WordPress版本
               ansible.builtin.command:
-                cmd: docker compose exec -T wp-cli wp --allow-root core version
+                cmd: docker compose exec -T wordpress wp --allow-root core version
                 chdir: "{{ project_dir }}"
               register: wp_version
               changed_when: false
 
             - name: 检查数据库连接
               ansible.builtin.command:
-                cmd: docker compose exec -T wp-cli wp --allow-root db check
+                cmd: docker compose exec -T wordpress wp --allow-root db check
                 chdir: "{{ project_dir }}"
               register: db_check
               changed_when: false
@@ -1083,7 +1063,7 @@
                 name: "WordPress安全更新检查 ({{ project_name }})"
                 minute: "0"
                 hour: "6"
-                job: "cd {{ project_dir }} && docker compose exec -T wp-cli wp --allow-root core check-update >> {{ project_dir }}/logs/wp-updates.log 2>&1"
+                job: "cd {{ project_dir }} && docker compose exec -T wordpress wp --allow-root core check-update >> {{ project_dir }}/logs/wp-updates.log 2>&1"
                 state: present
 
         - name: 6.4 性能监控和健康检查
@@ -1155,16 +1135,16 @@
                   docker compose exec -T wordpress ls -la /var/www/html/wp-config.php
                   
                   # 检查WordPress版本
-                  docker compose exec -T wp-cli wp --allow-root core version
+                  docker compose exec -T wordpress wp --allow-root core version
                   
                   # 检查插件更新
-                  docker compose exec -T wp-cli wp --allow-root plugin list --update=available
+                  docker compose exec -T wordpress wp --allow-root plugin list --update=available
                   
                   # 检查主题更新
-                  docker compose exec -T wp-cli wp --allow-root theme list --update=available
+                  docker compose exec -T wordpress wp --allow-root theme list --update=available
                   
                   # 检查用户列表
-                  docker compose exec -T wp-cli wp --allow-root user list
+                  docker compose exec -T wordpress wp --allow-root user list
                   
                   echo "=== 安全检查完成 ==="
                 dest: "{{ project_dir }}/scripts/security-check.sh"
@@ -1237,7 +1217,7 @@
 
             - name: 验证数据库连接健康
               ansible.builtin.command:
-                cmd: docker compose exec -T wp-cli wp --allow-root db check
+                cmd: docker compose exec -T wordpress wp --allow-root db check
                 chdir: "{{ project_dir }}"
               register: final_db_check
               changed_when: false
@@ -1279,11 +1259,34 @@
                   - 'hardware'
               register: system_facts
 
-            - name: 生成详细部署报告
-              ansible.builtin.template:
-                src: templates/DEPLOYMENT-REPORT.md.j2
+            - name: 生成简化部署报告
+              ansible.builtin.copy:
                 dest: "{{ project_dir }}/DEPLOYMENT-REPORT.md"
                 mode: '0644'
+                content: |
+                  # WordPress 部署报告
+                  
+                  生成时间: {{ ansible_date_time.iso8601 }}
+                  
+                  ## 服务器信息
+                  - 主机名: {{ ansible_hostname }}
+                  - IP 地址: {{ ansible_default_ipv4.address }}
+                  - 操作系统: {{ ansible_distribution }} {{ ansible_distribution_version }}
+                  - CPU 核心: {{ ansible_processor_vcpus }}
+                  - 内存: {{ ansible_memtotal_mb }}MB
+                  
+                  ## 部署信息
+                  - 项目名称: {{ project_name }}
+                  - 网站域名: {{ site_domain }}
+                  - 部署目录: {{ project_dir }}
+                  
+                  ## 访问地址
+                  - 网站首页: {{ 'https' if ssl.enabled else 'http' }}://{{ site_domain }}
+                  - 管理后台: {{ 'https' if ssl.enabled else 'http' }}://{{ site_domain }}/wp-admin
+                  - 管理员用户: {{ wordpress.admin_username }}
+                  
+                  ## 服务状态
+                  所有服务已成功部署并运行中。
 
         - name: 7.5 最终部署信息展示
           ansible.builtin.debug:
@@ -1317,7 +1320,7 @@
                  查看状态: cd {{ project_dir }} && docker compose ps
                  查看日志: cd {{ project_dir }} && docker compose logs -f
                  手动备份: bash {{ project_dir }}/scripts/backup.sh
-                 WordPress CLI: cd {{ project_dir }} && docker compose exec wp-cli wp --allow-root --info
+                 WordPress CLI: cd {{ project_dir }} && docker compose exec wordpress wp --allow-root --info
               
               📄 详细报告: {{ project_dir }}/DEPLOYMENT-REPORT.md
               
