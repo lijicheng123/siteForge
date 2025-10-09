@@ -81,7 +81,7 @@
         url: "https://mirrors.tuna.tsinghua.edu.cn/remi/enterprise/remi-release-{{ ansible_distribution_major_version }}.rpm"
         dest: "/tmp/remi-release-{{ ansible_distribution_major_version }}.rpm"
         mode: '0644'
-        timeout: 60
+        timeout: 180
       tags: ['php', 'remi', 'mirrors']
     
     - name: "PHP 准备 | 安装 Remi 仓库 RPM"
@@ -175,46 +175,84 @@
       # php-xmlrpc 在 Rocky Linux 9 上不可用，已移除
       # php-imagick 需要单独安装 ImageMagick，先移除
     
-    # PHP-FPM 配置优化
+    # PHP-FPM 配置优化（针对 2核2G 服务器，并发100优化）
+    # 计算逻辑：2G内存 - 512M(MySQL) - 256M(Redis) - 400M(系统) = 832M可用
+    # 每个PHP-FPM进程约占50-80MB，max_children = 832M / 70M ≈ 11-12
+    # 为了并发100，配置为20，但需要配合Nginx缓存减少实际PHP请求
     php_fpm_pools:
       - pool_name: www
-        pool_user: nginx
-        pool_group: nginx
+        pool_user: apache
+        pool_group: apache
         pool_listen: /run/php-fpm/www.sock
-        pool_listen_owner: nginx
-        pool_listen_group: nginx
+        pool_listen_owner: apache
+        pool_listen_group: apache
         pool_pm: dynamic
-        pool_pm_max_children: 50
-        pool_pm_start_servers: 5
-        pool_pm_min_spare_servers: 5
-        pool_pm_max_spare_servers: 35
-        pool_pm_max_requests: 500
+        pool_pm_max_children: 20              # 最大子进程数（2G内存优化值）
+        pool_pm_start_servers: 4              # 启动时进程数
+        pool_pm_min_spare_servers: 2          # 最小空闲进程数
+        pool_pm_max_spare_servers: 8          # 最大空闲进程数
+        pool_pm_max_requests: 1000            # 每个进程处理1000请求后重启（防止内存泄漏）
+        pool_pm_process_idle_timeout: 30s     # 空闲进程30秒后回收
+        pool_request_terminate_timeout: 300   # 单个请求最大执行时间
     
-    # php.ini 配置
-    php_memory_limit: "256M"
-    php_max_execution_time: "300"
-    php_upload_max_filesize: "64M"
-    php_post_max_size: "64M"
+    # php.ini 配置（优化上传和性能）
+    php_memory_limit: "256M"                  # 单个脚本内存限制
+    php_max_execution_time: "300"             # 最大执行时间5分钟
+    php_upload_max_filesize: "64M"            # 上传文件大小限制 64M ✓
+    php_post_max_size: "64M"                  # POST数据大小限制 64M ✓
     php_date_timezone: "Asia/Shanghai"
     php_opcache_enable: "1"
-    php_opcache_memory_consumption: "128"
-    php_opcache_max_accelerated_files: "10000"
+    php_opcache_memory_consumption: "256"     # OPcache内存增加到256M
+    php_opcache_max_accelerated_files: "20000"  # 增加缓存文件数
+    php_opcache_revalidate_freq: "60"         # 每60秒检查一次文件更新
+    php_opcache_fast_shutdown: "1"            # 快速关闭
+    php_opcache_enable_cli: "0"               # CLI模式禁用（节省内存）
     
     # --------------------------------------------------------------------------
-    # Nginx 配置
+    # Nginx 配置（针对 2核2G 优化）
     # --------------------------------------------------------------------------
     nginx_user: "nginx"
-    nginx_worker_processes: "auto"
-    nginx_worker_connections: "1024"
-    nginx_client_max_body_size: "64m"
-    nginx_keepalive_timeout: "65"
+    nginx_worker_processes: "2"               # 2核CPU，设置2个worker
+    nginx_worker_connections: "2048"          # 每个worker最大连接数（2核可支持更高）
+    nginx_client_max_body_size: "64m"         # 客户端请求体大小 64M ✓
+    nginx_keepalive_timeout: "30"             # Keepalive超时30秒（节省连接）
+    nginx_keepalive_requests: "100"           # 单个连接最多100个请求
     nginx_remove_default_vhost: true
+    
+    # Nginx 基础配置（role支持的变量）
+    nginx_sendfile: "on"
+    nginx_tcp_nopush: "on"
+    nginx_tcp_nodelay: "on"
+    
+    # Nginx额外性能配置（只包含role不支持的指令）
+    nginx_extra_http_options: |
+      # FastCGI缓冲区优化
+      fastcgi_buffers 16 16k;
+      fastcgi_buffer_size 32k;
+      fastcgi_busy_buffers_size 64k;
+      fastcgi_temp_file_write_size 256k;
+      
+      # Gzip压缩
+      gzip on;
+      gzip_vary on;
+      gzip_comp_level 6;
+      gzip_min_length 1000;
+      gzip_proxied any;
+      gzip_types text/plain text/css text/xml text/javascript application/json application/javascript application/xml+rss application/atom+xml image/svg+xml;
+      gzip_disable "msie6";
+      
+      # 文件缓存
+      open_file_cache max=10000 inactive=60s;
+      open_file_cache_valid 90s;
+      open_file_cache_min_uses 2;
+      open_file_cache_errors on;
     
     # 暂不配置虚拟主机，留到 Step 2
     nginx_vhosts: []
     
     # --------------------------------------------------------------------------
-    # MySQL/MariaDB 配置
+    # MySQL/MariaDB 配置（针对 2核2G 服务器优化）
+    # 2G内存分配：MySQL占用512M（约25%），预留给InnoDB缓冲池和连接
     # --------------------------------------------------------------------------
     mysql_root_password_update: true
     mysql_enabled_on_startup: true
@@ -230,10 +268,27 @@
         priv: "{{ db_name }}.*:ALL"
         host: "localhost"
     
-    # MariaDB 性能优化
-    mysql_max_allowed_packet: "64M"
-    mysql_innodb_buffer_pool_size: "256M"
-    mysql_innodb_log_file_size: "64M"
+    # MariaDB 性能优化（2G内存配置）
+    mysql_max_allowed_packet: "64M"             # 允许的最大包大小 64M ✓
+    mysql_innodb_buffer_pool_size: "512M"       # InnoDB缓冲池（2G内存的25%）
+    mysql_innodb_log_file_size: "128M"          # 日志文件大小
+    mysql_innodb_log_buffer_size: "16M"         # 日志缓冲区
+    mysql_innodb_flush_log_at_trx_commit: "2"   # 每秒刷新一次日志（性能优化）
+    mysql_innodb_flush_method: "O_DIRECT"       # 直接IO，减少系统缓存
+    mysql_innodb_file_per_table: "1"            # 每个表独立表空间
+    mysql_max_connections: "150"                # 最大连接数（并发100够用）
+    mysql_thread_cache_size: "16"               # 线程缓存
+    mysql_table_open_cache: "2048"              # 表缓存
+    mysql_query_cache_type: "0"                 # 禁用查询缓存（MariaDB 10.11已废弃）
+    mysql_tmp_table_size: "32M"                 # 临时表大小
+    mysql_max_heap_table_size: "32M"            # 内存表大小
+    mysql_sort_buffer_size: "2M"                # 排序缓冲区
+    mysql_read_buffer_size: "1M"                # 读缓冲区
+    mysql_read_rnd_buffer_size: "2M"            # 随机读缓冲区
+    mysql_join_buffer_size: "2M"                # JOIN缓冲区
+    mysql_slow_query_log_enabled: true          # 启用慢查询日志
+    mysql_slow_query_time: "2"                  # 慢查询阈值2秒
+    mysql_long_query_time: "2"                  # 长查询时间
     
     # --------------------------------------------------------------------------
     # 防火墙配置
@@ -273,10 +328,81 @@
     # WordPress 不需要 Composer，且在中国大陆访问 GitHub 可能受限
   
   # ============================================================================
-  # 中间任务：安装 Fail2Ban 和配置时间同步
+  # 中间任务：安装 Redis、Fail2Ban 和系统优化
   # （这些任务需要 EPEL 仓库，所以必须在 roles 执行后进行）
   # ============================================================================
   tasks:
+    # --------------------------------------------------------------------------
+    # 安装 Redis（方案四核心：对象缓存）
+    # --------------------------------------------------------------------------
+    - name: "性能优化 | 安装 Redis（需要 EPEL 仓库）"
+      ansible.builtin.dnf:
+        name: redis
+        state: present
+      tags: ['redis', 'cache', 'performance']
+    
+    - name: "性能优化 | 配置 Redis（2G内存优化）"
+      ansible.builtin.lineinfile:
+        path: /etc/redis/redis.conf
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+        backup: yes
+      loop:
+        - { regexp: '^maxmemory ', line: 'maxmemory 256mb' }           # Redis最大内存256M
+        - { regexp: '^maxmemory-policy ', line: 'maxmemory-policy allkeys-lru' }  # LRU淘汰策略
+        - { regexp: '^save 900', line: '# save 900 1' }                # 禁用RDB持久化（性能优化）
+        - { regexp: '^save 300', line: '# save 300 10' }
+        - { regexp: '^save 60', line: '# save 60 10000' }
+        - { regexp: '^appendonly ', line: 'appendonly no' }            # 禁用AOF（性能优化）
+        - { regexp: '^tcp-keepalive ', line: 'tcp-keepalive 60' }      # TCP keepalive
+        - { regexp: '^timeout ', line: 'timeout 300' }                 # 连接超时5分钟
+      tags: ['redis', 'cache', 'performance']
+    
+    - name: "性能优化 | 启动并启用 Redis 服务"
+      ansible.builtin.systemd:
+        name: redis
+        state: started
+        enabled: true
+      tags: ['redis', 'cache', 'performance']
+    
+    # --------------------------------------------------------------------------
+    # 系统内核参数优化（方案四核心）
+    # --------------------------------------------------------------------------
+    - name: "性能优化 | 配置系统内核参数（针对2核2G优化）"
+      ansible.builtin.sysctl:
+        name: "{{ item.name }}"
+        value: "{{ item.value }}"
+        state: present
+        reload: yes
+        sysctl_file: /etc/sysctl.d/99-wordpress-performance.conf
+      loop:
+        # 网络优化（启用 TCP BBR 拥塞控制算法）
+        - { name: 'net.core.default_qdisc', value: 'fq' }
+        - { name: 'net.ipv4.tcp_congestion_control', value: 'bbr' }
+        - { name: 'net.core.rmem_max', value: '16777216' }            # 最大接收缓冲区
+        - { name: 'net.core.wmem_max', value: '16777216' }            # 最大发送缓冲区
+        - { name: 'net.ipv4.tcp_rmem', value: '4096 87380 16777216' }
+        - { name: 'net.ipv4.tcp_wmem', value: '4096 65536 16777216' }
+        - { name: 'net.ipv4.tcp_max_syn_backlog', value: '8192' }     # SYN队列长度
+        - { name: 'net.core.somaxconn', value: '1024' }               # 监听队列长度
+        - { name: 'net.ipv4.tcp_slow_start_after_idle', value: '0' }  # 禁用慢启动
+        - { name: 'net.ipv4.tcp_tw_reuse', value: '1' }               # 启用TIME_WAIT重用
+        
+        # 文件系统优化
+        - { name: 'fs.file-max', value: '65536' }                     # 最大文件句柄数
+        - { name: 'fs.inotify.max_user_watches', value: '524288' }    # inotify监控数
+        
+        # 内存管理优化（2G内存配置）
+        - { name: 'vm.swappiness', value: '10' }                      # 降低swap使用
+        - { name: 'vm.dirty_ratio', value: '15' }                     # 脏页比例15%
+        - { name: 'vm.dirty_background_ratio', value: '5' }           # 后台写入比例5%
+        - { name: 'vm.overcommit_memory', value: '1' }                # 允许内存超额分配
+      tags: ['sysctl', 'performance']
+      ignore_errors: yes  # BBR可能在某些内核版本不可用
+    
+    # --------------------------------------------------------------------------
+    # 安全和维护工具
+    # --------------------------------------------------------------------------
     - name: "手动任务 | 安装 Fail2Ban（需要 EPEL 仓库）"
       ansible.builtin.dnf:
         name: fail2ban
@@ -307,6 +433,17 @@
       ansible.builtin.timezone:
         name: Asia/Shanghai
       tags: ['ntp', 'time']
+    
+    # --------------------------------------------------------------------------
+    # 权限配置：将 nginx 用户加入 apache 组（关键！）
+    # 这样 Nginx 可以通过组权限访问 apache 用户的文件
+    # --------------------------------------------------------------------------
+    - name: "权限配置 | 将 nginx 用户添加到 apache 组"
+      ansible.builtin.user:
+        name: nginx
+        groups: apache
+        append: yes
+      tags: ['permissions', 'users']
   
   # ============================================================================
   # 后置任务：安装 WP-CLI 和验证环境
@@ -329,7 +466,7 @@
         url: "https://gitee.com/fuckgitee2speed/wp-bare-metal-mirrors/raw/main/wp-cli.phar"
         dest: "/usr/local/bin/wp"
         mode: '0755'
-        timeout: 60
+        timeout: 180
       register: wpcli_download
       retries: 3
       delay: 5

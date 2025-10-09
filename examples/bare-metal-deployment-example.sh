@@ -22,7 +22,7 @@ API_BASE_URL="http://localhost:3000/api"
 SERVER_IP="120.77.170.69"
 SSH_USER="root"
 SSH_PASSWORD="1QAZ2wsx"
-DOMAIN="haoyuai.cn"
+DOMAIN="lijicheng.cn"
 ADMIN_EMAIL="lijicheng@lijicheng.cn"
 
 # 临时文件用于存储响应

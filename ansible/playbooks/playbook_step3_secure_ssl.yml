@@ -118,8 +118,8 @@
       ansible.builtin.file:
         path: "{{ wordpress_install_dir }}/.well-known/acme-challenge"
         state: directory
-        owner: nginx
-        group: nginx
+        owner: apache
+        group: apache
         mode: '0755'
   
   # ============================================================================

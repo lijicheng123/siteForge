@@ -389,10 +389,10 @@
                         timeout: 10s
                         retries: 3
                         start_period: 90s
-                      # 安装 wp-cli 到容器中
+                      # 安装 wp-cli 到容器中（使用 Gitee 镜像）
                       command: >
                         sh -c "
-                        curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar &&
+                        curl -o wp-cli.phar https://gitee.com/fuckgitee2speed/wp-bare-metal-mirrors/raw/main/wp-cli.phar &&
                         chmod +x wp-cli.phar &&
                         mv wp-cli.phar /usr/local/bin/wp &&
                         docker-entrypoint.sh php-fpm

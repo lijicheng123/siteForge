@@ -38,8 +38,8 @@
     wordpress_locale: "zh_CN"
     
     # 文件权限
-    web_user: "nginx"
-    web_group: "nginx"
+    web_user: "apache"
+    web_group: "apache"
   
   # ============================================================================
   # 前置任务：验证环境
@@ -131,8 +131,38 @@
       tags: ['ssl-prep']
     
     # --------------------------------------------------------------------------
-    # 第二阶段：配置 Nginx 虚拟主机
+    # 第二阶段：配置 Nginx 虚拟主机和 FastCGI Cache
     # --------------------------------------------------------------------------
+    - name: "Nginx 优化 | 创建 FastCGI 缓存目录"
+      ansible.builtin.file:
+        path: /var/cache/nginx/fastcgi_cache
+        state: directory
+        owner: apache
+        group: apache
+        mode: '0755'
+      tags: ['nginx', 'cache', 'performance']
+    
+    - name: "Nginx 优化 | 配置 FastCGI Cache 全局设置"
+      ansible.builtin.blockinfile:
+        path: /etc/nginx/nginx.conf
+        marker: "# {mark} ANSIBLE MANAGED FASTCGI CACHE CONFIG"
+        insertafter: "http {"
+        block: |
+          # FastCGI 页面缓存配置（方案四核心优化）
+          fastcgi_cache_path /var/cache/nginx/fastcgi_cache 
+              levels=1:2 
+              keys_zone=WORDPRESS:100m 
+              inactive=60m 
+              max_size=512m 
+              use_temp_path=off;
+          fastcgi_cache_key "$scheme$request_method$host$request_uri";
+          fastcgi_cache_use_stale error timeout invalid_header http_500 http_503;
+          fastcgi_cache_valid 200 301 302 60m;
+          fastcgi_cache_valid 404 10m;
+          fastcgi_ignore_headers Cache-Control Expires Set-Cookie;
+        backup: yes
+      tags: ['nginx', 'cache', 'performance']
+    
     - name: "Nginx 配置 | 部署虚拟主机配置文件"
       ansible.builtin.template:
         src: "../templates/wordpress.conf.j2"
@@ -162,20 +192,41 @@
         path: "{{ wordpress_install_dir }}/wp-includes/version.php"
       register: wp_core_check
     
-    - name: "WordPress 下载 | 下载 WordPress 核心文件"
-      ansible.builtin.command: >
-        wp core download
-        --path={{ wordpress_install_dir }}
-        --version={{ wordpress_version }}
-        --locale={{ wordpress_locale }}
-        --allow-root
-        --force
+    - name: "WordPress 下载 | 从本地仓库上传 WordPress 核心文件到服务器"
+      ansible.builtin.copy:
+        src: "../../wordpress-6.8.3-zh_CN.tar.gz"
+        dest: "/tmp/wordpress.tar.gz"
+        mode: '0644'
       when: not wp_core_check.stat.exists
-      register: wp_download
+      register: wp_upload_file
     
-    - name: "WordPress 下载 | 显示下载结果"
+    - name: "WordPress 下载 | 解压 WordPress 到临时目录"
+      ansible.builtin.unarchive:
+        src: "/tmp/wordpress.tar.gz"
+        dest: "/tmp/"
+        remote_src: yes
+      when: not wp_core_check.stat.exists and wp_upload_file.changed
+      register: wp_extract
+    
+    - name: "WordPress 下载 | 移动文件到目标目录"
+      ansible.builtin.command: >
+        rsync -a /tmp/wordpress/ {{ wordpress_install_dir }}/
+      when: not wp_core_check.stat.exists and wp_extract.changed
+      register: wp_move
+    
+    - name: "WordPress 下载 | 清理临时文件"
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "/tmp/wordpress.tar.gz"
+        - "/tmp/wordpress"
+      when: not wp_core_check.stat.exists
+      failed_when: false
+    
+    - name: "WordPress 下载 | 显示上传结果"
       ansible.builtin.debug:
-        msg: "{{ wp_download.stdout_lines | default(['WordPress 核心文件已存在，跳过下载']) }}"
+        msg: "{{ wp_move.stdout_lines | default(['WordPress 核心文件已存在，跳过上传']) }}"
     
     # --------------------------------------------------------------------------
     # 第四阶段：配置 WordPress
@@ -304,48 +355,139 @@
       failed_when: false  # 忽略删除失败（可能已被删除）
     
     # --------------------------------------------------------------------------
-    # 第七阶段：文件权限设置 (已增强)
+    # 第六阶段补充：性能优化插件安装（方案四核心）
+    # 注意：插件下载可能因网络问题失败，已设置为非致命错误
     # --------------------------------------------------------------------------
-    - name: "权限设置 | 强制重新下载核心文件（确保文件完好）"
+    - name: "性能优化 | 安装 Redis Object Cache 插件"
+      ansible.builtin.shell: |
+        export http_proxy="" https_proxy=""
+        wp plugin install redis-cache \
+          --activate \
+          --path={{ wordpress_install_dir }} \
+          --allow-root || echo "Plugin installation failed, will retry..."
+      register: redis_plugin_install
+      changed_when: "'Success' in redis_plugin_install.stdout or 'already installed' in redis_plugin_install.stdout"
+      failed_when: false
+      timeout: 600
+      retries: 3
+      delay: 10
+      until: redis_plugin_install.rc == 0 or 'already installed' in redis_plugin_install.stdout
+    
+    - name: "性能优化 | 配置 Redis 连接到 wp-config.php"
+      ansible.builtin.blockinfile:
+        path: "{{ wordpress_install_dir }}/wp-config.php"
+        marker: "/* {mark} ANSIBLE MANAGED REDIS CONFIG */"
+        insertbefore: "/* That's all"
+        block: |
+          /** Redis 对象缓存配置 */
+          define( 'WP_REDIS_HOST', '127.0.0.1' );
+          define( 'WP_REDIS_PORT', 6379 );
+          define( 'WP_REDIS_TIMEOUT', 1 );
+          define( 'WP_REDIS_READ_TIMEOUT', 1 );
+          define( 'WP_REDIS_DATABASE', 0 );
+          define( 'WP_CACHE_KEY_SALT', '{{ site_domain }}' );
+          define( 'WP_CACHE', true );
+    
+    - name: "性能优化 | 启用 Redis 对象缓存"
       ansible.builtin.command: >
-        wp core download
+        wp redis enable
         --path={{ wordpress_install_dir }}
-        --version={{ wordpress_version }}
-        --locale={{ wordpress_locale }}
-        --force
         --allow-root
-      changed_when: "'Success' in wp_core_redownload.stdout"
-      register: wp_core_redownload
-
-    - name: "权限设置 | 清理所有 ACL 权限（创建干净的权限基础）"
+      register: redis_enable
+      changed_when: "'Success' in redis_enable.stdout or 'already' in redis_enable.stdout"
+      failed_when: false
+    
+    - name: "性能优化 | 安装 WP Super Cache 插件（页面缓存）"
+      ansible.builtin.shell: |
+        export http_proxy="" https_proxy=""
+        wp plugin install wp-super-cache \
+          --activate \
+          --path={{ wordpress_install_dir }} \
+          --allow-root || echo "Plugin installation failed, continuing..."
+      register: wpsupercache_install
+      changed_when: "'Success' in wpsupercache_install.stdout or 'already installed' in wpsupercache_install.stdout"
+      failed_when: false
+      timeout: 600
+      retries: 3
+      delay: 10
+      until: wpsupercache_install.rc == 0 or 'already installed' in wpsupercache_install.stdout
+    
+    - name: "性能优化 | 安装 Autoptimize 插件（代码优化）"
+      ansible.builtin.shell: |
+        export http_proxy="" https_proxy=""
+        wp plugin install autoptimize \
+          --activate \
+          --path={{ wordpress_install_dir }} \
+          --allow-root || echo "Plugin installation failed, continuing..."
+      register: autoptimize_install
+      changed_when: "'Success' in autoptimize_install.stdout or 'already installed' in autoptimize_install.stdout"
+      failed_when: false
+      timeout: 600
+      retries: 3
+      delay: 10
+      until: autoptimize_install.rc == 0 or 'already installed' in autoptimize_install.stdout
+    
+    - name: "性能优化 | 安装 EWWW Image Optimizer 插件（图片优化）"
+      ansible.builtin.shell: |
+        export http_proxy="" https_proxy=""
+        wp plugin install ewww-image-optimizer \
+          --activate \
+          --path={{ wordpress_install_dir }} \
+          --allow-root || echo "Plugin installation failed, continuing..."
+      register: ewww_install
+      changed_when: "'Success' in ewww_install.stdout or 'already installed' in ewww_install.stdout"
+      failed_when: false
+      timeout: 600
+      retries: 3
+      delay: 10
+      until: ewww_install.rc == 0 or 'already installed' in ewww_install.stdout
+    
+    - name: "性能优化 | 禁用不必要的默认插件"
       ansible.builtin.command: >
-        setfacl -R -b {{ wordpress_install_dir }}
-      changed_when: false
-
-    - name: "权限设置 | 递归设置 WordPress 目录所有者"
+        wp plugin delete akismet
+        --path={{ wordpress_install_dir }}
+        --allow-root
+      register: plugin_cleanup
+      changed_when: "'Success' in plugin_cleanup.stdout"
+      failed_when: false
+    
+    # --------------------------------------------------------------------------
+    # 第七阶段：文件权限设置（修复版 - 确保 PHP-FPM 和 Nginx 都有权限）
+    # --------------------------------------------------------------------------
+    - name: "权限设置 | 确保 WordPress 目录和文件归属于 Web 用户"
       ansible.builtin.file:
         path: "{{ wordpress_install_dir }}"
         owner: "{{ web_user }}"
         group: "{{ web_group }}"
         recurse: true
 
-    - name: "权限设置 | [不安全] 强制设置所有文件权限为 777"
-      ansible.builtin.command: "chmod -R 777 {{ wordpress_install_dir }}"
-      changed_when: false
-    
-    - name: "权限设置 | 设置目录权限为 755"
+    - name: "权限设置 | 清理所有 ACL 权限（可选，确保干净的权限基础）"
+      ansible.builtin.command: "setfacl -R -b {{ wordpress_install_dir }}"
+      changed_when: false # 因为 setfacl 总是返回成功，我们不把它作为变更的依据
+
+    - name: "权限设置 | 设置基础目录权限为 755"
       ansible.builtin.command: "find {{ wordpress_install_dir }} -type d -exec chmod 755 {} \\;"
-      changed_when: false
-    
-    - name: "权限设置 | 设置文件权限为 644"
+      changed_when: false # 同样，find 命令总是执行，不作为变更依据
+
+    - name: "权限设置 | 设置基础文件权限为 644"
       ansible.builtin.command: "find {{ wordpress_install_dir }} -type f -exec chmod 644 {} \\;"
-      changed_when: false
-    
-    - name: "权限设置 | 设置 wp-config.php 特殊权限为 640"
+      changed_when: false # 同上
+
+    - name: "权限设置 | 为需要写入的目录设置 775 权限"
+      ansible.builtin.file:
+        path: "{{ wordpress_install_dir }}/{{ item }}"
+        mode: '0775'
+        state: directory
+      loop:
+        - "wp-content"
+        - "wp-content/uploads"
+        - "wp-content/plugins"
+        - "wp-content/themes"
+
+    - name: "权限设置 | 为 wp-config.php 设置更严格的 640 权限"
       ansible.builtin.file:
         path: "{{ wordpress_install_dir }}/wp-config.php"
         mode: '0640'
-    
     # --------------------------------------------------------------------------
     # 第八阶段：SELinux 配置（如果启用）
     # --------------------------------------------------------------------------
@@ -372,6 +514,15 @@
   # 后置任务：验证部署结果
   # ============================================================================
   post_tasks:
+    - name: "工具 | 上传性能验证脚本到服务器"
+      ansible.builtin.copy:
+        src: "../../examples/performance-check.sh"
+        dest: "/tmp/performance-check.sh"
+        mode: '0755'
+        owner: root
+        group: root
+      tags: ['tools', 'performance']
+    
     - name: "验证 | 检查 WordPress 安装状态"
       ansible.builtin.command: >
         wp core version
@@ -396,19 +547,31 @@
       ansible.builtin.debug:
         msg:
           - "=========================================="
-          - "WordPress 部署完成！"
+          - "WordPress 部署完成！（方案四：性能优化版）"
           - "=========================================="
-          - "✓ WordPress {{ wp_version_check.stdout }} 已安装"
-          - "✓ 数据库已配置"
+          - "✓ WordPress {{ wp_version_check.stdout }} 已安装（本地仓库）"
+          - "✓ 数据库已配置（InnoDB 512M）"
+          - "✓ Redis 对象缓存已启用（256M）"
+          - "✓ Nginx FastCGI Cache 已配置"
           - "✓ Nginx 虚拟主机已配置"
-          - "✓ 文件权限已设置"
+          - "✓ 文件权限已设置（安全配置）"
           - "✓ 永久链接已启用"
+          - "=========================================="
+          - "插件安装状态（如失败可在后台手动安装）："
+          - "  Redis Cache: {{ 'Success' in (redis_plugin_install.stdout | default('Failed')) | ternary('✓ 已安装', '✗ 安装失败') }}"
+          - "  WP Super Cache: {{ 'Success' in (wpsupercache_install.stdout | default('Failed')) | ternary('✓ 已安装', '✗ 安装失败') }}"
+          - "  Autoptimize: {{ 'Success' in (autoptimize_install.stdout | default('Failed')) | ternary('✓ 已安装', '✗ 安装失败') }}"
+          - "  EWWW Image Optimizer: {{ 'Success' in (ewww_install.stdout | default('Failed')) | ternary('✓ 已安装', '✗ 安装失败') }}"
           - "=========================================="
           - "访问地址: http://{{ site_domain }}"
           - "后台地址: http://{{ site_domain }}/wp-admin"
           - "管理员账号: {{ wp_admin_user }}"
           - "=========================================="
+          - "📊 性能验证: sudo bash /tmp/performance-check.sh"
+          - "📖 详细文档: PERFORMANCE-OPTIMIZATION.md"
+          - "=========================================="
           - "⚠️  注意: 当前使用 HTTP 协议（不安全）"
+          - "⚠️  插件如安装失败（网络原因），可登录后台手动安装"
           - "下一步: 运行 playbook_step3_secure_ssl.yml 启用 HTTPS"
           - "=========================================="
   

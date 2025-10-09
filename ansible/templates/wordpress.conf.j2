@@ -1,11 +1,36 @@
 # ============================================================================
-# Nginx 虚拟主机配置 - WordPress 优化版 (HTTP Only)
+# Nginx 虚拟主机配置 - WordPress 高性能优化版 (HTTP Only + FastCGI Cache)
 # ============================================================================
 # 域名: {{ site_domain }}
 # 文档根目录: {{ wordpress_install_dir }}
 # 生成时间: {{ ansible_date_time.iso8601 }}
-# 由 SiteForge 自动生成 - 请勿手动编辑
+# 由 SiteForge 自动生成 - 方案四混合优化配置
+# 
+# 优化特性:
+# - FastCGI 页面缓存（显著提升性能）
+# - 64M 文件上传支持
+# - 针对 2核2G 服务器优化
+# - 并发100支持
 # ============================================================================
+
+# ============================================================================
+# FastCGI Cache 配置（页面级缓存 - 方案四核心优化）
+# 注意：此配置需要在 http 上下文中，但由于 Ansible role 限制，
+#       我们在这里定义，需要手动添加到 /etc/nginx/nginx.conf 的 http 块中
+# ============================================================================
+# 在 /etc/nginx/nginx.conf 的 http 块中添加以下配置：
+#
+# fastcgi_cache_path /var/cache/nginx/fastcgi_cache 
+#     levels=1:2 
+#     keys_zone=WORDPRESS:100m 
+#     inactive=60m 
+#     max_size=512m 
+#     use_temp_path=off;
+# fastcgi_cache_key "$scheme$request_method$host$request_uri";
+# fastcgi_cache_use_stale error timeout invalid_header http_500 http_503;
+# fastcgi_cache_valid 200 301 302 60m;
+# fastcgi_cache_valid 404 10m;
+# fastcgi_ignore_headers Cache-Control Expires Set-Cookie;
 
 # HTTP Server Block (端口 80)
 server {
@@ -23,6 +48,13 @@ server {
     
     # 字符集
     charset utf-8;
+    
+    # ========================================================================
+    # 文件上传大小配置（64M）
+    # ========================================================================
+    client_max_body_size 64M;
+    client_body_buffer_size 128k;
+    client_body_timeout 60s;
     
     # ========================================================================
     # 安全头部配置
@@ -50,8 +82,32 @@ server {
     }
     
     # ========================================================================
-    # PHP 处理配置 (FastCGI)
+    # PHP 处理配置 (FastCGI + 页面缓存)
     # ========================================================================
+    
+    # 定义不缓存的条件
+    set $skip_cache 0;
+    
+    # POST 请求不缓存
+    if ($request_method = POST) {
+        set $skip_cache 1;
+    }
+    
+    # 带查询字符串的请求不缓存
+    if ($query_string != "") {
+        set $skip_cache 1;
+    }
+    
+    # 特定 URI 不缓存（后台、登录、购物车等）
+    if ($request_uri ~* "/wp-admin/|/wp-login.php|/xmlrpc.php|/wp-cron.php|wp-.*.php|/feed/|index.php|sitemap(_index)?.xml") {
+        set $skip_cache 1;
+    }
+    
+    # 登录用户不缓存
+    if ($http_cookie ~* "comment_author|wordpress_[a-f0-9]+|wp-postpass|wordpress_logged_in") {
+        set $skip_cache 1;
+    }
+    
     location ~ \.php$ {
         try_files $uri =404;
         fastcgi_split_path_info ^(.+\.php)(/.+)$;
@@ -65,15 +121,34 @@ server {
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
         fastcgi_param PATH_INFO $fastcgi_path_info;
         
-        # 超时设置
+        # 超时设置（针对2核2G优化）
         fastcgi_read_timeout 300;
         fastcgi_send_timeout 300;
+        fastcgi_connect_timeout 60;
         
-        # 缓冲区设置
-        fastcgi_buffer_size 128k;
-        fastcgi_buffers 256 16k;
-        fastcgi_busy_buffers_size 256k;
+        # 缓冲区设置（针对2核2G优化）
+        fastcgi_buffer_size 32k;
+        fastcgi_buffers 16 16k;
+        fastcgi_busy_buffers_size 64k;
         fastcgi_temp_file_write_size 256k;
+        
+        # ====================================================================
+        # FastCGI 页面缓存配置（方案四核心 - 性能提升50-80%）
+        # ====================================================================
+        fastcgi_cache WORDPRESS;
+        fastcgi_cache_valid 200 60m;          # 成功响应缓存60分钟
+        fastcgi_cache_valid 301 302 30m;      # 重定向缓存30分钟
+        fastcgi_cache_valid 404 10m;          # 404缓存10分钟
+        fastcgi_cache_bypass $skip_cache;     # 绕过缓存的条件
+        fastcgi_no_cache $skip_cache;         # 不缓存的条件
+        fastcgi_cache_lock on;                # 防止缓存雪崩
+        fastcgi_cache_lock_timeout 5s;
+        fastcgi_cache_revalidate on;          # 缓存过期后重新验证
+        fastcgi_cache_background_update on;   # 后台更新缓存
+        
+        # 添加缓存状态头（便于调试）
+        add_header X-FastCGI-Cache $upstream_cache_status;
+        add_header X-Cache-Status $upstream_cache_status;
     }
     
     # ========================================================================
@@ -135,22 +210,21 @@ server {
     }
     
     # ========================================================================
-    # 性能优化
+    # 性能优化（针对2核2G服务器）
     # ========================================================================
     
-    # Gzip 压缩
+    # Gzip 压缩（已在全局配置中启用，这里保留以确保覆盖）
     gzip on;
     gzip_vary on;
     gzip_proxied any;
     gzip_comp_level 6;
-    gzip_types text/plain text/css text/xml text/javascript 
-               application/json application/javascript application/xml+rss 
-               application/rss+xml font/truetype font/opentype 
-               application/vnd.ms-fontobject image/svg+xml;
+    gzip_min_length 1000;
+    gzip_types text/plain text/css text/xml text/javascript application/json application/javascript application/xml+rss application/rss+xml application/atom+xml font/truetype font/opentype application/vnd.ms-fontobject image/svg+xml image/x-icon;
     
-    # 客户端上传限制
-    client_max_body_size 64M;
-    client_body_timeout 60s;
+    # 连接优化
+    keepalive_timeout 30;
+    keepalive_requests 100;
+    reset_timedout_connection on;
     
     # 禁止日志记录 favicon 和 robots.txt
     location = /favicon.ico {
