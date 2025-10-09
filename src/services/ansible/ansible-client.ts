@@ -3,7 +3,7 @@
  * 封装Ansible命令执行和结果处理
  */
 
-import { exec } from 'child_process';
+import { exec, spawn } from 'child_process';
 import { promisify } from 'util';
 import * as fs from 'fs/promises';
 import * as path from 'path';
@@ -101,8 +101,8 @@ export class AnsibleClient {
       
       // 添加其他选项
       command += ' --become --become-method=sudo';
-      // 只在调试模式下显示详细输出，正常情况下保持简洁
-      // command += ' -v'; // 详细输出 - 已禁用以减少日志噪音
+      // 启用详细输出以便查看进度（临时调试）
+      command += ' -v'; // 详细输出 - 帮助诊断长时间等待问题
       
       console.log(`执行Ansible命令: ${command}`);
       
@@ -121,6 +121,46 @@ export class AnsibleClient {
         await this.cleanupTempFile(extraVarsFile);
       }
       
+      // 提取真正的错误信息（不包括警告）
+      let errorSummary = result.stderr;
+      if (!result.success && result.stdout) {
+        // 从 stdout 中提取 fatal 错误信息
+        const fatalLines: string[] = [];
+        const lines = result.stdout.split('\n');
+        
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+          if (line.includes('fatal:') || line.includes('FAILED!')) {
+            // 找到 fatal 行，提取任务名和错误
+            let taskName = '';
+            // 往前找任务名
+            for (let j = i - 1; j >= 0 && j >= i - 5; j--) {
+              if (lines[j].includes('TASK [')) {
+                taskName = lines[j].trim();
+                break;
+              }
+            }
+            if (taskName) fatalLines.push(taskName);
+            fatalLines.push(line.trim());
+            
+            // 提取 JSON 错误信息
+            const jsonMatch = line.match(/\{[^}]*"msg":\s*"([^"]+)"[^}]*\}/);
+            if (jsonMatch && jsonMatch[1]) {
+              fatalLines.push(`错误详情: ${jsonMatch[1]}`);
+            }
+            
+            const failuresMatch = line.match(/"failures":\s*\[([^\]]+)\]/);
+            if (failuresMatch && failuresMatch[1]) {
+              fatalLines.push(`失败信息: ${failuresMatch[1]}`);
+            }
+          }
+        }
+        
+        if (fatalLines.length > 0) {
+          errorSummary = fatalLines.join('\n');
+        }
+      }
+      
       return {
         playbookName,
         status: result.success ? 'success' : 'failed',
@@ -132,7 +172,7 @@ export class AnsibleClient {
         startTime: startTime.toISOString(),
         endTime: endTime.toISOString(),
         duration,
-        summary: result.success ? 'Playbook执行成功' : `Playbook执行失败: ${result.stderr}`
+        summary: result.success ? 'Playbook执行成功' : `Playbook执行失败: ${errorSummary}`
       };
       
     } catch (error) {
@@ -250,59 +290,123 @@ export class AnsibleClient {
   }
 
   /**
-   * 执行系统命令
+   * 执行系统命令（使用 spawn 实现实时输出）
    */
   private async executeCommand(command: string): Promise<AnsibleExecutionResult> {
     const startTime = Date.now();
     
     console.log('执行系统命令command===>', command);
-    try {
-
-      const { stdout, stderr } = await execAsync(command, {
-        timeout: 1800000, // 15分钟超时 - 适应完整的WordPress部署流程
-        maxBuffer: 1024 * 1024 * 50 // 50MB缓冲区 - 增加以处理详细输出
+    
+    return new Promise((resolve, reject) => {
+      // 使用 spawn 而不是 exec，以获得实时输出
+      const args = command.split(' ');
+      const cmd = args.shift()!;
+      const child = spawn(cmd, args, {
+        shell: true,
+        stdio: ['ignore', 'pipe', 'pipe']
       });
 
-
+      let stdout = '';
+      let stderr = '';
+      let lastOutputTime = Date.now();
       
-      const duration = (Date.now() - startTime) / 1000;
-      // 只显示关键信息，避免日志截断
-      console.log(`执行系统命令完成 (${duration}s) - stdout长度: ${stdout.length}, stderr长度: ${stderr.length}`);
-      if (stderr && stderr.length > 0) {
-        console.log('执行系统命令stderr===>', stderr.length > 1000 ? stderr.substring(stderr.length - 1000) : stderr);
-      }
+      // 实时输出 stdout
+      child.stdout?.on('data', (data) => {
+        const output = data.toString();
+        stdout += output;
+        // 实时打印到控制台
+        process.stdout.write(output);
+        lastOutputTime = Date.now();
+      });
+      
+      // 实时输出 stderr
+      child.stderr?.on('data', (data) => {
+        const output = data.toString();
+        stderr += output;
+        // stderr 也实时打印（通常是 Ansible 的进度信息）
+        process.stderr.write(output);
+        lastOutputTime = Date.now();
+      });
+      
+      // 超时检查（15分钟）
+      const timeout = setTimeout(() => {
+        child.kill('SIGTERM');
+        reject(new Error('命令执行超时（15分钟）'));
+      }, 1800000);
+      
+      // 进程退出
+      child.on('close', (code) => {
+        clearTimeout(timeout);
+        const duration = (Date.now() - startTime) / 1000;
+        
+        console.log(`\n执行系统命令完成 (${duration}s) - 退出码: ${code}, stdout长度: ${stdout.length}, stderr长度: ${stderr.length}`);
+        
+        try {
 
-      return {
-        success: true,
-        stdout,
-        stderr,
-        exitCode: 0,
-        duration
-      };
-    } catch (error: any) {
-      const duration = (Date.now() - startTime) / 1000;
-      console.log(`执行系统命令失败 (${duration}s):`);
-      console.log('错误码:', error.code);
-      console.log('错误消息:', error.message);
-      if (error.stdout) {
-        console.log('最后的stdout (最多1000字符):', error.stdout.length > 1000 ? 
-          error.stdout.substring(error.stdout.length - 1000) : error.stdout);
-      }
-      if (error.stderr) {
-        console.log('完整stderr:', error.stderr);
-      }
-      return {
-        success: false,
-        stdout: error.stdout || '',
-        stderr: error.stderr || error.message,
-        exitCode: error.code || 1,
-        duration
-      };
-    }
+          // 检查关键错误：主机匹配失败
+          if (stderr.includes('Could not match supplied host pattern')) {
+            console.error('❌ Ansible 致命错误：未找到匹配的主机！');
+            resolve({
+              success: false,
+              stdout,
+              stderr: 'Ansible 未能匹配到目标主机。请检查 inventory 配置。',
+              exitCode: code || 1,
+              duration
+            });
+            return;
+          }
+
+          // 检查是否有跳过所有主机的情况
+          if (stdout.includes('skipping: no hosts matched')) {
+            console.error('❌ Ansible 致命错误：没有主机被执行！');
+            resolve({
+              success: false,
+              stdout,
+              stderr: 'Ansible playbook 没有在任何主机上执行。',
+              exitCode: code || 1,
+              duration
+            });
+            return;
+          }
+
+          // 根据退出码判断成功/失败
+          resolve({
+            success: code === 0,
+            stdout,
+            stderr,
+            exitCode: code || 0,
+            duration
+          });
+        } catch (error: any) {
+          console.error('解析命令结果时出错:', error);
+          resolve({
+            success: false,
+            stdout,
+            stderr: error.message,
+            exitCode: code || 1,
+            duration
+          });
+        }
+      });
+      
+      // 进程错误
+      child.on('error', (error) => {
+        clearTimeout(timeout);
+        const duration = (Date.now() - startTime) / 1000;
+        console.error(`执行系统命令失败 (${duration}s):`, error);
+        resolve({
+          success: false,
+          stdout,
+          stderr: error.message,
+          exitCode: 1,
+          duration
+        });
+      });
+    });
   }
 
   /**
-   * 解析Playbook输出 - 修复版本
+   * 解析Playbook输出 - 使用 PLAY RECAP 作为可靠来源
    */
   private parsePlaybookOutput(stdout: string, stderr: string): any {
     const lines = stdout.split('\n');
@@ -311,36 +415,57 @@ export class AnsibleClient {
     let successTasks = 0;
     let failedTasks = 0;
     let skippedTasks = 0;
+    let changedTasks = 0;
 
+    // =========================================================================
+    // 首先从 PLAY RECAP 获取准确的统计数据（最可靠）
+    // 格式: server_0  : ok=85   changed=7    unreachable=0    failed=0    skipped=56
+    // =========================================================================
+    const playRecapLine = lines.find(line => 
+      line.includes('server_0') && 
+      line.includes('ok=') && 
+      line.includes('failed=')
+    );
+    
+    if (playRecapLine) {
+      const okMatch = playRecapLine.match(/ok=(\d+)/);
+      const changedMatch = playRecapLine.match(/changed=(\d+)/);
+      const failedMatch = playRecapLine.match(/failed=(\d+)/);
+      const skippedMatch = playRecapLine.match(/skipped=(\d+)/);
+      
+      if (okMatch) successTasks = parseInt(okMatch[1]);
+      if (changedMatch) changedTasks = parseInt(changedMatch[1]);
+      if (failedMatch) failedTasks = parseInt(failedMatch[1]);
+      if (skippedMatch) skippedTasks = parseInt(skippedMatch[1]);
+      
+      // 总任务数 = 成功 + 失败 + 跳过
+      totalTasks = successTasks + failedTasks;
+    }
+
+    // =========================================================================
+    // 然后解析详细的任务信息（用于调试和日志）
+    // =========================================================================
     let currentTask = '';
-    let currentTaskStatus = '';
     
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
       
       // 识别任务开始
       if (line.includes('TASK [')) {
-        totalTasks++;
         currentTask = line.match(/TASK \[(.*?)\]/)?.[1] || 'Unknown Task';
       }
       
-      // 识别任务结果状态
-      else if (line.includes(': [server_0]: FAILED!')) {
-        failedTasks++;
-        currentTaskStatus = 'failed';
-        
+      // 识别失败的任务（用于详细错误信息）
+      else if (line.includes('fatal:') || line.includes('FAILED!')) {
         // 尝试提取错误信息
         let errorMsg = '';
-        const nextLine = lines[i + 1];
-        if (nextLine && nextLine.includes('"msg":')) {
-          const msgMatch = nextLine.match(/"msg":\s*"([^"]+)"/);
-          if (msgMatch) {
-            errorMsg = msgMatch[1];
-          }
+        const jsonMatch = line.match(/\{[^}]*"msg":\s*"([^"]+)"[^}]*\}/);
+        if (jsonMatch && jsonMatch[1]) {
+          errorMsg = jsonMatch[1];
         }
         
         const taskResult: AnsibleTaskResult = {
-          taskName: currentTask,
+          taskName: currentTask || 'Unknown Task',
           status: 'failed',
           message: errorMsg || '任务执行失败',
           changed: false,
@@ -351,43 +476,8 @@ export class AnsibleClient {
           duration: 1
         };
         
-        tasks.push(taskResult);
-      }
-      
-      else if (line.includes(': [server_0]: ok:') || line.includes(': [server_0]')) {
-        if (currentTask && !tasks.find(t => t.taskName === currentTask)) {
-          successTasks++;
-          const taskResult: AnsibleTaskResult = {
-            taskName: currentTask,
-            status: 'success',
-            message: '任务执行成功',
-            changed: line.includes('changed'),
-            stdout: line,
-            stderr: '',
-            startTime: new Date().toISOString(),
-            endTime: new Date().toISOString(),
-            duration: 1
-          };
-          
-          tasks.push(taskResult);
-        }
-      }
-      
-      else if (line.includes('skipped')) {
-        skippedTasks++;
-        if (currentTask && !tasks.find(t => t.taskName === currentTask)) {
-          const taskResult: AnsibleTaskResult = {
-            taskName: currentTask,
-            status: 'skipped',
-            message: '任务被跳过',
-            changed: false,
-            stdout: line,
-            stderr: '',
-            startTime: new Date().toISOString(),
-            endTime: new Date().toISOString(),
-            duration: 1
-          };
-          
+        // 避免重复添加
+        if (!tasks.find(t => t.taskName === taskResult.taskName && t.status === 'failed')) {
           tasks.push(taskResult);
         }
       }
@@ -398,6 +488,7 @@ export class AnsibleClient {
       successTasks,
       failedTasks,
       skippedTasks,
+      changedTasks,
       tasks
     };
   }

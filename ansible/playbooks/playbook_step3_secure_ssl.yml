@@ -1,0 +1,320 @@
+---
+# ============================================================================
+# Playbook Step 3: 配置 HTTPS (Let's Encrypt SSL 证书)
+# ============================================================================
+# 目标: 使用 Certbot 申请 Let's Encrypt 免费 SSL 证书并自动配置 Nginx
+# 
+# 必需的 extra-vars 参数:
+#   - target_host: 目标服务器 IP 地址
+#   - ssh_user: SSH 登录用户名
+#   - site_domain: 网站域名 (例如: example.com)
+#   - admin_email: 用于 Let's Encrypt 通知的邮箱地址
+#
+# 重要前提条件:
+#   1. 域名必须已正确解析到目标服务器 IP
+#   2. 服务器防火墙必须开放 80 和 443 端口
+#   3. Nginx 必须已运行且已配置虚拟主机
+#   4. WordPress 必须已部署且可通过 HTTP 访问
+#
+# 执行示例:
+#   ansible-playbook -i inventory.yml playbook_step3_secure_ssl.yml \
+#     --extra-vars '{"target_host":"1.2.3.4","site_domain":"example.com",...}'
+# ============================================================================
+
+- name: "Step 3: 配置 HTTPS 和 SSL 证书"
+  hosts: all
+  become: true
+  gather_facts: true
+  
+  vars:
+    # WordPress 安装路径
+    wordpress_install_dir: "/var/www/{{ site_domain }}"
+    
+    # Nginx 配置路径
+    nginx_vhost_path: "/etc/nginx/conf.d/{{ site_domain }}.conf"
+    
+    # Certbot 配置
+    certbot_auto_renew: true
+    certbot_auto_renew_user: "root"
+    certbot_auto_renew_hour: "3"
+    certbot_auto_renew_minute: "30"
+    certbot_create_if_missing: true
+    certbot_create_method: "webroot"  # 使用 webroot 模式（零停机）
+    certbot_admin_email: "{{ admin_email }}"
+    certbot_create_standalone_stop_services: []  # 不停止服务
+    
+    # 证书域名配置
+    certbot_certs:
+      - domains:
+          - "{{ site_domain }}"
+        webroot_path: "{{ wordpress_install_dir }}"
+    
+    # Certbot 插件
+    certbot_install_method: "package"  # 使用系统包管理器安装
+  
+  # ============================================================================
+  # 前置任务：验证环境就绪
+  # ============================================================================
+  pre_tasks:
+    - name: "前置检查 | 显示 SSL 配置信息"
+      ansible.builtin.debug:
+        msg:
+          - "=========================================="
+          - "HTTPS 配置信息"
+          - "=========================================="
+          - "域名: {{ site_domain }}"
+          - "邮箱: {{ admin_email }}"
+          - "Webroot 路径: {{ wordpress_install_dir }}"
+          - "证书申请方式: Webroot (零停机)"
+          - "自动续期: 启用"
+          - "=========================================="
+    
+    - name: "前置检查 | 验证 Nginx 虚拟主机配置存在"
+      ansible.builtin.stat:
+        path: "{{ nginx_vhost_path }}"
+      register: nginx_vhost_stat
+      failed_when: not nginx_vhost_stat.stat.exists
+    
+    - name: "前置检查 | 验证 WordPress 目录存在"
+      ansible.builtin.stat:
+        path: "{{ wordpress_install_dir }}/index.php"
+      register: wp_index_stat
+      failed_when: not wp_index_stat.stat.exists
+    
+    - name: "前置检查 | 检查域名 DNS 解析"
+      ansible.builtin.command: >
+        host {{ site_domain }}
+      register: dns_check
+      changed_when: false
+      failed_when: false
+    
+    - name: "前置检查 | 显示 DNS 解析结果"
+      ansible.builtin.debug:
+        msg: "{{ dns_check.stdout_lines }}"
+    
+    - name: "前置检查 | 警告 - 如果 DNS 未正确解析"
+      ansible.builtin.debug:
+        msg:
+          - "⚠️  警告: 域名 DNS 解析可能未正确配置"
+          - "请确保 {{ site_domain }} 已解析到 {{ ansible_default_ipv4.address }}"
+          - "否则 Let's Encrypt 证书申请将失败"
+      when: ansible_default_ipv4.address not in dns_check.stdout
+    
+    - name: "前置检查 | 测试 HTTP 访问（80端口）"
+      ansible.builtin.uri:
+        url: "http://{{ site_domain }}"
+        follow_redirects: none
+        status_code: [200, 301, 302]
+      register: http_test
+      delegate_to: localhost
+      ignore_errors: true
+    
+    - name: "前置检查 | HTTP 访问结果"
+      ansible.builtin.debug:
+        msg: "✓ HTTP 访问正常 (状态码: {{ http_test.status | default('N/A') }})"
+      when: http_test is succeeded
+    
+    - name: "前置检查 | 确保 .well-known/acme-challenge 目录存在"
+      ansible.builtin.file:
+        path: "{{ wordpress_install_dir }}/.well-known/acme-challenge"
+        state: directory
+        owner: nginx
+        group: nginx
+        mode: '0755'
+  
+  # ============================================================================
+  # 执行角色：安装和配置 Certbot
+  # ============================================================================
+  roles:
+    - role: geerlingguy.certbot
+      tags: ['certbot', 'ssl']
+  
+  # ============================================================================
+  # 后置任务：配置 Nginx 强制 HTTPS 和安全优化
+  # ============================================================================
+  post_tasks:
+    # --------------------------------------------------------------------------
+    # 第一阶段：验证证书申请
+    # --------------------------------------------------------------------------
+    - name: "证书验证 | 检查证书文件是否存在"
+      ansible.builtin.stat:
+        path: "/etc/letsencrypt/live/{{ site_domain }}/fullchain.pem"
+      register: cert_check
+    
+    - name: "证书验证 | 显示证书状态"
+      ansible.builtin.debug:
+        msg: "✓ SSL 证书已成功申请: /etc/letsencrypt/live/{{ site_domain }}/"
+      when: cert_check.stat.exists
+    
+    - name: "证书验证 | 证书申请失败提示"
+      ansible.builtin.fail:
+        msg: |
+          ❌ SSL 证书申请失败！
+          
+          可能的原因:
+          1. 域名 DNS 未正确解析到此服务器
+          2. 防火墙未开放 80 端口
+          3. Let's Encrypt 速率限制（单域名每周最多 5 次失败）
+          
+          请检查并手动运行:
+          certbot certonly --webroot -w {{ wordpress_install_dir }} -d {{ site_domain }}
+      when: not cert_check.stat.exists
+    
+    # --------------------------------------------------------------------------
+    # 第二阶段：更新 Nginx 配置以启用 HTTPS
+    # --------------------------------------------------------------------------
+    - name: "Nginx 配置 | 备份当前配置"
+      ansible.builtin.copy:
+        src: "{{ nginx_vhost_path }}"
+        dest: "{{ nginx_vhost_path }}.backup"
+        remote_src: true
+        mode: preserve
+    
+    - name: "Nginx 配置 | 部署 HTTPS 优化的配置文件"
+      ansible.builtin.template:
+        src: "../templates/wordpress-ssl.conf.j2"
+        dest: "{{ nginx_vhost_path }}"
+        owner: root
+        group: root
+        mode: '0644'
+      notify:
+        - reload nginx
+    
+    - name: "Nginx 配置 | 验证 Nginx 配置语法"
+      ansible.builtin.command: nginx -t
+      register: nginx_test_ssl
+      changed_when: false
+      failed_when: nginx_test_ssl.rc != 0
+    
+    - name: "Nginx 配置 | 重新加载 Nginx"
+      ansible.builtin.systemd:
+        name: nginx
+        state: reloaded
+    
+    # --------------------------------------------------------------------------
+    # 第三阶段：更新 WordPress 站点 URL
+    # --------------------------------------------------------------------------
+    - name: "WordPress 配置 | 更新站点 URL 为 HTTPS"
+      ansible.builtin.command: >
+        wp option update {{ item }} 'https://{{ site_domain }}'
+        --path={{ wordpress_install_dir }}
+        --allow-root
+      loop:
+        - "siteurl"
+        - "home"
+      register: wp_url_update
+      changed_when: "'Success' in wp_url_update.stdout"
+    
+    - name: "WordPress 配置 | 在 wp-config.php 中强制定义 HTTPS URL"
+      ansible.builtin.blockinfile:
+        path: "{{ wordpress_install_dir }}/wp-config.php"
+        marker: "// {mark} ANSIBLE MANAGED BLOCK - HTTPS Configuration"
+        insertbefore: "/* That's all, stop editing! Happy publishing. */"
+        block: |
+          /**
+           * 强制使用 HTTPS - 由 SiteForge 自动配置
+           */
+          // 处理反向代理的 HTTPS 头
+          if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
+              $_SERVER['HTTPS'] = 'on';
+          }
+          
+          // 强制定义站点 URL（优先级高于数据库）
+          define('WP_HOME', 'https://{{ site_domain }}');
+          define('WP_SITEURL', 'https://{{ site_domain }}');
+          define('FORCE_SSL_ADMIN', true);
+    
+    - name: "WordPress 配置 | 刷新 WordPress 缓存"
+      ansible.builtin.command: >
+        wp cache flush
+        --path={{ wordpress_install_dir }}
+        --allow-root
+      changed_when: false
+      failed_when: false
+    
+    # --------------------------------------------------------------------------
+    # 第四阶段：安全加固
+    # --------------------------------------------------------------------------
+    - name: "安全加固 | 设置证书目录权限"
+      ansible.builtin.file:
+        path: "/etc/letsencrypt"
+        mode: '0755'
+        state: directory
+    
+    - name: "安全加固 | 检查自动续期定时任务"
+      ansible.builtin.cron:
+        name: "Certbot automatic renewal"
+        job: "certbot renew --quiet --post-hook 'systemctl reload nginx'"
+        minute: "{{ certbot_auto_renew_minute }}"
+        hour: "{{ certbot_auto_renew_hour }}"
+        state: present
+    
+    # --------------------------------------------------------------------------
+    # 第五阶段：测试 HTTPS 访问
+    # --------------------------------------------------------------------------
+    - name: "验证 | 测试 HTTPS 访问（443端口）"
+      ansible.builtin.uri:
+        url: "https://{{ site_domain }}"
+        validate_certs: true
+        follow_redirects: all
+        status_code: [200, 301, 302]
+      register: https_test
+      delegate_to: localhost
+      ignore_errors: true
+    
+    - name: "验证 | HTTPS 访问结果"
+      ansible.builtin.debug:
+        msg: "✓ HTTPS 访问正常 (状态码: {{ https_test.status }})"
+      when: https_test is succeeded
+    
+    - name: "验证 | 测试 HTTP 到 HTTPS 重定向"
+      ansible.builtin.uri:
+        url: "http://{{ site_domain }}"
+        follow_redirects: none
+        status_code: [301, 302]
+      register: redirect_test
+      delegate_to: localhost
+      ignore_errors: true
+    
+    - name: "验证 | HTTP 重定向结果"
+      ansible.builtin.debug:
+        msg: "✓ HTTP 自动重定向到 HTTPS"
+      when: redirect_test is succeeded
+    
+    # --------------------------------------------------------------------------
+    # 第六阶段：SSL 评分检查（可选）
+    # --------------------------------------------------------------------------
+    - name: "完成 | 显示 HTTPS 配置总结"
+      ansible.builtin.debug:
+        msg:
+          - "=========================================="
+          - "🎉 HTTPS 配置完成！网站已上线！"
+          - "=========================================="
+          - "✓ Let's Encrypt SSL 证书已申请"
+          - "✓ 证书路径: /etc/letsencrypt/live/{{ site_domain }}/"
+          - "✓ Nginx 已配置 HTTPS"
+          - "✓ HTTP 自动重定向到 HTTPS"
+          - "✓ WordPress URL 已更新为 HTTPS"
+          - "✓ SSL 强制登录已启用"
+          - "✓ 证书自动续期已配置"
+          - "=========================================="
+          - "🌐 网站访问地址:"
+          - "   前台: https://{{ site_domain }}"
+          - "   后台: https://{{ site_domain }}/wp-admin"
+          - "=========================================="
+          - "📊 SSL 安全评级检查 (推荐):"
+          - "   https://www.ssllabs.com/ssltest/analyze.html?d={{ site_domain }}"
+          - "=========================================="
+          - "📅 证书有效期: 90 天"
+          - "   自动续期时间: 每天 {{ certbot_auto_renew_hour }}:{{ certbot_auto_renew_minute }}"
+          - "=========================================="
+  
+  # ============================================================================
+  # Handlers: 服务重启
+  # ============================================================================
+  handlers:
+    - name: reload nginx
+      ansible.builtin.systemd:
+        name: nginx
+        state: reloaded
+

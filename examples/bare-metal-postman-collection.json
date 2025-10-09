@@ -1,0 +1,255 @@
+{
+  "info": {
+    "name": "SiteForge - 裸金属 WordPress 部署",
+    "description": "三步部署流程 API 测试集合",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "serverIp",
+      "value": "192.168.1.100",
+      "type": "string"
+    },
+    {
+      "key": "sshUser",
+      "value": "root",
+      "type": "string"
+    },
+    {
+      "key": "sshPassword",
+      "value": "your-ssh-password",
+      "type": "string"
+    },
+    {
+      "key": "domain",
+      "value": "example.com",
+      "type": "string"
+    },
+    {
+      "key": "adminEmail",
+      "value": "admin@example.com",
+      "type": "string"
+    },
+    {
+      "key": "deploymentContext",
+      "value": "{}",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Step 1: 准备服务器环境",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// 验证响应成功",
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response is successful\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.eql(true);",
+              "});",
+              "",
+              "// 保存 deploymentContext 到环境变量",
+              "var jsonData = pm.response.json();",
+              "if (jsonData.success && jsonData.data.deploymentContext) {",
+              "    pm.collectionVariables.set(\"deploymentContext\", JSON.stringify(jsonData.data.deploymentContext));",
+              "    console.log(\"✓ deploymentContext 已保存到环境变量\");",
+              "    ",
+              "    // 显示关键信息",
+              "    console.log(\"数据库名:\", jsonData.data.deploymentContext.dbName);",
+              "    console.log(\"数据库用户:\", jsonData.data.deploymentContext.dbUser);",
+              "    console.log(\"WordPress 管理员:\", jsonData.data.deploymentContext.wpAdminUser);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"ip\": \"{{serverIp}}\",\n  \"sshUser\": \"{{sshUser}}\",\n  \"sshPassword\": \"{{sshPassword}}\",\n  \"domain\": \"{{domain}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/provisioning/bare-metal/prepare-server",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "provisioning",
+            "bare-metal",
+            "prepare-server"
+          ]
+        },
+        "description": "安装 LEMP 栈（Nginx + PHP 8.3 + MariaDB）、配置防火墙、创建数据库、生成所有密码和密钥。\n\n⏱️ 预计耗时: 5-10 分钟\n\n⚠️ 注意: 响应中的 deploymentContext 包含敏感信息，请妥善保管！"
+      },
+      "response": []
+    },
+    {
+      "name": "Step 2: 部署 WordPress",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "// 检查是否已执行 Step 1",
+              "var context = pm.collectionVariables.get(\"deploymentContext\");",
+              "if (!context || context === \"{}\") {",
+              "    console.error(\"❌ 错误: 未找到 deploymentContext，请先执行 Step 1！\");",
+              "    throw new Error(\"请先执行 Step 1: 准备服务器环境\");",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response is successful\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.eql(true);",
+              "});",
+              "",
+              "// 显示网站信息",
+              "var jsonData = pm.response.json();",
+              "if (jsonData.success && jsonData.data) {",
+              "    console.log(\"✓ WordPress 部署完成！\");",
+              "    console.log(\"网站地址:\", jsonData.data.siteUrl);",
+              "    console.log(\"后台地址:\", jsonData.data.adminUrl);",
+              "    console.log(\"⚠️ 当前使用 HTTP，请继续执行 Step 3 配置 HTTPS\");",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"deploymentContext\": {{deploymentContext}},\n  \"sshPassword\": \"{{sshPassword}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/provisioning/bare-metal/deploy-wordpress",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "provisioning",
+            "bare-metal",
+            "deploy-wordpress"
+          ]
+        },
+        "description": "配置 Nginx 虚拟主机、下载并安装 WordPress、设置文件权限。\n\n⏱️ 预计耗时: 3-5 分钟\n\n⚠️ 前置条件: 必须先成功执行 Step 1"
+      },
+      "response": []
+    },
+    {
+      "name": "Step 3: 配置 HTTPS",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "// 检查是否已执行 Step 1",
+              "var context = pm.collectionVariables.get(\"deploymentContext\");",
+              "if (!context || context === \"{}\") {",
+              "    console.error(\"❌ 错误: 未找到 deploymentContext，请先执行 Step 1 和 Step 2！\");",
+              "    throw new Error(\"请先执行 Step 1 和 Step 2\");",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response is successful\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.success).to.eql(true);",
+              "});",
+              "",
+              "// 显示最终结果",
+              "var jsonData = pm.response.json();",
+              "if (jsonData.success && jsonData.data) {",
+              "    console.log(\"✓ HTTPS 配置完成！\");",
+              "    console.log(\"🎉 部署完成！网站已上线！\");",
+              "    console.log(\"\");",
+              "    console.log(\"网站地址:\", jsonData.data.secureSiteUrl);",
+              "    console.log(\"后台地址:\", jsonData.data.secureAdminUrl);",
+              "    console.log(\"SSL 证书路径:\", jsonData.data.certificatePath);",
+              "    console.log(\"\");",
+              "    ",
+              "    // 获取管理员信息",
+              "    var context = JSON.parse(pm.collectionVariables.get(\"deploymentContext\"));",
+              "    console.log(\"管理员账号:\", context.wpAdminUser);",
+              "    console.log(\"管理员密码:\", context.wpAdminPassword);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"deploymentContext\": {{deploymentContext}},\n  \"sshPassword\": \"{{sshPassword}}\",\n  \"adminEmail\": \"{{adminEmail}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/provisioning/bare-metal/secure-ssl",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "provisioning",
+            "bare-metal",
+            "secure-ssl"
+          ]
+        },
+        "description": "申请 Let's Encrypt SSL 证书、配置 HTTPS、设置自动续期。\n\n⏱️ 预计耗时: 2-3 分钟\n\n⚠️ 重要前置条件:\n1. 域名必须已正确解析到服务器 IP\n2. 防火墙必须开放 80 和 443 端口\n3. 必须先成功执行 Step 1 和 Step 2"
+      },
+      "response": []
+    }
+  ]
+}
+

@@ -1,0 +1,425 @@
+---
+# ============================================================================
+# Playbook Step 1: 服务器环境准备（裸金属 LEMP 栈）
+# ============================================================================
+# 目标: 在 Rocky Linux 服务器上安装和配置完整的 LEMP 环境
+# 
+# 必需的 extra-vars 参数:
+#   - target_host: 目标服务器 IP 地址
+#   - ssh_user: SSH 登录用户名
+#   - site_domain: 网站域名 (例如: example.com)
+#   - mysql_root_password: MySQL root 用户密码
+#   - db_name: WordPress 数据库名
+#   - db_user: WordPress 数据库用户名
+#   - db_password: WordPress 数据库用户密码
+#
+# 执行示例:
+#   ansible-playbook -i inventory.yml playbook_step1_prepare_server.yml \
+#     --extra-vars '{"target_host":"1.2.3.4","ssh_user":"root",...}'
+# ============================================================================
+
+- name: "Step 1: 准备 Rocky Linux 服务器环境 (LEMP)"
+  hosts: all
+  become: true
+  gather_facts: true
+  
+  # ============================================================================
+  # 前置检查：确保目标系统是 Rocky Linux
+  # ============================================================================
+  pre_tasks:
+    - name: "前置检查 | 验证操作系统类型"
+      ansible.builtin.assert:
+        that:
+          - ansible_distribution == "Rocky"
+        fail_msg: "此 Playbook 仅支持 Rocky Linux 系统，当前系统: {{ ansible_distribution }}"
+        success_msg: "系统验证通过: {{ ansible_distribution }} {{ ansible_distribution_version }}"
+    
+    - name: "前置检查 | 显示服务器基本信息"
+      ansible.builtin.debug:
+        msg:
+          - "目标服务器: {{ ansible_hostname }}"
+          - "操作系统: {{ ansible_distribution }} {{ ansible_distribution_version }}"
+          - "架构: {{ ansible_architecture }}"
+          - "CPU 核心数: {{ ansible_processor_vcpus }}"
+          - "内存: {{ (ansible_memtotal_mb / 1024) | round(2) }} GB"
+    
+    # --------------------------------------------------------------------------
+    # 清理可能存在的错误仓库配置（从之前的运行中残留）
+    # 必须在更新缓存之前执行，否则会因为错误的仓库配置导致缓存更新失败
+    # --------------------------------------------------------------------------
+    - name: "清理 | 移除可能存在的错误 MariaDB 仓库配置"
+      ansible.builtin.file:
+        path: "/etc/yum.repos.d/mariadb.repo"
+        state: absent
+      tags: ['cleanup', 'repos']
+    
+    - name: "前置检查 | 更新系统包缓存"
+      ansible.builtin.dnf:
+        update_cache: true
+      changed_when: false
+    
+    # --------------------------------------------------------------------------
+    # 配置国内镜像源（清华大学开源镜像站）
+    # --------------------------------------------------------------------------
+    - name: "镜像配置 | 配置 EPEL 清华镜像源"
+      ansible.builtin.yum_repository:
+        name: epel
+        description: Extra Packages for Enterprise Linux $releasever - $basearch
+        baseurl: https://mirrors.tuna.tsinghua.edu.cn/epel/$releasever/Everything/$basearch/
+        enabled: true
+        gpgcheck: true
+        gpgkey: https://mirrors.tuna.tsinghua.edu.cn/epel/RPM-GPG-KEY-EPEL-$releasever
+        metalink: ""
+      tags: ['epel', 'repos', 'mirrors']
+    
+    # --------------------------------------------------------------------------
+    # 关键任务：配置 Remi 仓库并启用 PHP 8.3 模块（必须在 PHP 角色执行前完成）
+    # 使用清华镜像加速下载
+    # --------------------------------------------------------------------------
+    - name: "PHP 准备 | 从清华镜像下载 Remi 仓库 RPM"
+      ansible.builtin.get_url:
+        url: "https://mirrors.tuna.tsinghua.edu.cn/remi/enterprise/remi-release-{{ ansible_distribution_major_version }}.rpm"
+        dest: "/tmp/remi-release-{{ ansible_distribution_major_version }}.rpm"
+        mode: '0644'
+        timeout: 60
+      tags: ['php', 'remi', 'mirrors']
+    
+    - name: "PHP 准备 | 安装 Remi 仓库 RPM"
+      ansible.builtin.dnf:
+        name: "/tmp/remi-release-{{ ansible_distribution_major_version }}.rpm"
+        state: present
+        disable_gpg_check: true
+      tags: ['php', 'remi']
+    
+    - name: "PHP 准备 | 配置 Remi 仓库使用清华镜像"
+      ansible.builtin.replace:
+        path: "/etc/yum.repos.d/remi.repo"
+        regexp: '^(mirrorlist=.*)$'
+        replace: '#\1'
+      tags: ['php', 'remi', 'mirrors']
+    
+    - name: "PHP 准备 | 设置 Remi 仓库 baseurl 为清华镜像"
+      ansible.builtin.replace:
+        path: "/etc/yum.repos.d/remi.repo"
+        regexp: '^#baseurl=http://rpms\.remirepo\.net/'
+        replace: 'baseurl=https://mirrors.tuna.tsinghua.edu.cn/remi/'
+      tags: ['php', 'remi', 'mirrors']
+    
+    - name: "PHP 准备 | 配置 Remi PHP 8.3 仓库使用清华镜像"
+      ansible.builtin.replace:
+        path: "/etc/yum.repos.d/remi-modular.repo"
+        regexp: '^(mirrorlist=.*)$'
+        replace: '#\1'
+      tags: ['php', 'remi', 'mirrors']
+    
+    - name: "PHP 准备 | 设置 Remi PHP 8.3 baseurl 为清华镜像"
+      ansible.builtin.replace:
+        path: "/etc/yum.repos.d/remi-modular.repo"
+        regexp: '^#baseurl=http://rpms\.remirepo\.net/'
+        replace: 'baseurl=https://mirrors.tuna.tsinghua.edu.cn/remi/'
+      tags: ['php', 'remi', 'mirrors']
+    
+    - name: "PHP 准备 | 重置 PHP 模块"
+      ansible.builtin.command: dnf module reset php -y
+      register: php_module_reset
+      changed_when: "'Resetting' in php_module_reset.stdout"
+      failed_when: false
+      tags: ['php', 'remi']
+
+    - name: "PHP 准备 | 启用 Remi PHP 8.3 模块"
+      ansible.builtin.command: dnf module enable php:remi-8.3 -y
+      register: php_module_enable
+      changed_when: "'Enabling' in php_module_enable.stdout"
+      failed_when: false
+      tags: ['php', 'remi']
+    
+    - name: "PHP 准备 | 清理 DNF 缓存（确保角色使用最新仓库数据）"
+      ansible.builtin.command: dnf clean all
+      changed_when: true
+      tags: ['php', 'remi']
+
+  # ============================================================================
+  # 角色变量配置
+  # ============================================================================
+  vars:
+    # --------------------------------------------------------------------------
+    # PHP 8.3 配置（使用 Remi 仓库）
+    # --------------------------------------------------------------------------
+    php_version: "8.3"
+    php_packages_state: "latest"
+    php_webserver_daemon: "nginx"
+    php_enablerepo: "remi-{{ php_version | replace('.', '') }}"
+    
+    # PHP Versions Role 配置（用于安装 Remi 仓库）
+    php_versions_install_recommends: false
+    php_default_version_debian: "8.3"
+    php_default_version_redhat: "8.3"
+    
+    # PHP 核心扩展
+    php_packages:
+      - php
+      - php-cli
+      - php-common
+      - php-fpm
+      - php-mysqlnd
+      - php-gd
+      - php-xml
+      - php-mbstring
+      - php-opcache
+      - php-curl
+      - php-zip
+      - php-intl
+      - php-bcmath
+      - php-soap
+      - php-pecl-apcu
+      # php-xmlrpc 在 Rocky Linux 9 上不可用，已移除
+      # php-imagick 需要单独安装 ImageMagick，先移除
+    
+    # PHP-FPM 配置优化
+    php_fpm_pools:
+      - pool_name: www
+        pool_user: nginx
+        pool_group: nginx
+        pool_listen: /run/php-fpm/www.sock
+        pool_listen_owner: nginx
+        pool_listen_group: nginx
+        pool_pm: dynamic
+        pool_pm_max_children: 50
+        pool_pm_start_servers: 5
+        pool_pm_min_spare_servers: 5
+        pool_pm_max_spare_servers: 35
+        pool_pm_max_requests: 500
+    
+    # php.ini 配置
+    php_memory_limit: "256M"
+    php_max_execution_time: "300"
+    php_upload_max_filesize: "64M"
+    php_post_max_size: "64M"
+    php_date_timezone: "Asia/Shanghai"
+    php_opcache_enable: "1"
+    php_opcache_memory_consumption: "128"
+    php_opcache_max_accelerated_files: "10000"
+    
+    # --------------------------------------------------------------------------
+    # Nginx 配置
+    # --------------------------------------------------------------------------
+    nginx_user: "nginx"
+    nginx_worker_processes: "auto"
+    nginx_worker_connections: "1024"
+    nginx_client_max_body_size: "64m"
+    nginx_keepalive_timeout: "65"
+    nginx_remove_default_vhost: true
+    
+    # 暂不配置虚拟主机，留到 Step 2
+    nginx_vhosts: []
+    
+    # --------------------------------------------------------------------------
+    # MySQL/MariaDB 配置
+    # --------------------------------------------------------------------------
+    mysql_root_password_update: true
+    mysql_enabled_on_startup: true
+    
+    mysql_databases:
+      - name: "{{ db_name }}"
+        encoding: utf8mb4
+        collation: utf8mb4_unicode_ci
+    
+    mysql_users:
+      - name: "{{ db_user }}"
+        password: "{{ db_password }}"
+        priv: "{{ db_name }}.*:ALL"
+        host: "localhost"
+    
+    # MariaDB 性能优化
+    mysql_max_allowed_packet: "64M"
+    mysql_innodb_buffer_pool_size: "256M"
+    mysql_innodb_log_file_size: "64M"
+    
+    # --------------------------------------------------------------------------
+    # 防火墙配置
+    # --------------------------------------------------------------------------
+    firewall_state: started
+    firewall_enabled_at_boot: true
+    firewall_allowed_tcp_ports:
+      - "22"    # SSH
+      - "80"    # HTTP
+      - "443"   # HTTPS
+    
+    # Composer 已移除（WordPress 不需要）
+
+  # ============================================================================
+  # 执行角色任务
+  # 注意：EPEL、Remi 仓库和 PHP 模块已在 pre_tasks 中配置，确保角色能找到 PHP 8.3
+  # ============================================================================
+  roles:
+    # 1. 配置防火墙（安全第一）
+    - role: geerlingguy.firewall
+      tags: ['firewall', 'security']
+    
+    # 2. 安装 Nginx
+    - role: geerlingguy.nginx
+      tags: ['nginx', 'web']
+    
+    # 3. 安装 PHP 8.3 和 PHP-FPM
+    # 注意：Remi 仓库已在 pre_tasks 中配置完成
+    - role: geerlingguy.php
+      tags: ['php']
+    
+    # 4. 安装并配置 MariaDB
+    - role: geerlingguy.mysql
+      tags: ['mysql', 'database']
+    
+    # 注意：Composer 已移除
+    # WordPress 不需要 Composer，且在中国大陆访问 GitHub 可能受限
+  
+  # ============================================================================
+  # 中间任务：安装 Fail2Ban 和配置时间同步
+  # （这些任务需要 EPEL 仓库，所以必须在 roles 执行后进行）
+  # ============================================================================
+  tasks:
+    - name: "手动任务 | 安装 Fail2Ban（需要 EPEL 仓库）"
+      ansible.builtin.dnf:
+        name: fail2ban
+        state: present
+      tags: ['fail2ban', 'security']
+    
+    - name: "手动任务 | 安装 ACL 工具（用于权限清理）"
+      ansible.builtin.dnf:
+        name: acl
+        state: present
+      tags: ['acl', 'security']
+    
+    - name: "手动任务 | 启动并启用 Fail2Ban 服务"
+      ansible.builtin.systemd:
+        name: fail2ban
+        state: started
+        enabled: true
+      tags: ['fail2ban', 'security']
+    
+    - name: "手动任务 | 确保 Chronyd 服务正在运行（Rocky Linux 默认已安装）"
+      ansible.builtin.systemd:
+        name: chronyd
+        state: started
+        enabled: true
+      tags: ['ntp', 'time']
+    
+    - name: "手动任务 | 设置系统时区为 Asia/Shanghai"
+      ansible.builtin.timezone:
+        name: Asia/Shanghai
+      tags: ['ntp', 'time']
+  
+  # ============================================================================
+  # 后置任务：安装 WP-CLI 和验证环境
+  # ============================================================================
+  post_tasks:
+    # --------------------------------------------------------------------------
+    # 从 Gitee 国内镜像下载 WP-CLI（解决下载速度慢问题）
+    # 镜像源: https://gitee.com/fuckgitee2speed/wp-bare-metal-mirrors
+    # --------------------------------------------------------------------------
+    
+    # 首先删除可能存在的损坏文件
+    - name: "后置任务 | 清理可能损坏的旧 WP-CLI 文件"
+      ansible.builtin.file:
+        path: "/usr/local/bin/wp"
+        state: absent
+      tags: ['wp-cli']
+    
+    - name: "后置任务 | 从 Gitee 镜像下载 WP-CLI"
+      ansible.builtin.get_url:
+        url: "https://gitee.com/fuckgitee2speed/wp-bare-metal-mirrors/raw/main/wp-cli.phar"
+        dest: "/usr/local/bin/wp"
+        mode: '0755'
+        timeout: 60
+      register: wpcli_download
+      retries: 3
+      delay: 5
+      until: wpcli_download is succeeded
+      tags: ['wp-cli']
+    
+    # 验证文件是否真的存在且可执行
+    - name: "后置任务 | 验证 WP-CLI 文件确实存在"
+      ansible.builtin.stat:
+        path: "/usr/local/bin/wp"
+      register: wp_file_stat
+      tags: ['wp-cli']
+    
+    - name: "后置任务 | 检查 WP-CLI 文件大小（确保不是错误页面）"
+      ansible.builtin.fail:
+        msg: "WP-CLI 文件太小（{{ wp_file_stat.stat.size }} 字节），可能下载的是错误页面。正常应该 >5MB"
+      when: 
+        - wp_file_stat.stat.exists
+        - wp_file_stat.stat.size < 5000000
+      tags: ['wp-cli']
+    
+    - name: "后置任务 | 检查下载是否失败"
+      ansible.builtin.fail:
+        msg: |
+          WP-CLI 从 Gitee 镜像下载失败！
+          
+          错误信息: {{ wpcli_download.msg | default('未知错误') }}
+          
+          请检查：
+          1. 服务器网络连接是否正常
+          2. Gitee 镜像是否可访问: https://gitee.com/fuckgitee2speed/wp-bare-metal-mirrors
+          3. 或手动上传 WP-CLI 到 /usr/local/bin/wp
+      when: not wp_file_stat.stat.exists or wpcli_download.failed | default(false)
+      tags: ['wp-cli']
+    
+    - name: "后置任务 | 验证 WP-CLI 可执行"
+      ansible.builtin.command: /usr/local/bin/wp --info --allow-root
+      register: wp_cli_info
+      changed_when: false
+      failed_when: wp_cli_info.rc != 0
+      tags: ['wp-cli']
+    
+    - name: "后置任务 | 显示 WP-CLI 版本信息"
+      ansible.builtin.debug:
+        msg: "{{ wp_cli_info.stdout_lines }}"
+      tags: ['wp-cli']
+    
+    - name: "后置任务 | 确保 PHP-FPM 服务正在运行"
+      ansible.builtin.systemd:
+        name: php-fpm
+        state: started
+        enabled: true
+    
+    - name: "后置任务 | 确保 Nginx 服务正在运行"
+      ansible.builtin.systemd:
+        name: nginx
+        state: started
+        enabled: true
+    
+    - name: "后置任务 | 确保 MariaDB 服务正在运行"
+      ansible.builtin.systemd:
+        name: mariadb
+        state: started
+        enabled: true
+    
+    - name: "后置任务 | 测试数据库连接"
+      ansible.builtin.command: >
+        mysql -u {{ db_user }} -p'{{ db_password }}' {{ db_name }} -e "SELECT 1;"
+      register: db_test
+      changed_when: false
+      failed_when: db_test.rc != 0
+      no_log: true  # 不记录密码到日志
+    
+    - name: "完成 | 显示环境准备总结"
+      ansible.builtin.debug:
+        msg:
+          - "=========================================="
+          - "服务器环境准备完成！"
+          - "=========================================="
+          - "✓ EPEL 仓库已配置"
+          - "✓ 防火墙已启用 (开放端口: 22, 80, 443)"
+          - "✓ Fail2Ban 已启用 (SSH 保护)"
+          - "✓ 时间已同步"
+          - "✓ Nginx {{ nginx_version | default('latest') }} 已安装并运行"
+          - "✓ PHP {{ php_version }} 已安装并运行"
+          - "✓ MariaDB 已安装并运行"
+          - "✓ WP-CLI 已安装"
+          - "✓ 数据库 '{{ db_name }}' 已创建"
+          - "✓ 数据库用户 '{{ db_user }}' 已授权"
+          - "=========================================="
+          - "下一步: 运行 playbook_step2_deploy_wordpress.yml"
+          - "=========================================="
+

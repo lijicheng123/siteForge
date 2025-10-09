@@ -283,3 +283,155 @@ export const fullDeploymentResponseSchema = responseSchema(deploymentStatusSchem
 
 // 部署状态查询响应Schema
 export const deploymentStatusResponseSchema = responseSchema(deploymentStatusSchema);
+
+// ============================================================================
+// 裸金属（Bare Metal）部署方案 Schema - 三步部署流程
+// ============================================================================
+
+// --- Step 1: 服务器环境准备 ---
+
+// Step 1 请求 Schema
+export const bareMetalPrepareServerRequestSchema = objectSchema({
+  ip: ipAddressSchema,
+  sshUser: {
+    type: 'string',
+    minLength: 1,
+    maxLength: 50,
+    pattern: '^[a-zA-Z0-9_-]+$',
+    description: 'SSH 登录用户名'
+  },
+  sshPassword: {
+    type: 'string',
+    minLength: 1,
+    maxLength: 200,
+    description: 'SSH 登录密码'
+  },
+  domain: {
+    type: 'string',
+    pattern: '^[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$',
+    description: '网站域名（例如: example.com）'
+  }
+}, ['ip', 'sshUser', 'sshPassword', 'domain']);
+
+// 部署上下文 Schema（用于跨步骤传递数据）
+export const deploymentContextSchema = objectSchema({
+  targetHost: ipAddressSchema,
+  sshUser: {
+    type: 'string',
+    description: 'SSH 用户名'
+  },
+  siteDomain: {
+    type: 'string',
+    description: '网站域名'
+  },
+  dbName: {
+    type: 'string',
+    description: '数据库名称'
+  },
+  dbUser: {
+    type: 'string',
+    description: '数据库用户名'
+  },
+  dbPassword: {
+    type: 'string',
+    description: '数据库密码'
+  },
+  wpAdminUser: {
+    type: 'string',
+    description: 'WordPress 管理员用户名'
+  },
+  wpAdminPassword: {
+    type: 'string',
+    description: 'WordPress 管理员密码'
+  },
+  wpAdminEmail: {
+    type: 'string',
+    format: 'email',
+    description: 'WordPress 管理员邮箱'
+  },
+  wpSaltKeys: {
+    type: 'string',
+    description: 'WordPress 安全密钥（Salt Keys）'
+  }
+}, ['targetHost', 'sshUser', 'siteDomain', 'dbName', 'dbUser', 'dbPassword', 'wpAdminUser', 'wpAdminPassword', 'wpAdminEmail', 'wpSaltKeys']);
+
+// Step 1 响应 Schema
+export const bareMetalPrepareServerResponseSchema = responseSchema(
+  objectSchema({
+    message: descriptionSchema,
+    deploymentContext: deploymentContextSchema,
+    playbookResult: ansiblePlaybookResultSchema
+  }, ['message', 'deploymentContext'])
+);
+
+// --- Step 2: WordPress 部署 ---
+
+// Step 2 请求 Schema
+export const bareMetalDeployWordPressRequestSchema = objectSchema({
+  deploymentContext: deploymentContextSchema,
+  sshPassword: {
+    type: 'string',
+    minLength: 1,
+    maxLength: 200,
+    description: 'SSH 登录密码（用于 Ansible 连接）'
+  }
+}, ['deploymentContext', 'sshPassword']);
+
+// Step 2 响应 Schema
+export const bareMetalDeployWordPressResponseSchema = responseSchema(
+  objectSchema({
+    message: descriptionSchema,
+    siteUrl: {
+      type: 'string',
+      format: 'uri',
+      description: '网站访问地址（HTTP）'
+    },
+    adminUrl: {
+      type: 'string',
+      format: 'uri',
+      description: 'WordPress 后台地址'
+    },
+    deploymentContext: deploymentContextSchema,
+    playbookResult: ansiblePlaybookResultSchema
+  }, ['message', 'siteUrl', 'adminUrl', 'deploymentContext'])
+);
+
+// --- Step 3: HTTPS 配置 ---
+
+// Step 3 请求 Schema
+export const bareMetalSecureSSLRequestSchema = objectSchema({
+  deploymentContext: deploymentContextSchema,
+  sshPassword: {
+    type: 'string',
+    minLength: 1,
+    maxLength: 200,
+    description: 'SSH 登录密码（用于 Ansible 连接）'
+  },
+  adminEmail: {
+    type: 'string',
+    format: 'email',
+    description: 'Let\'s Encrypt 证书通知邮箱'
+  }
+}, ['deploymentContext', 'sshPassword', 'adminEmail']);
+
+// Step 3 响应 Schema
+export const bareMetalSecureSSLResponseSchema = responseSchema(
+  objectSchema({
+    message: descriptionSchema,
+    secureSiteUrl: {
+      type: 'string',
+      format: 'uri',
+      description: '安全网站访问地址（HTTPS）'
+    },
+    secureAdminUrl: {
+      type: 'string',
+      format: 'uri',
+      description: 'WordPress 后台地址（HTTPS）'
+    },
+    certificatePath: {
+      type: 'string',
+      description: 'SSL 证书路径'
+    },
+    playbookResult: ansiblePlaybookResultSchema
+  }, ['message', 'secureSiteUrl', 'secureAdminUrl'])
+);

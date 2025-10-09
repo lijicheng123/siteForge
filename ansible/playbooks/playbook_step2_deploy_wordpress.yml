@@ -1,0 +1,423 @@
+---
+# ============================================================================
+# Playbook Step 2: 部署 WordPress 站点
+# ============================================================================
+# 目标: 使用 WP-CLI 下载、配置并安装 WordPress
+# 
+# 必需的 extra-vars 参数:
+#   - target_host: 目标服务器 IP 地址
+#   - ssh_user: SSH 登录用户名
+#   - site_domain: 网站域名 (例如: example.com)
+#   - db_name: WordPress 数据库名
+#   - db_user: WordPress 数据库用户名
+#   - db_password: WordPress 数据库用户密码
+#   - wp_admin_user: WordPress 管理员用户名
+#   - wp_admin_password: WordPress 管理员密码
+#   - wp_admin_email: WordPress 管理员邮箱
+#   - wp_salt_keys: JSON 格式的 WordPress 安全密钥字符串
+#
+# 执行示例:
+#   ansible-playbook -i inventory.yml playbook_step2_deploy_wordpress.yml \
+#     --extra-vars @vars.json
+# ============================================================================
+
+- name: "Step 2: 部署 WordPress 站点"
+  hosts: all
+  become: true
+  gather_facts: true
+  
+  vars:
+    # WordPress 安装路径
+    wordpress_install_dir: "/var/www/{{ site_domain }}"
+    
+    # Nginx 配置路径
+    nginx_vhost_path: "/etc/nginx/conf.d/{{ site_domain }}.conf"
+    
+    # WordPress 版本
+    wordpress_version: "latest"
+    wordpress_locale: "zh_CN"
+    
+    # 文件权限
+    web_user: "nginx"
+    web_group: "nginx"
+  
+  # ============================================================================
+  # 前置任务：验证环境
+  # ============================================================================
+  pre_tasks:
+    - name: "前置检查 | 验证 LEMP 环境是否就绪"
+      ansible.builtin.service_facts:
+    
+    - name: "前置检查 | 确保 Nginx 正在运行"
+      ansible.builtin.assert:
+        that:
+          - ansible_facts.services['nginx.service'].state == 'running'
+        fail_msg: "Nginx 未运行，请先执行 playbook_step1_prepare_server.yml"
+    
+    - name: "前置检查 | 确保 PHP-FPM 正在运行"
+      ansible.builtin.assert:
+        that:
+          - ansible_facts.services['php-fpm.service'].state == 'running'
+        fail_msg: "PHP-FPM 未运行，请先执行 playbook_step1_prepare_server.yml"
+    
+    - name: "前置检查 | 确保 MariaDB 正在运行"
+      ansible.builtin.assert:
+        that:
+          - ansible_facts.services['mariadb.service'].state == 'running'
+        fail_msg: "MariaDB 未运行，请先执行 playbook_step1_prepare_server.yml"
+    
+    - name: "前置检查 | 验证 WP-CLI 可用性"
+      ansible.builtin.command: wp --version --allow-root
+      register: wp_check
+      changed_when: false
+      failed_when: wp_check.rc != 0
+    
+    - name: "前置检查 | 显示部署配置信息"
+      ansible.builtin.debug:
+        msg:
+          - "=========================================="
+          - "WordPress 部署配置"
+          - "=========================================="
+          - "域名: {{ site_domain }}"
+          - "安装路径: {{ wordpress_install_dir }}"
+          - "数据库名: {{ db_name }}"
+          - "数据库用户: {{ db_user }}"
+          - "管理员用户: {{ wp_admin_user }}"
+          - "管理员邮箱: {{ wp_admin_email }}"
+          - "WordPress 版本: {{ wordpress_version }}"
+          - "语言: {{ wordpress_locale }}"
+          - "=========================================="
+
+  # ============================================================================
+  # 主要任务：部署 WordPress
+  # ============================================================================
+  tasks:
+    # --------------------------------------------------------------------------
+    # 第一阶段：创建目录结构
+    # --------------------------------------------------------------------------
+    - name: "目录准备 | 创建 WordPress 安装目录"
+      ansible.builtin.file:
+        path: "{{ wordpress_install_dir }}"
+        state: directory
+        owner: "{{ web_user }}"
+        group: "{{ web_group }}"
+        mode: '0755'
+    
+    - name: "目录准备 | 创建日志目录"
+      ansible.builtin.file:
+        path: "/var/log/nginx/{{ site_domain }}"
+        state: directory
+        owner: "{{ web_user }}"
+        group: "{{ web_group }}"
+        mode: '0755'
+    
+    - name: "目录准备 | 创建 Let's Encrypt webroot 目录"
+      ansible.builtin.file:
+        path: "/var/www/letsencrypt"
+        state: directory
+        owner: "{{ web_user }}"
+        group: "{{ web_group }}"
+        mode: '0755'
+      tags: ['ssl-prep']
+    
+    - name: "目录准备 | 创建 ACME challenge 目录"
+      ansible.builtin.file:
+        path: "/var/www/letsencrypt/.well-known/acme-challenge"
+        state: directory
+        owner: "{{ web_user }}"
+        group: "{{ web_group }}"
+        mode: '0755'
+        recurse: yes
+      tags: ['ssl-prep']
+    
+    # --------------------------------------------------------------------------
+    # 第二阶段：配置 Nginx 虚拟主机
+    # --------------------------------------------------------------------------
+    - name: "Nginx 配置 | 部署虚拟主机配置文件"
+      ansible.builtin.template:
+        src: "../templates/wordpress.conf.j2"
+        dest: "{{ nginx_vhost_path }}"
+        owner: root
+        group: root
+        mode: '0644'
+      notify: 
+        - reload nginx
+    
+    - name: "Nginx 配置 | 验证 Nginx 配置语法"
+      ansible.builtin.command: nginx -t
+      register: nginx_test
+      changed_when: false
+      failed_when: nginx_test.rc != 0
+    
+    - name: "Nginx 配置 | 重启 Nginx 服务"
+      ansible.builtin.systemd:
+        name: nginx
+        state: reloaded
+    
+    # --------------------------------------------------------------------------
+    # 第三阶段：下载和安装 WordPress
+    # --------------------------------------------------------------------------
+    - name: "WordPress 下载 | 检查 WordPress 核心文件是否已存在"
+      ansible.builtin.stat:
+        path: "{{ wordpress_install_dir }}/wp-includes/version.php"
+      register: wp_core_check
+    
+    - name: "WordPress 下载 | 下载 WordPress 核心文件"
+      ansible.builtin.command: >
+        wp core download
+        --path={{ wordpress_install_dir }}
+        --version={{ wordpress_version }}
+        --locale={{ wordpress_locale }}
+        --allow-root
+        --force
+      when: not wp_core_check.stat.exists
+      register: wp_download
+    
+    - name: "WordPress 下载 | 显示下载结果"
+      ansible.builtin.debug:
+        msg: "{{ wp_download.stdout_lines | default(['WordPress 核心文件已存在，跳过下载']) }}"
+    
+    # --------------------------------------------------------------------------
+    # 第四阶段：配置 WordPress
+    # --------------------------------------------------------------------------
+    - name: "WordPress 配置 | 创建 wp-config.php"
+      ansible.builtin.command: >
+        wp config create
+        --dbname={{ db_name }}
+        --dbuser={{ db_user }}
+        --dbpass={{ db_password }}
+        --dbhost=localhost
+        --dbprefix=wp_
+        --skip-salts
+        --path={{ wordpress_install_dir }}
+        --allow-root
+        --force
+      register: wp_config_create
+      no_log: true  # 不记录敏感信息
+    
+    - name: "WordPress 配置 | 注入 Salt Keys 到 wp-config.php"
+      ansible.builtin.blockinfile:
+        path: "{{ wordpress_install_dir }}/wp-config.php"
+        marker: "/* {mark} ANSIBLE MANAGED SALT KEYS */"
+        insertafter: "DB_COLLATE"
+        block: |
+          /**#@+
+           * 身份验证唯一密钥和盐
+           * 由 SiteForge 自动生成
+           */
+          {{ wp_salt_keys }}
+          /**#@-*/
+    
+    - name: "WordPress 配置 | 添加额外的 PHP 配置到 wp-config.php"
+      ansible.builtin.blockinfile:
+        path: "{{ wordpress_install_dir }}/wp-config.php"
+        marker: "/* {mark} ANSIBLE MANAGED PHP CONFIG */"
+        insertbefore: "/* That's all"
+        block: |
+          /** 内存限制 */
+          define( 'WP_MEMORY_LIMIT', '256M' );
+          
+          /** 启用自动更新 */
+          define( 'WP_AUTO_UPDATE_CORE', true );
+          
+          /** 禁用文件编辑（安全） */
+          define( 'DISALLOW_FILE_EDIT', false );
+          
+          /** 设置文件系统方法为直接写入 */
+          define( 'FS_METHOD', 'direct' );
+    
+    # --------------------------------------------------------------------------
+    # 第五阶段：运行 WordPress 安装
+    # --------------------------------------------------------------------------
+    - name: "WordPress 安装 | 检查是否已安装"
+      ansible.builtin.command: >
+        wp core is-installed
+        --path={{ wordpress_install_dir }}
+        --allow-root
+      register: wp_is_installed
+      changed_when: false
+      failed_when: false
+    
+    - name: "WordPress 安装 | 执行 WordPress 安装"
+      ansible.builtin.command: >
+        wp core install
+        --url=http://{{ site_domain }}
+        --title="{{ site_domain }}"
+        --admin_user={{ wp_admin_user }}
+        --admin_password={{ wp_admin_password }}
+        --admin_email={{ wp_admin_email }}
+        --path={{ wordpress_install_dir }}
+        --allow-root
+      when: wp_is_installed.rc != 0
+      register: wp_install
+      no_log: true
+    
+    - name: "WordPress 安装 | 显示安装结果"
+      ansible.builtin.debug:
+        msg: "{{ wp_install.stdout_lines | default(['WordPress 已安装，跳过安装步骤']) }}"
+      when: wp_install.changed | default(false)
+    
+    # --------------------------------------------------------------------------
+    # 第六阶段：WordPress 基础配置
+    # --------------------------------------------------------------------------
+    - name: "WordPress 配置 | 设置永久链接结构"
+      ansible.builtin.command: >
+        wp rewrite structure '/%postname%/'
+        --path={{ wordpress_install_dir }}
+        --allow-root
+      register: wp_rewrite
+      changed_when: "'Success' in wp_rewrite.stdout"
+    
+    - name: "WordPress 配置 | 设置时区"
+      ansible.builtin.command: >
+        wp option update timezone_string 'Asia/Shanghai'
+        --path={{ wordpress_install_dir }}
+        --allow-root
+      register: wp_timezone
+      changed_when: "'Success' in wp_timezone.stdout"
+    
+    - name: "WordPress 配置 | 设置日期格式"
+      ansible.builtin.command: >
+        wp option update date_format 'Y-m-d'
+        --path={{ wordpress_install_dir }}
+        --allow-root
+      changed_when: false
+    
+    - name: "WordPress 配置 | 设置时间格式"
+      ansible.builtin.command: >
+        wp option update time_format 'H:i'
+        --path={{ wordpress_install_dir }}
+        --allow-root
+      changed_when: false
+    
+    - name: "WordPress 配置 | 删除默认示例内容"
+      ansible.builtin.command: >
+        wp {{ item }}
+        --path={{ wordpress_install_dir }}
+        --allow-root
+      loop:
+        - "post delete 1 --force"  # 删除默认文章
+        - "post delete 2 --force"  # 删除示例页面
+        - "plugin delete hello"    # 删除 Hello Dolly 插件
+      register: wp_cleanup
+      changed_when: "'Success' in wp_cleanup.stdout"
+      failed_when: false  # 忽略删除失败（可能已被删除）
+    
+    # --------------------------------------------------------------------------
+    # 第七阶段：文件权限设置 (已增强)
+    # --------------------------------------------------------------------------
+    - name: "权限设置 | 强制重新下载核心文件（确保文件完好）"
+      ansible.builtin.command: >
+        wp core download
+        --path={{ wordpress_install_dir }}
+        --version={{ wordpress_version }}
+        --locale={{ wordpress_locale }}
+        --force
+        --allow-root
+      changed_when: "'Success' in wp_core_redownload.stdout"
+      register: wp_core_redownload
+
+    - name: "权限设置 | 清理所有 ACL 权限（创建干净的权限基础）"
+      ansible.builtin.command: >
+        setfacl -R -b {{ wordpress_install_dir }}
+      changed_when: false
+
+    - name: "权限设置 | 递归设置 WordPress 目录所有者"
+      ansible.builtin.file:
+        path: "{{ wordpress_install_dir }}"
+        owner: "{{ web_user }}"
+        group: "{{ web_group }}"
+        recurse: true
+
+    - name: "权限设置 | [不安全] 强制设置所有文件权限为 777"
+      ansible.builtin.command: "chmod -R 777 {{ wordpress_install_dir }}"
+      changed_when: false
+    
+    - name: "权限设置 | 设置目录权限为 755"
+      ansible.builtin.command: "find {{ wordpress_install_dir }} -type d -exec chmod 755 {} \\;"
+      changed_when: false
+    
+    - name: "权限设置 | 设置文件权限为 644"
+      ansible.builtin.command: "find {{ wordpress_install_dir }} -type f -exec chmod 644 {} \\;"
+      changed_when: false
+    
+    - name: "权限设置 | 设置 wp-config.php 特殊权限为 640"
+      ansible.builtin.file:
+        path: "{{ wordpress_install_dir }}/wp-config.php"
+        mode: '0640'
+    
+    # --------------------------------------------------------------------------
+    # 第八阶段：SELinux 配置（如果启用）
+    # --------------------------------------------------------------------------
+    - name: "SELinux | 检查 SELinux 状态"
+      ansible.builtin.command: getenforce
+      register: selinux_status
+      changed_when: false
+      failed_when: false
+    
+    - name: "SELinux | 设置 WordPress 目录的 SELinux 上下文"
+      ansible.builtin.sefcontext:
+        target: "{{ wordpress_install_dir }}(/.*)?"
+        setype: httpd_sys_rw_content_t
+        state: present
+      when: selinux_status.stdout == 'Enforcing'
+    
+    - name: "SELinux | 应用 SELinux 上下文"
+      ansible.builtin.command: >
+        restorecon -Rv {{ wordpress_install_dir }}
+      when: selinux_status.stdout == 'Enforcing'
+      changed_when: false
+  
+  # ============================================================================
+  # 后置任务：验证部署结果
+  # ============================================================================
+  post_tasks:
+    - name: "验证 | 检查 WordPress 安装状态"
+      ansible.builtin.command: >
+        wp core version
+        --path={{ wordpress_install_dir }}
+        --allow-root
+      register: wp_version_check
+      changed_when: false
+    
+    - name: "验证 | 显示 WordPress 版本"
+      ansible.builtin.debug:
+        msg: "WordPress 版本: {{ wp_version_check.stdout }}"
+    
+    - name: "验证 | 测试 HTTP 访问"
+      ansible.builtin.uri:
+        url: "http://{{ site_domain }}"
+        follow_redirects: all
+        status_code: [200, 301, 302]
+      register: http_test
+      ignore_errors: true
+    
+    - name: "完成 | 显示部署总结"
+      ansible.builtin.debug:
+        msg:
+          - "=========================================="
+          - "WordPress 部署完成！"
+          - "=========================================="
+          - "✓ WordPress {{ wp_version_check.stdout }} 已安装"
+          - "✓ 数据库已配置"
+          - "✓ Nginx 虚拟主机已配置"
+          - "✓ 文件权限已设置"
+          - "✓ 永久链接已启用"
+          - "=========================================="
+          - "访问地址: http://{{ site_domain }}"
+          - "后台地址: http://{{ site_domain }}/wp-admin"
+          - "管理员账号: {{ wp_admin_user }}"
+          - "=========================================="
+          - "⚠️  注意: 当前使用 HTTP 协议（不安全）"
+          - "下一步: 运行 playbook_step3_secure_ssl.yml 启用 HTTPS"
+          - "=========================================="
+  
+  # ============================================================================
+  # Handlers: 服务重启
+  # ============================================================================
+  handlers:
+    - name: reload nginx
+      ansible.builtin.systemd:
+        name: nginx
+        state: reloaded
+

@@ -1,13 +1,42 @@
 ---
-# Ansible Collections 依赖声明
-# 安装命令: ansible-galaxy collection install -r requirements.yml
+# Ansible 依赖声明文件
+# 安装命令: ansible-galaxy install -r requirements.yml --force
 
+# Ansible Collections（保留用于通用功能）
 collections:
-  # Docker 管理所需
-  - name: community.docker
-    version: ">=3.4.0"
-  
-  # 防火墙管理所需
+  # 系统管理所需
   - name: ansible.posix
     version: ">=1.5.0"
 
+# Ansible Roles（用于裸金属 LEMP 部署）
+# 注意: 只列出在 Ansible Galaxy 上确认存在的 roles
+roles:
+  # EPEL 仓库（Rocky Linux 必需的额外软件包源）
+  - src: geerlingguy.repo-epel
+    name: geerlingguy.repo_epel
+  
+  # 防火墙管理
+  - src: geerlingguy.firewall
+  
+  # Nginx Web 服务器
+  - src: geerlingguy.nginx
+  
+  # PHP 运行环境和扩展（Remi 仓库将在 playbook 中手动配置）
+  - src: geerlingguy.php
+    version: "6.0.0"  # 最新版本，支持 PHP 8.3
+  
+  # MySQL/MariaDB 数据库
+  - src: geerlingguy.mysql
+  
+  # Certbot SSL 证书管理
+  - src: geerlingguy.certbot
+  
+  # 注意：Composer 已移除（WordPress 不需要，且访问 GitHub 可能受限）
+
+# ============================================================================
+# 以下功能将通过 Playbook 中的 tasks 手动实现（不使用 roles）:
+# - Fail2Ban (SSH 暴力破解防护) - 使用 dnf 模块直接安装
+# - NTP/Chronyd (时间同步) - Rocky Linux 默认已安装 chronyd
+# - Remi 仓库 (PHP 8.3) - 手动安装并配置 DNF 模块
+# - WP-CLI (WordPress 命令行) - 使用 get_url 模块下载
+# ============================================================================
