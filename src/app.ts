@@ -1,5 +1,7 @@
 // src/app.ts
 import fastify from 'fastify';
+import fastifyStatic from '@fastify/static';
+import path from 'path';
 import dotenv from 'dotenv';
 import cors from '@fastify/cors';
 import routes from './routes';
@@ -31,6 +33,13 @@ const app = fastify({
 // Register Plugins
 app.register(cors, {
   origin: '*', // For development only. Restrict in production.
+});
+
+// Serve static files from the root-level `images/` directory at `/images`
+app.register(fastifyStatic, {
+  root: path.resolve(process.cwd(), 'images'),
+  prefix: '/images/',
+  decorateReply: false
 });
 
 // 注册全局中间件

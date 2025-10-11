@@ -8,6 +8,7 @@ import workflowRoutes from './workflow';
 import healthCheckRoutes from './health-check';
 import provisioningRoutes from './provisioning';
 import siteBuilderRoutes from './site-builder';
+import galleryRoutes from './gallery';
 
 /**
  * 主路由注册插件
@@ -26,6 +27,9 @@ export default async function routes(fastify: FastifyInstance, options: FastifyP
   
   // 注册Site Builder路由
   await fastify.register(siteBuilderRoutes, { prefix: '/api' });
+  
+  // 注册图片库路由（不加 /api 前缀，直接对外暴露 HTML 页面）
+  await fastify.register(galleryRoutes);
   
   // TODO: 注册其他模块的路由
   // await fastify.register(authRoutes, { prefix: '/api/auth' });
