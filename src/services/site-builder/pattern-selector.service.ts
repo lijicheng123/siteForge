@@ -33,13 +33,14 @@ function loadEnrichedPatterns(): any {
 export async function executePatternSelector(request: PatternSelectorRequest): Promise<PatternSelectorResponse> {
   // 1. 加载所有 enriched patterns
   const patternLibrary = loadEnrichedPatterns();
+
+  const { globalElements, pages } = request;
   
   // 2. 构建 prompt
-  const prompt = patternSelectorPromptFactory.getPatternSelectorPrompt(request, patternLibrary);
-  
+  const prompt = patternSelectorPromptFactory.getPatternSelectorPrompt({ globalElements, pages }, patternLibrary);
   // 3. 调用 LLM
   const response = await LLMGateway.callText({
-    model: MODEL_IDS.GEMINI_2_5_PRO,
+    model: MODEL_IDS.GPT_5_MINI,
     prompt,
     temperature: 0.7,
     jsonMode: true,
