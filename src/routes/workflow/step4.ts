@@ -23,7 +23,7 @@ const step4Schema: FastifySchema = {
  */
 export default async function step4Routes(fastify: FastifyInstance, options: FastifyPluginOptions) {
   
-  fastify.post('/4-plan-content', { 
+  fastify.post('/4-design-pages-outlines', { 
     schema: step4Schema,
     config: {
       rateLimit: {
@@ -57,13 +57,7 @@ export default async function step4Routes(fastify: FastifyInstance, options: Fas
       };
       
       // 调用服务函数执行核心业务逻辑
-      const updatedPages = await executeStep4(blueprint);
-      
-      // 构建内容完备蓝图
-      const contentCompleteBlueprint = {
-        ...blueprint,
-        pages: updatedPages
-      };
+      const contentCompleteBlueprint = await executeStep4(blueprint);
       
       return reply.send({
         success: true,

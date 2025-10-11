@@ -103,7 +103,7 @@ export async function executeStep4(params: Step4Request): Promise<any> {
   console.log('Prompt:', prompt);
   
   const response = await LLMGateway.callText({ 
-    model: MODEL_IDS.GEMINI_2_5_PRO, 
+    model: MODEL_IDS.GPT_5_MINI, 
     prompt, 
     temperature: 0.7,
     jsonMode: true, // 启用原生 JSON 模式
