@@ -2,3 +2,5 @@ node_modules/
 dist/
 .env
 *.log
+deployment_*.json
+password_*.txt
