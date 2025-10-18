@@ -79,7 +79,7 @@ export const blockSchema = {
 
 //内容规划大纲协议（规划内容）
 export const outlineSectionSchema = objectSchema({
-  sectionName: nameSchema,
+  sectionName: { type: 'string', minLength: 1, maxLength: 20 },  // TODO: 以后需要验证，在同级加上sectionTitle
   instruction: { type: 'string', minLength: 10, maxLength: 500 },
   estimatedWords: { type: 'number', minimum: 50, maximum: 2000 }
 }, ['sectionName', 'instruction']);

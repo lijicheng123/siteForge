@@ -34,10 +34,12 @@ export async function executePatternSelector(request: PatternSelectorRequest): P
   // 1. 加载所有 enriched patterns
   const patternLibrary = loadEnrichedPatterns();
 
-  const { globalElements, pages } = request;
+  const { globalElements, pages, patterns } = request;
+  // TODO: patterns 后面将本服务的patterns库合并进去
+  // const allPatterns = [...patterns, ...patternLibrary];
   
   // 2. 构建 prompt
-  const prompt = patternSelectorPromptFactory.getPatternSelectorPrompt({ globalElements, pages }, patternLibrary);
+  const prompt = patternSelectorPromptFactory.getPatternSelectorPrompt({ globalElements, pages }, patterns);
   // 3. 调用 LLM
   const response = await LLMGateway.callText({
     model: MODEL_IDS.GPT_5_MINI,
@@ -49,21 +51,21 @@ export async function executePatternSelector(request: PatternSelectorRequest): P
   
   // 4. 解析并返回结果
   const result = JSON.parse(response) as PatternSelectorResponse;
-  
+   // TODO:以后要把返回的值进行验证一下
   // 5. 验证返回的 Pattern ID 是否都存在于 enriched-patterns.json 中
-  const patternKeys = Object.keys(patternLibrary);
-  const validPatternIds = patternKeys.map(key => {
-    const match = key.match(/^ptn-(\d+)$/);
-    return match ? parseInt(match[1], 10) : null;
-  }).filter(id => id !== null);
+  // const patternKeys = Object.keys(patternLibrary);
+  // const validPatternIds = patternKeys.map(key => {
+  //   const match = key.match(/^ptn-(\d+)$/);
+  //   return match ? parseInt(match[1], 10) : null;
+  // }).filter(id => id !== null);
   
-  const invalidPatterns = result.patterns.filter(p => !validPatternIds.includes(p.id));
+  // const invalidPatterns = result.patterns.filter(p => !validPatternIds.includes(p.id));
   
-  if (invalidPatterns.length > 0) {
-    console.warn(`Warning: AI returned invalid pattern IDs: ${invalidPatterns.map(p => p.id).join(', ')}`);
-    // 过滤掉无效的 Pattern ID
-    result.patterns = result.patterns.filter(p => validPatternIds.includes(p.id));
-  }
+  // if (invalidPatterns.length > 0) {
+  //   console.warn(`Warning: AI returned invalid pattern IDs: ${invalidPatterns.map(p => p.id).join(', ')}`);
+  //   // 过滤掉无效的 Pattern ID
+  //   result.patterns = result.patterns.filter(p => validPatternIds.includes(p.id));
+  // }
   
   return result;
 }

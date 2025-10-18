@@ -118,7 +118,7 @@ export const step4RequestSchema = {
       }
     }
   },
-  required: ['structuredData', 'designSystem', 'globalElements', 'pages'],
+  required: ['pages'], // TODO: structuredData, designSystem, globalElements 后面要补回
 };
 
 

@@ -24,7 +24,7 @@ const selectedPatternSchema = {
 export const PatternSelectorRequestSchema = objectSchema({
   globalElements: globalElementsSchema,
   pages: arraySchema(instructionCompletePageSchema)
-}, ['globalElements', 'pages']);
+}, ['pages']);  // TODO: globalElements 后面要补回
 
 // Pattern 选择器响应 Schema
 export const PatternSelectorResponseSchema = {
@@ -71,6 +71,7 @@ export type PatternSelectorRequest = {
       copyright: string;
     };
   };
+  patterns: any[];  // TODO: 以后需要补全类型
   pages: Array<{
     name: string;
     path: string;

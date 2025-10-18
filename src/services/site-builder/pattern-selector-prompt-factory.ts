@@ -61,10 +61,7 @@ ${JSON.stringify(patternLibrary, null, 2)}
 
 ${outlineSections}
 
-# 全局元素信息 (Global Elements)
-- **Header 菜单项数量**: ${globalElements.header.menuItems.length} 个
-- **Header CTA 按钮**: ${globalElements.header.ctaButton ? globalElements.header.ctaButton.text : '无'}
-- **Footer 区块数量**: ${globalElements.footer.sections.length} 个
+
 
 # 任务指令 (Task Instructions)
 
@@ -126,7 +123,7 @@ ${outlineSections}
 
 # 自我验证清单 (Validation Checklist)
 在输出前，请检查：
-- ✅ 所有 Pattern ID 都存在于 Pattern 库中（检查 ptn-{id} 格式）
+- ✅ 所有 Pattern ID 都存在于 Pattern 库中
 - ✅ 页面的主要 sections 都有对应的 Pattern 覆盖
 - ✅ 每个 Pattern 的 reasoning 都明确说明了它适合哪些 sections
 - ✅ Pattern 组合在风格上保持一致
